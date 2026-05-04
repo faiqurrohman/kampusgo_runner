@@ -1,0 +1,55 @@
+import 'package:flutter/material.dart';
+import 'dashboard_screen.dart';
+import 'register_screen.dart';
+import '../utils/app_theme.dart';
+
+class LoginScreen extends StatefulWidget { const LoginScreen({super.key}); @override State<LoginScreen> createState() => _LoginScreenState(); }
+class _LoginScreenState extends State<LoginScreen> {
+  final formKey = GlobalKey<FormState>();
+  final email = TextEditingController(text: 'demo@kampusgo.id');
+  final password = TextEditingController(text: '123456');
+  bool hide = true;
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    body: SafeArea(child: ListView(padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24), children: [
+      const SizedBox(height: 60),
+      Container(
+        width: 80, height: 80,
+        alignment: Alignment.centerLeft,
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(colors: [AppTheme.primary, AppTheme.secondary]),
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [BoxShadow(color: AppTheme.primary.withOpacity(0.3), blurRadius: 16, offset: const Offset(0, 8))],
+          ),
+          child: const Center(child: Icon(Icons.school_rounded, color: Colors.white, size: 42)),
+        ),
+      ),
+      const SizedBox(height: 32),
+      Text('Masuk ke KAMPUSGO', style: Theme.of(context).textTheme.displayMedium?.copyWith(fontSize: 32)),
+      const SizedBox(height: 12), 
+      Text('Kelola jadwal, uang saku, IPK, dan link kuliahmu dengan lebih cerdas.', style: Theme.of(context).textTheme.bodyMedium),
+      const SizedBox(height: 48),
+      Form(key: formKey, child: Column(children: [
+        TextFormField(controller: email, decoration: const InputDecoration(labelText: 'Email', prefixIcon: Icon(Icons.email_outlined)), validator: (v) => v != null && v.contains('@') ? null : 'Email tidak valid'),
+        const SizedBox(height: 20),
+        TextFormField(controller: password, obscureText: hide, decoration: InputDecoration(labelText: 'Password', prefixIcon: const Icon(Icons.lock_outline), suffixIcon: IconButton(icon: Icon(hide ? Icons.visibility : Icons.visibility_off), onPressed: () => setState(() => hide = !hide))), validator: (v) => v != null && v.length >= 6 ? null : 'Password minimal 6 karakter'),
+        const SizedBox(height: 32),
+        ElevatedButton(onPressed: () { if (formKey.currentState!.validate()) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const DashboardScreen())); }, child: const Text('Masuk Sekarang')),
+      ])),
+      const SizedBox(height: 24),
+      TextButton(
+        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RegisterScreen())), 
+        style: TextButton.styleFrom(foregroundColor: Theme.of(context).textTheme.bodyMedium?.color),
+        child: RichText(text: TextSpan(text: 'Belum punya akun? ', style: Theme.of(context).textTheme.bodyMedium, children: [
+          TextSpan(text: 'Daftar', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold))
+        ])),
+      ),
+      const SizedBox(height: 32),
+      Container(padding: const EdgeInsets.all(20), decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)), borderRadius: BorderRadius.circular(24)), child: Row(children: [
+        const Icon(Icons.info_outline_rounded, color: Colors.grey), const SizedBox(width: 12),
+        Expanded(child: Text('Demo login: demo@kampusgo.id / 123456', style: Theme.of(context).textTheme.bodyMedium)),
+      ])),
+    ])),
+  );
+}
