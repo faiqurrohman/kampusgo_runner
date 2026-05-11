@@ -73,17 +73,14 @@ class _Home extends StatelessWidget {
                 ]
               ),
               IconButton(
-                onPressed: () => data.toggleTheme(),
-                icon: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  child: Icon(
-                    data.themeMode == ThemeMode.dark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
-                    key: ValueKey(data.themeMode),
-                    color: Colors.amber,
-                  ),
-                ),
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    builder: (_) => _SettingsSheet(onLogout: onLogout),
+                  );
+                }, 
+                icon: const Icon(Icons.settings_rounded)
               ),
-              IconButton(onPressed: onLogout, icon: Icon(Icons.logout_rounded, color: Theme.of(context).colorScheme.error)),
             ],
           ),
         ),
@@ -209,4 +206,54 @@ class _SparklinePainter extends CustomPainter {
   }
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _SettingsSheet extends StatelessWidget {
+  final VoidCallback onLogout;
+  const _SettingsSheet({required this.onLogout});
+
+  @override
+  Widget build(BuildContext context) {
+    final data = AppData.instance;
+    return AnimatedBuilder(
+      animation: data,
+      builder: (_, __) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text('Pengaturan', style: Theme.of(context).textTheme.titleLarge),
+            ),
+            const SizedBox(height: 16),
+            ListTile(
+              leading: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: AppTheme.primary.withOpacity(0.1), borderRadius: BorderRadius.circular(12)), child: const Icon(Icons.dark_mode_rounded, color: AppTheme.primary)),
+              title: const Text('Mode Gelap'),
+              trailing: Switch(value: data.themeMode == ThemeMode.dark, onChanged: (v) => data.toggleTheme(), activeColor: AppTheme.primary),
+            ),
+            ListTile(
+              leading: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.orange.withOpacity(0.1), borderRadius: BorderRadius.circular(12)), child: const Icon(Icons.notifications_active_rounded, color: Colors.orange)),
+              title: const Text('Notifikasi Pengingat'),
+              trailing: Switch(value: true, onChanged: (v) {}, activeColor: AppTheme.primary),
+            ),
+            ListTile(
+              leading: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.green.withOpacity(0.1), borderRadius: BorderRadius.circular(12)), child: const Icon(Icons.person_rounded, color: Colors.green)),
+              title: const Text('Profil Mahasiswa'),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: () {},
+            ),
+            const Divider(height: 32),
+            ListTile(
+              leading: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: AppTheme.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(12)), child: const Icon(Icons.logout_rounded, color: AppTheme.accent)),
+              title: const Text('Keluar Akun', style: const TextStyle(color: AppTheme.accent, fontWeight: FontWeight.bold)),
+              onTap: () { Navigator.pop(context); onLogout(); },
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
 }
