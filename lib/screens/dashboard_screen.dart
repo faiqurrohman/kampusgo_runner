@@ -19,13 +19,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) => AnimatedBuilder(animation: data, builder: (_, __) => Scaffold(
     body: pages[index],
-    bottomNavigationBar: NavigationBar(selectedIndex: index, onDestinationSelected: (v) => setState(() => index = v), destinations: const [
-      NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'Home'),
-      NavigationDestination(icon: Icon(Icons.event_note_outlined), selectedIcon: Icon(Icons.event_note), label: 'Planner'),
-      NavigationDestination(icon: Icon(Icons.account_balance_wallet_outlined), selectedIcon: Icon(Icons.account_balance_wallet), label: 'Budget'),
-      NavigationDestination(icon: Icon(Icons.show_chart), label: 'GPA'),
-      NavigationDestination(icon: Icon(Icons.folder_outlined), selectedIcon: Icon(Icons.folder), label: 'Resource'),
-    ]),
+    bottomNavigationBar: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: NavigationBar(selectedIndex: index, onDestinationSelected: (v) => setState(() => index = v), destinations: const [
+        NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'Home'),
+        NavigationDestination(icon: Icon(Icons.event_note_outlined), selectedIcon: Icon(Icons.event_note), label: 'Jadwal'),
+        NavigationDestination(icon: Icon(Icons.account_balance_wallet_outlined), selectedIcon: Icon(Icons.account_balance_wallet), label: 'Keuangan'),
+        NavigationDestination(icon: Icon(Icons.show_chart), label: 'Nilai'),
+        NavigationDestination(icon: Icon(Icons.folder_outlined), selectedIcon: Icon(Icons.folder), label: 'Arsip'),
+      ]),
+    ),
   ));
 }
 
@@ -92,6 +95,13 @@ class _Home extends StatelessWidget {
             ),
             const SizedBox(width: 12),
             const Text('Prioritas Terdekat', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+            const Spacer(),
+            if (next.isNotEmpty)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(20)),
+                child: Text('Sisa ${next.first.deadline.difference(DateTime.now()).inDays} hari', style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+              ),
           ]),
           const SizedBox(height: 16),
           Text(next.isEmpty ? 'Semua tugas selesai. Mantap!' : next.first.title, style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold)),
@@ -122,16 +132,30 @@ class _Home extends StatelessWidget {
       const SizedBox(height: 16),
       InfoCard(icon: Icons.assignment_rounded, title: 'Deadline Aktif', value: '${data.schedules.where((e)=>!e.done).length} tugas', color: Colors.orange, onTap: () => onTabChange(1)),
       const SizedBox(height: 12),
-      InfoCard(icon: Icons.payments_rounded, title: 'Total Pengeluaran', value: Formatters.currency.format(data.totalExpense()), color: Colors.green, onTap: () => onTabChange(2), trailingWidget: CustomPaint(size: const Size(40, 24), painter: _SparklinePainter(color: Colors.green))),
+      InfoCard(icon: Icons.payments_rounded, title: 'Total Pengeluaran', value: Formatters.currency.format(data.totalExpense()), color: Colors.green, valueColor: AppTheme.accent, onTap: () => onTabChange(2), trailingWidget: CustomPaint(size: const Size(40, 24), painter: _SparklinePainter(color: Colors.green))),
       const SizedBox(height: 12),
       InfoCard(
         icon: Icons.workspace_premium_rounded, title: 'Prediksi IPK', value: data.calculateGpa().toStringAsFixed(2), color: AppTheme.secondary, onTap: () => onTabChange(3),
-        trailingWidget: SizedBox(height: 24, child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-          Container(width: 4, height: 12, decoration: BoxDecoration(color: AppTheme.secondary.withOpacity(0.3), borderRadius: BorderRadius.circular(2))), const SizedBox(width: 3),
-          Container(width: 4, height: 18, decoration: BoxDecoration(color: AppTheme.secondary.withOpacity(0.6), borderRadius: BorderRadius.circular(2))), const SizedBox(width: 3),
-          Container(width: 4, height: 14, decoration: BoxDecoration(color: AppTheme.secondary.withOpacity(0.4), borderRadius: BorderRadius.circular(2))), const SizedBox(width: 3),
-          Container(width: 4, height: 24, decoration: BoxDecoration(color: AppTheme.secondary, borderRadius: BorderRadius.circular(2))),
-        ])),
+        trailingWidget: SizedBox(
+          width: 70,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text('${((data.calculateGpa() / 4.0) * 100).toInt()}% ke 4.0', style: const TextStyle(fontSize: 10, color: AppTheme.secondary, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 6),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                  value: data.calculateGpa() / 4.0,
+                  backgroundColor: AppTheme.secondary.withOpacity(0.2),
+                  valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.secondary),
+                  minHeight: 6,
+                ),
+              ),
+            ]
+          )
+        )
       ),
       const SizedBox(height: 12),
       InfoCard(icon: Icons.lightbulb_rounded, title: 'Tips Hari Ini', value: 'Fokus 25 menit, istirahat 5 menit', color: Colors.amber, onTap: () {}),
