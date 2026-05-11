@@ -6,7 +6,8 @@ class InfoCard extends StatelessWidget {
   final String value;
   final Color color;
   final VoidCallback? onTap;
-  const InfoCard({super.key, required this.icon, required this.title, required this.value, required this.color, this.onTap});
+  final Widget? trailingWidget;
+  const InfoCard({super.key, required this.icon, required this.title, required this.value, required this.color, this.onTap, this.trailingWidget});
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +29,10 @@ class InfoCard extends StatelessWidget {
               const SizedBox(height: 4),
               Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             ])),
+            if (trailingWidget != null) ...[
+              trailingWidget!,
+              const SizedBox(width: 12),
+            ],
             Icon(Icons.chevron_right_rounded, color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.5)),
           ]),
         ),

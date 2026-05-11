@@ -97,7 +97,23 @@ class _Home extends StatelessWidget {
           Text(next.isEmpty ? 'Semua tugas selesai. Mantap!' : next.first.title, style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold)),
           if (next.isNotEmpty) ...[
             const SizedBox(height: 8),
-            Text(next.first.course, style: const TextStyle(color: Colors.white, fontSize: 16)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(next.first.course, style: const TextStyle(color: Colors.white, fontSize: 16)),
+                const Text('65%', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+              ],
+            ),
+            const SizedBox(height: 12),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: LinearProgressIndicator(
+                value: 0.65,
+                backgroundColor: Colors.white.withOpacity(0.2),
+                valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                minHeight: 6,
+              ),
+            ),
           ]
         ])
       ),
@@ -106,11 +122,36 @@ class _Home extends StatelessWidget {
       const SizedBox(height: 16),
       InfoCard(icon: Icons.assignment_rounded, title: 'Deadline Aktif', value: '${data.schedules.where((e)=>!e.done).length} tugas', color: Colors.orange, onTap: () => onTabChange(1)),
       const SizedBox(height: 12),
-      InfoCard(icon: Icons.payments_rounded, title: 'Total Pengeluaran', value: Formatters.currency.format(data.totalExpense()), color: Colors.green, onTap: () => onTabChange(2)),
+      InfoCard(icon: Icons.payments_rounded, title: 'Total Pengeluaran', value: Formatters.currency.format(data.totalExpense()), color: Colors.green, onTap: () => onTabChange(2), trailingWidget: CustomPaint(size: const Size(40, 24), painter: _SparklinePainter(color: Colors.green))),
       const SizedBox(height: 12),
-      InfoCard(icon: Icons.workspace_premium_rounded, title: 'Prediksi IPK', value: data.calculateGpa().toStringAsFixed(2), color: AppTheme.secondary, onTap: () => onTabChange(3)),
+      InfoCard(
+        icon: Icons.workspace_premium_rounded, title: 'Prediksi IPK', value: data.calculateGpa().toStringAsFixed(2), color: AppTheme.secondary, onTap: () => onTabChange(3),
+        trailingWidget: SizedBox(height: 24, child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+          Container(width: 4, height: 12, decoration: BoxDecoration(color: AppTheme.secondary.withOpacity(0.3), borderRadius: BorderRadius.circular(2))), const SizedBox(width: 3),
+          Container(width: 4, height: 18, decoration: BoxDecoration(color: AppTheme.secondary.withOpacity(0.6), borderRadius: BorderRadius.circular(2))), const SizedBox(width: 3),
+          Container(width: 4, height: 14, decoration: BoxDecoration(color: AppTheme.secondary.withOpacity(0.4), borderRadius: BorderRadius.circular(2))), const SizedBox(width: 3),
+          Container(width: 4, height: 24, decoration: BoxDecoration(color: AppTheme.secondary, borderRadius: BorderRadius.circular(2))),
+        ])),
+      ),
       const SizedBox(height: 12),
       InfoCard(icon: Icons.lightbulb_rounded, title: 'Tips Hari Ini', value: 'Fokus 25 menit, istirahat 5 menit', color: Colors.amber, onTap: () {}),
     ]));
   }
+}
+
+class _SparklinePainter extends CustomPainter {
+  final Color color;
+  _SparklinePainter({required this.color});
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = color..strokeWidth = 2.5..style = PaintingStyle.stroke..strokeCap = StrokeCap.round;
+    final path = Path()
+      ..moveTo(0, size.height * 0.8)
+      ..lineTo(size.width * 0.3, size.height * 0.4)
+      ..lineTo(size.width * 0.6, size.height * 0.6)
+      ..lineTo(size.width, size.height * 0.1);
+    canvas.drawPath(path, paint);
+  }
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
