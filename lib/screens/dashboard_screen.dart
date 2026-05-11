@@ -107,6 +107,8 @@ class _Home extends StatelessWidget {
       InfoCard(icon: Icons.payments_rounded, title: 'Total Pengeluaran', value: Formatters.currency.format(data.totalExpense()), color: Colors.green),
       const SizedBox(height: 12),
       InfoCard(icon: Icons.workspace_premium_rounded, title: 'Prediksi IPK', value: data.calculateGpa().toStringAsFixed(2), color: AppTheme.secondary),
+      const SizedBox(height: 12),
+      const InfoCard(icon: Icons.lightbulb_rounded, title: 'Tips Hari Ini', value: 'Fokus 25 menit, istirahat 5 menit', color: Colors.amber),
     ]));
   }
 }
