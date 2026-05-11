@@ -146,7 +146,7 @@ class _Home extends StatelessWidget {
       const SizedBox(height: 16),
       Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, borderRadius: BorderRadius.circular(24), border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1))),
+        decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, borderRadius: BorderRadius.circular(32), border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1))),
         child: Row(children: [
           Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: AppTheme.primary.withOpacity(0.1), borderRadius: BorderRadius.circular(16)), child: const Icon(Icons.door_front_door_outlined, color: AppTheme.primary)),
           const SizedBox(width: 16),
@@ -161,13 +161,13 @@ class _Home extends StatelessWidget {
       const SizedBox(height: 28),
       Text('Ringkasan', style: Theme.of(context).textTheme.titleLarge),
       const SizedBox(height: 16),
-      InfoCard(icon: Icons.assignment_rounded, title: 'Deadline Aktif', value: '${data.schedules.where((e)=>!e.done).length} tugas', color: Colors.orange, onTap: () => onTabChange(1)),
+      InfoCard(icon: Icons.assignment_rounded, title: 'Deadline Aktif', value: data.schedules.where((e)=>!e.done).isEmpty ? 'Tugas beres! 🎉' : '${data.schedules.where((e)=>!e.done).length} tugas', color: Colors.orange, onTap: () => onTabChange(1)),
       const SizedBox(height: 12),
-      InfoCard(icon: Icons.payments_rounded, title: 'Total Pengeluaran', value: Formatters.currency.format(data.totalExpense()), color: Colors.green, valueColor: AppTheme.accent, onTap: () => onTabChange(2), trailingWidget: CustomPaint(size: const Size(40, 24), painter: _SparklinePainter(color: Colors.green))),
+      InfoCard(icon: Icons.payments_rounded, title: 'Total Pengeluaran', value: data.expenses.isEmpty ? 'Belum jajan 💸' : Formatters.currency.format(data.totalExpense()), color: Colors.green, valueColor: data.expenses.isEmpty ? null : AppTheme.accent, onTap: () => onTabChange(2), trailingWidget: data.expenses.isEmpty ? null : CustomPaint(size: const Size(40, 24), painter: _SparklinePainter(color: Colors.green))),
       const SizedBox(height: 12),
       InfoCard(
-        icon: Icons.workspace_premium_rounded, title: 'Prediksi IPK', value: data.calculateGpa().toStringAsFixed(2), color: AppTheme.secondary, onTap: () => onTabChange(3),
-        trailingWidget: SizedBox(
+        icon: Icons.workspace_premium_rounded, title: 'Prediksi IPK', value: data.gpaItems.isEmpty ? 'Belum ada nilai 🎯' : data.calculateGpa().toStringAsFixed(2), color: AppTheme.secondary, onTap: () => onTabChange(3),
+        trailingWidget: data.gpaItems.isEmpty ? null : SizedBox(
           width: 70,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
