@@ -11,18 +11,38 @@ class _LoginScreenState extends State<LoginScreen> {
   bool hide = true;
   @override
   Widget build(BuildContext context) => Scaffold(
+    bottomNavigationBar: SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(28, 16, 28, 24),
+        child: Container(
+          padding: const EdgeInsets.all(20), 
+          decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)), borderRadius: BorderRadius.circular(24)), 
+          child: Row(children: [
+            const Icon(Icons.info_outline_rounded, color: Colors.grey), const SizedBox(width: 12),
+            Expanded(child: Text('Demo login: demo@kampusgo.id / 123456', style: Theme.of(context).textTheme.bodyMedium)),
+          ])
+        ),
+      ),
+    ),
     body: SafeArea(child: ListView(padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24), children: [
       const SizedBox(height: 60),
-      Container(
-        width: 80, height: 80,
+      Align(
         alignment: Alignment.centerLeft,
         child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           decoration: BoxDecoration(
             gradient: const LinearGradient(colors: [AppTheme.primary, AppTheme.secondary]),
             borderRadius: BorderRadius.circular(24),
             boxShadow: [BoxShadow(color: AppTheme.primary.withOpacity(0.3), blurRadius: 16, offset: const Offset(0, 8))],
           ),
-          child: const Center(child: Icon(Icons.school_rounded, color: Colors.white, size: 42)),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.school_rounded, color: Colors.white, size: 36),
+              const SizedBox(width: 16),
+              const Text('KAMPUSGO', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
+            ],
+          ),
         ),
       ),
       const SizedBox(height: 32),
@@ -45,11 +65,6 @@ class _LoginScreenState extends State<LoginScreen> {
           TextSpan(text: 'Daftar', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold))
         ])),
       ),
-      const SizedBox(height: 32),
-      Container(padding: const EdgeInsets.all(20), decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)), borderRadius: BorderRadius.circular(24)), child: Row(children: [
-        const Icon(Icons.info_outline_rounded, color: Colors.grey), const SizedBox(width: 12),
-        Expanded(child: Text('Demo login: demo@kampusgo.id / 123456', style: Theme.of(context).textTheme.bodyMedium)),
-      ])),
     ])),
   );
 }

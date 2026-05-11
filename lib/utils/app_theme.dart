@@ -74,11 +74,11 @@ class AppTheme {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
-          borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1),
+          borderSide: const BorderSide(color: Color(0xFFCBD5E1), width: 1.5),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
-          borderSide: const BorderSide(color: primary, width: 2),
+          borderSide: const BorderSide(color: accent, width: 2),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       ),
@@ -167,11 +167,11 @@ class AppTheme {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
-          borderSide: BorderSide.none,
+          borderSide: const BorderSide(color: Color(0xFF334155), width: 1.5),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
-          borderSide: const BorderSide(color: primary, width: 2),
+          borderSide: const BorderSide(color: accent, width: 2),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       ),
