@@ -19,6 +19,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) => AnimatedBuilder(animation: data, builder: (_, __) => Scaffold(
     body: pages[index],
+    floatingActionButton: index == 0 ? FloatingActionButton(
+      onPressed: () {},
+      backgroundColor: AppTheme.primary,
+      elevation: 4,
+      child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
+    ) : null,
     bottomNavigationBar: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: NavigationBar(selectedIndex: index, onDestinationSelected: (v) => setState(() => index = v), destinations: const [
@@ -56,6 +62,16 @@ class _Home extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
+              Stack(
+                alignment: Alignment.topRight,
+                children: [
+                  IconButton(onPressed: () {}, icon: const Icon(Icons.notifications_none_rounded)),
+                  Positioned(
+                    top: 12, right: 12,
+                    child: Container(width: 8, height: 8, decoration: const BoxDecoration(color: AppTheme.accent, shape: BoxShape.circle)),
+                  )
+                ]
+              ),
               IconButton(
                 onPressed: () => data.toggleTheme(),
                 icon: AnimatedSwitcher(
@@ -126,6 +142,21 @@ class _Home extends StatelessWidget {
             ),
           ]
         ])
+      ),
+      const SizedBox(height: 16),
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, borderRadius: BorderRadius.circular(24), border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1))),
+        child: Row(children: [
+          Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: AppTheme.primary.withOpacity(0.1), borderRadius: BorderRadius.circular(16)), child: const Icon(Icons.door_front_door_outlined, color: AppTheme.primary)),
+          const SizedBox(width: 16),
+          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('Kelas Selanjutnya', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppTheme.primary, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 4),
+            const Text('Mobile Programming • R. A3.1', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+          ])),
+          const Text('10:00', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.primary)),
+        ]),
       ),
       const SizedBox(height: 28),
       Text('Ringkasan', style: Theme.of(context).textTheme.titleLarge),
