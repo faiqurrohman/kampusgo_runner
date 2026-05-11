@@ -8,7 +8,7 @@ class AppTheme {
   static const Color background = Color(0xFF0F172A); // Slate 900
   static const Color surfaceColor = Color(0xFF1E293B); // Slate 800
   static const Color textLight = Color(0xFFF8FAFC); // Slate 50
-  static const Color textMuted = Color(0xFF94A3B8); // Slate 400
+  static const Color textMuted = Color(0xFFCBD5E1); // Slate 300
 
   static ThemeData get lightTheme {
     return ThemeData(
@@ -28,7 +28,7 @@ class AppTheme {
         headlineMedium: GoogleFonts.outfit(color: const Color(0xFF0F172A), fontWeight: FontWeight.w600),
         titleLarge: GoogleFonts.outfit(color: const Color(0xFF0F172A), fontWeight: FontWeight.w600),
         bodyLarge: GoogleFonts.inter(color: const Color(0xFF0F172A)),
-        bodyMedium: GoogleFonts.inter(color: const Color(0xFF64748B)),
+        bodyMedium: GoogleFonts.inter(color: const Color(0xFF475569)),
       ),
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
@@ -66,8 +66,8 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: Colors.white,
-        labelStyle: GoogleFonts.inter(color: const Color(0xFF64748B)),
-        hintStyle: GoogleFonts.inter(color: const Color(0xFF64748B)),
+        labelStyle: GoogleFonts.inter(color: const Color(0xFF475569)),
+        hintStyle: GoogleFonts.inter(color: const Color(0xFF475569)),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
           borderSide: BorderSide.none,
@@ -87,9 +87,9 @@ class AppTheme {
         indicatorColor: primary.withOpacity(0.1),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return GoogleFonts.inter(color: primary, fontSize: 12, fontWeight: FontWeight.w600);
+            return GoogleFonts.inter(color: primary, fontSize: 14, fontWeight: FontWeight.bold);
           }
-          return GoogleFonts.inter(color: const Color(0xFF64748B), fontSize: 12, fontWeight: FontWeight.w500);
+          return GoogleFonts.inter(color: const Color(0xFF475569), fontSize: 13, fontWeight: FontWeight.w600);
         }),
       ),
       dialogTheme: DialogThemeData(
@@ -180,9 +180,9 @@ class AppTheme {
         indicatorColor: primary.withOpacity(0.2),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return GoogleFonts.inter(color: primary, fontSize: 12, fontWeight: FontWeight.w600);
+            return GoogleFonts.inter(color: primary, fontSize: 14, fontWeight: FontWeight.bold);
           }
-          return GoogleFonts.inter(color: textMuted, fontSize: 12, fontWeight: FontWeight.w500);
+          return GoogleFonts.inter(color: textMuted, fontSize: 13, fontWeight: FontWeight.w600);
         }),
       ),
       dialogTheme: DialogThemeData(

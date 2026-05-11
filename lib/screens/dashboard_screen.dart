@@ -69,7 +69,7 @@ class _Home extends StatelessWidget {
       ]),
       const SizedBox(height: 32),
       Container(
-        padding: const EdgeInsets.all(28), 
+        padding: const EdgeInsets.fromLTRB(28, 28, 28, 36), 
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [AppTheme.primary, AppTheme.secondary],
@@ -89,13 +89,13 @@ class _Home extends StatelessWidget {
               child: const Icon(Icons.star_rounded, color: Colors.white, size: 20),
             ),
             const SizedBox(width: 12),
-            const Text('Prioritas Terdekat', style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w600)),
+            const Text('Prioritas Terdekat', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
           ]),
           const SizedBox(height: 16),
           Text(next.isEmpty ? 'Semua tugas selesai. Mantap!' : next.first.title, style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold)),
           if (next.isNotEmpty) ...[
             const SizedBox(height: 8),
-            Text(next.first.course, style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 16)),
+            Text(next.first.course, style: const TextStyle(color: Colors.white, fontSize: 16)),
           ]
         ])
       ),
