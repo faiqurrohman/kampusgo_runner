@@ -218,39 +218,74 @@ class _SettingsSheet extends StatelessWidget {
     return AnimatedBuilder(
       animation: data,
       builder: (_, __) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+        padding: const EdgeInsets.only(top: 24, bottom: 8),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Text('Pengaturan', style: Theme.of(context).textTheme.titleLarge),
             ),
             const SizedBox(height: 16),
-            ListTile(
-              leading: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: AppTheme.primary.withOpacity(0.1), borderRadius: BorderRadius.circular(12)), child: const Icon(Icons.dark_mode_rounded, color: AppTheme.primary)),
-              title: const Text('Mode Gelap'),
-              trailing: Switch(value: data.themeMode == ThemeMode.dark, onChanged: (v) => data.toggleTheme(), activeColor: AppTheme.primary),
+            Flexible(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ListTile(
+                      leading: const CircleAvatar(backgroundColor: AppTheme.primary, child: Text('MH', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+                      title: const Text('Mahasiswa Hebat', style: TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: const Text('NIM: 12345678 • Universitas A'),
+                      trailing: const Icon(Icons.chevron_right_rounded),
+                      onTap: () {},
+                    ),
+                    const Divider(height: 24),
+                    ListTile(
+                      leading: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: AppTheme.primary.withOpacity(0.1), borderRadius: BorderRadius.circular(12)), child: const Icon(Icons.dark_mode_rounded, color: AppTheme.primary)),
+                      title: const Text('Mode Gelap'),
+                      trailing: Switch(value: data.themeMode == ThemeMode.dark, onChanged: (v) => data.toggleTheme(), activeColor: AppTheme.primary),
+                    ),
+                    ListTile(
+                      leading: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.orange.withOpacity(0.1), borderRadius: BorderRadius.circular(12)), child: const Icon(Icons.notifications_active_rounded, color: Colors.orange)),
+                      title: const Text('Pengingat Tugas'),
+                      subtitle: const Text('1 hari sebelum deadline', style: TextStyle(fontSize: 12)),
+                      trailing: const Icon(Icons.chevron_right_rounded),
+                      onTap: () {},
+                    ),
+                    ListTile(
+                      leading: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: AppTheme.secondary.withOpacity(0.1), borderRadius: BorderRadius.circular(12)), child: const Icon(Icons.track_changes_rounded, color: AppTheme.secondary)),
+                      title: const Text('Target IPK Semester'),
+                      subtitle: const Text('Saat ini: 4.00', style: TextStyle(fontSize: 12)),
+                      trailing: const Icon(Icons.chevron_right_rounded),
+                      onTap: () {},
+                    ),
+                    ListTile(
+                      leading: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(12)), child: const Icon(Icons.sync_rounded, color: Colors.blue)),
+                      title: const Text('Sinkronisasi Kalender'),
+                      subtitle: const Text('Terhubung ke Google Calendar', style: TextStyle(fontSize: 12)),
+                      trailing: const Icon(Icons.chevron_right_rounded),
+                      onTap: () {},
+                    ),
+                    ListTile(
+                      leading: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.teal.withOpacity(0.1), borderRadius: BorderRadius.circular(12)), child: const Icon(Icons.help_outline_rounded, color: Colors.teal)),
+                      title: const Text('Bantuan & Masukan'),
+                      subtitle: const Text('Lapor bug atau saran fitur', style: TextStyle(fontSize: 12)),
+                      trailing: const Icon(Icons.chevron_right_rounded),
+                      onTap: () {},
+                    ),
+                    const Divider(height: 32),
+                    ListTile(
+                      leading: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: AppTheme.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(12)), child: const Icon(Icons.logout_rounded, color: AppTheme.accent)),
+                      title: const Text('Keluar Akun', style: TextStyle(color: AppTheme.accent, fontWeight: FontWeight.bold)),
+                      onTap: () { Navigator.pop(context); onLogout(); },
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                ),
+              ),
             ),
-            ListTile(
-              leading: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.orange.withOpacity(0.1), borderRadius: BorderRadius.circular(12)), child: const Icon(Icons.notifications_active_rounded, color: Colors.orange)),
-              title: const Text('Notifikasi Pengingat'),
-              trailing: Switch(value: true, onChanged: (v) {}, activeColor: AppTheme.primary),
-            ),
-            ListTile(
-              leading: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.green.withOpacity(0.1), borderRadius: BorderRadius.circular(12)), child: const Icon(Icons.person_rounded, color: Colors.green)),
-              title: const Text('Profil Mahasiswa'),
-              trailing: const Icon(Icons.chevron_right_rounded),
-              onTap: () {},
-            ),
-            const Divider(height: 32),
-            ListTile(
-              leading: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: AppTheme.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(12)), child: const Icon(Icons.logout_rounded, color: AppTheme.accent)),
-              title: const Text('Keluar Akun', style: const TextStyle(color: AppTheme.accent, fontWeight: FontWeight.bold)),
-              onTap: () { Navigator.pop(context); onLogout(); },
-            ),
-            const SizedBox(height: 16),
           ],
         ),
       ),
