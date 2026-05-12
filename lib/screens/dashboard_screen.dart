@@ -25,15 +25,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       elevation: 4,
       child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
     ) : null,
-    bottomNavigationBar: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: NavigationBar(selectedIndex: index, onDestinationSelected: (v) => setState(() => index = v), destinations: const [
-        NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'Home'),
-        NavigationDestination(icon: Icon(Icons.event_note_outlined), selectedIcon: Icon(Icons.event_note), label: 'Jadwal'),
-        NavigationDestination(icon: Icon(Icons.account_balance_wallet_outlined), selectedIcon: Icon(Icons.account_balance_wallet), label: 'Keuangan'),
-        NavigationDestination(icon: Icon(Icons.show_chart), label: 'Nilai'),
-        NavigationDestination(icon: Icon(Icons.folder_outlined), selectedIcon: Icon(Icons.folder), label: 'Arsip'),
-      ]),
+    bottomNavigationBar: _AnimatedMotionNavBar(
+      selectedIndex: index,
+      onDestinationSelected: (v) => setState(() => index = v),
     ),
   ));
 }
@@ -290,5 +284,163 @@ class _SettingsSheet extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class _AnimatedMotionNavBar extends StatelessWidget {
+  final int selectedIndex;
+  final ValueChanged<int> onDestinationSelected;
+
+  const _AnimatedMotionNavBar({
+    required this.selectedIndex,
+    required this.onDestinationSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final items = [
+      (icon: Icons.home_outlined, activeIcon: Icons.home, label: 'Home'),
+      (icon: Icons.event_note_outlined, activeIcon: Icons.event_note, label: 'Jadwal'),
+      (icon: Icons.account_balance_wallet_outlined, activeIcon: Icons.account_balance_wallet, label: 'Keuangan'),
+      (icon: Icons.show_chart, activeIcon: Icons.show_chart, label: 'Nilai'),
+      (icon: Icons.folder_outlined, activeIcon: Icons.folder, label: 'Arsip'),
+    ];
+
+    // Menggunakan warna Teal utama sesuai instruksi dan gambar referensi user
+    const bgColor = Color(0xFF338385);
+    const circleColor = Color(0xFF1A3D3E);
+
+    return SizedBox(
+      height: 80,
+      child: TweenAnimationBuilder<double>(
+        tween: Tween<double>(begin: selectedIndex.toDouble(), end: selectedIndex.toDouble()),
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeOutCubic,
+        builder: (context, animatedIndex, child) {
+          return Stack(
+            clipBehavior: Clip.none,
+            children: [
+              // 1. Custom Painter untuk menggambar bar beserta notch dan lingkaran indikator
+              CustomPaint(
+                size: Size(MediaQuery.of(context).size.width, 80),
+                painter: _NotchPainter(
+                  animatedIndex: animatedIndex,
+                  bgColor: bgColor,
+                  circleColor: circleColor,
+                ),
+              ),
+              // 2. Ikon-ikon navigasi beserta nama/labelnya
+              Row(
+                children: List.generate(items.length, (index) {
+                  final isSelected = index == selectedIndex;
+                  final item = items[index];
+                  return Expanded(
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () => onDestinationSelected(index),
+                      child: SizedBox(
+                        height: 80,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            // Animasi pergerakan ikon ke atas memasuki lingkaran indikator
+                            AnimatedPositioned(
+                              duration: const Duration(milliseconds: 350),
+                              curve: Curves.easeOutCubic,
+                              top: isSelected ? 0 : 22,
+                              child: AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 300),
+                                transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
+                                child: Icon(
+                                  isSelected ? item.activeIcon : item.icon,
+                                  key: ValueKey<bool>(isSelected),
+                                  color: isSelected ? Colors.white : Colors.white70,
+                                  size: isSelected ? 26 : 24,
+                                ),
+                              ),
+                            ),
+                            // Nama label tetap dipertahankan di bagian bawah tab
+                            Positioned(
+                              bottom: 10,
+                              child: Text(
+                                item.label,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                                  color: isSelected ? Colors.white : Colors.white70,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _NotchPainter extends CustomPainter {
+  final double animatedIndex;
+  final Color bgColor;
+  final Color circleColor;
+
+  _NotchPainter({
+    required this.animatedIndex,
+    required this.bgColor,
+    required this.circleColor,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    double itemWidth = size.width / 5;
+    double centerX = (itemWidth * animatedIndex) + (itemWidth / 2);
+
+    // Jalur (Path) dari Bottom Navigation Bar dengan lekukan (notch) yang dinamis
+    Path path = Path();
+    path.moveTo(0, 0);
+    path.lineTo(centerX - 42, 0);
+    
+    // Kurva masuk ke dalam lekukan (notch)
+    path.quadraticBezierTo(centerX - 22, 0, centerX - 18, 12);
+    
+    // Busur melingkar cekung ke bawah
+    path.arcToPoint(
+      Offset(centerX + 18, 12),
+      radius: const Radius.circular(20),
+      clockwise: false,
+    );
+    
+    // Kurva keluar dari lekukan (notch)
+    path.quadraticBezierTo(centerX + 22, 0, centerX + 42, 0);
+    
+    path.lineTo(size.width, 0);
+    path.lineTo(size.width, size.height);
+    path.lineTo(0, size.height);
+    path.close();
+
+    // Menggambar bayangan halus di bawah bar agar terlihat lebih hidup dan premium
+    canvas.drawShadow(path, Colors.black, 8, true);
+
+    // Mengisi warna latar belakang bar utama
+    Paint bgPaint = Paint()..color = bgColor..style = PaintingStyle.fill;
+    canvas.drawPath(path, bgPaint);
+
+    // Menggambar lingkaran indikator gelap yang mengapung di dalam lekukan
+    Paint circlePaint = Paint()..color = circleColor..style = PaintingStyle.fill;
+    canvas.drawCircle(Offset(centerX, 13), 22, circlePaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _NotchPainter oldDelegate) {
+    return oldDelegate.animatedIndex != animatedIndex ||
+           oldDelegate.bgColor != bgColor ||
+           oldDelegate.circleColor != circleColor;
   }
 }
