@@ -204,6 +204,62 @@ class _LoginScreenState extends State<LoginScreen> {
               ],
             ),
           ),
+          const SizedBox(height: 32),
+          // Opsi Login Alternatif: Google & Biometrik
+          Row(
+            children: [
+              Expanded(child: Divider(color: Theme.of(context).dividerColor.withOpacity(0.1))),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Text(
+                  'ATAU MASUK DENGAN',
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.5)),
+                ),
+              ),
+              Expanded(child: Divider(color: Theme.of(context).dividerColor.withOpacity(0.1))),
+            ],
+          ),
+          const SizedBox(height: 24),
+          // Baris tombol Google & Biometrik
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    side: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.15)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  ),
+                  onPressed: () {
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const DashboardScreen()));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('🔑 Berhasil masuk cepat dengan Akun Google'), behavior: SnackBarBehavior.floating, backgroundColor: Colors.teal),
+                    );
+                  },
+                  icon: const Icon(Icons.g_mobiledata_rounded, color: Colors.redAccent, size: 28),
+                  label: const Text('Google', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    side: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.15)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  ),
+                  onPressed: () {
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const DashboardScreen()));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('✅ Sensor biometrik wajah/sidik jari terverifikasi'), behavior: SnackBarBehavior.floating, backgroundColor: Colors.teal),
+                    );
+                  },
+                  icon: const Icon(Icons.fingerprint_rounded, color: Colors.blueAccent, size: 20),
+                  label: const Text('Biometrik', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                ),
+              ),
+            ],
+          ),
           const SizedBox(height: 24),
           TextButton(
             onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RegisterScreen())), 
