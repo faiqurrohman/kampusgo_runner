@@ -204,120 +204,108 @@ class _Home extends StatelessWidget {
     final data = AppData.instance;
     final next = data.schedules.where((e) => !e.done).toList()..sort((a,b)=>a.deadline.compareTo(b.deadline));
     return SafeArea(child: ListView(padding: const EdgeInsets.only(left: 24, right: 24, top: 48, bottom: 20), children: [
-      Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+      // Tata Letak Header Diperbarui (Foto Profil di atas, disusul Nama Mahasiswa/Sapaan ke bawah seperti Slide 2)
+      Column(
         children: [
-          // 1. Paling Kiri: Foto profil mahasiswa melingkar (Sesuai tata letak Slide 2)
+          // Baris atas: Kapsul tombol kontrol aksi di pojok kanan agar layar tetap seimbang
+          Align(
+            alignment: Alignment.centerRight,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.12)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () {},
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        const Icon(Icons.notifications_none_rounded, color: Colors.amber, size: 20),
+                        Positioned(
+                          top: -2, right: -2,
+                          child: Container(width: 6, height: 6, decoration: const BoxDecoration(color: AppTheme.accent, shape: BoxShape.circle)),
+                        )
+                      ]
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () {
+                      data.toggleTheme();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(data.themeMode == ThemeMode.dark ? '🌙 Beralih ke Dark Mode' : '☀️ Beralih ke Light Mode'),
+                          behavior: SnackBarBehavior.floating,
+                          duration: const Duration(milliseconds: 1000),
+                        ),
+                      );
+                    },
+                    child: Icon(
+                      data.themeMode == ThemeMode.dark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+                      color: Colors.amber,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => SettingsScreen(onLogout: onLogout)),
+                      );
+                    },
+                    child: const Icon(Icons.settings_rounded, size: 20),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          // Foto profil mahasiswa melingkar berukuran besar di tengah (seperti Slide 2)
           Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(color: AppTheme.primary.withOpacity(0.5), width: 2),
               boxShadow: [
-                BoxShadow(color: AppTheme.primary.withOpacity(0.2), blurRadius: 8, spreadRadius: 1),
+                BoxShadow(color: AppTheme.primary.withOpacity(0.2), blurRadius: 12, spreadRadius: 2),
               ],
             ),
             child: CircleAvatar(
-              radius: 22,
+              radius: 36,
               backgroundColor: Colors.white.withOpacity(0.12),
               backgroundImage: data.userAvatarUrl.contains('/') || data.userAvatarUrl.contains('\\')
                   ? FileImage(File(data.userAvatarUrl))
                   : null,
               child: data.userAvatarUrl.contains('/') || data.userAvatarUrl.contains('\\')
                   ? null
-                  : Text(data.userAvatarUrl, style: const TextStyle(fontSize: 22)),
+                  : Text(data.userAvatarUrl, style: const TextStyle(fontSize: 34)),
             ),
           ),
-          const SizedBox(width: 12),
-          // 2. Tengah: Kolom teks sapaan dan sub-teks
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Flexible(
-                      child: Text(
-                        'Halo, ${data.userName}',
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    const Text('👋', style: TextStyle(fontSize: 18)),
-                  ],
-                ),
-                const SizedBox(height: 2), 
-                Text(
-                  'Pantau hidup kampusmu hari ini.', 
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 11),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
+          const SizedBox(height: 16),
+          // Nama mahasiswa/sapaan diletakkan ke bawah setelah foto profil tanpa mengubah variabel namanya
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Halo, ${data.userName}',
+                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(width: 6),
+              const Text('👋', style: TextStyle(fontSize: 22)),
+            ],
           ),
-          const SizedBox(width: 8),
-          // 3. Kanan: Kapsul tombol kontrol aksi
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.12)),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // 1. Ikon Lonceng Notifikasi berwarna kuning/amber
-                GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () {},
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      const Icon(Icons.notifications_none_rounded, color: Colors.amber, size: 20),
-                      Positioned(
-                        top: -2, right: -2,
-                        child: Container(width: 6, height: 6, decoration: const BoxDecoration(color: AppTheme.accent, shape: BoxShape.circle)),
-                      )
-                    ]
-                  ),
-                ),
-                const SizedBox(width: 14),
-                // 2. Ikon Toggle Tema (Matahari/Bulan) berwarna kuning/amber
-                GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () {
-                    data.toggleTheme();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(data.themeMode == ThemeMode.dark ? '🌙 Beralih ke Dark Mode' : '☀️ Beralih ke Light Mode'),
-                        behavior: SnackBarBehavior.floating,
-                        duration: const Duration(milliseconds: 1000),
-                      ),
-                    );
-                  },
-                  child: Icon(
-                    data.themeMode == ThemeMode.dark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
-                    color: Colors.amber,
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 14),
-                // 3. Ikon Pengaturan (Roda Gigi)
-                GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => SettingsScreen(onLogout: onLogout)),
-                    );
-                  },
-                  child: const Icon(Icons.settings_rounded, size: 20),
-                ),
-              ],
-            ),
+          const SizedBox(height: 4),
+          Text(
+            'Pantau hidup kampusmu hari ini.',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 12),
           ),
         ],
       ),
@@ -631,8 +619,8 @@ class _AnimatedMotionNavBar extends StatefulWidget {
 
 class _AnimatedMotionNavBarState extends State<_AnimatedMotionNavBar> {
   final List<_NavItem> _items = [
-    _NavItem(icon: Icons.dashboard_rounded, label: 'Dasbor'),
-    _NavItem(icon: Icons.event_note_rounded, label: 'Jadwal'),
+    _NavItem(icon: Icons.grid_view_rounded, label: 'Dasbor'),
+    _NavItem(icon: Icons.edit_calendar_rounded, label: 'Jadwal'),
     _NavItem(icon: Icons.account_balance_wallet_rounded, label: 'Keuangan'),
     _NavItem(icon: Icons.school_rounded, label: 'Nilai'),
     _NavItem(icon: Icons.folder_special_rounded, label: 'Arsip'),
@@ -641,102 +629,113 @@ class _AnimatedMotionNavBarState extends State<_AnimatedMotionNavBar> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final navBgColor = isDark ? const Color(0xFF1E1B2E) : Colors.white;
-    final activeCircleColor = isDark ? const Color(0xFF2D2747) : AppTheme.primary.withOpacity(0.08);
+    // Konsep: Liquid Floating Curved Bar beraksen Glassmorphism melayang
+    final navBgColor = isDark ? const Color(0xFF221E35).withOpacity(0.9) : Colors.white.withOpacity(0.95);
+    final liquidColor = isDark ? AppTheme.accent : AppTheme.primary;
 
-    return Container(
-      height: 80,
-      decoration: BoxDecoration(
-        color: navBgColor,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 20,
-            offset: const Offset(0, -5),
-          ),
-        ],
-      ),
-      child: Stack(
-        children: [
-          // Custom Painter untuk Background dan Indikator Notch Bergerak
-          Positioned.fill(
-            child: TweenAnimationBuilder<double>(
-              tween: Tween<double>(
-                begin: widget.selectedIndex.toDouble(),
-                end: widget.selectedIndex.toDouble(),
-              ),
-              duration: const Duration(milliseconds: 350),
-              curve: Curves.easeOutCubic,
-              builder: (context, animatedValue, child) {
-                return CustomPaint(
-                  painter: _NotchPainter(
-                    animatedIndex: animatedValue,
-                    itemCount: _items.length,
-                    bgColor: navBgColor,
-                    circleColor: activeCircleColor,
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+        child: SizedBox(
+          height: 74,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              // Custom Painter untuk Dock Melayang dengan Kurva Unik & Indikator Cairan (Liquid)
+              Positioned.fill(
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween<double>(
+                    begin: widget.selectedIndex.toDouble(),
+                    end: widget.selectedIndex.toDouble(),
                   ),
-                );
-              },
-            ),
-          ),
-          // Ikon dan Teks Navigasi
-          Row(
-            children: List.generate(_items.length, (index) {
-              final isSelected = widget.selectedIndex == index;
-              final item = _items[index];
-
-              return Expanded(
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () => widget.onDestinationSelected(index),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // Animasi Translasi Ikon (Naik saat aktif)
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeOutCubic,
-                        transform: Matrix4.translationValues(
-                          0,
-                          isSelected ? -6 : 2,
-                          0,
-                        ),
-                        child: AnimatedTheme(
-                          data: Theme.of(context),
-                          child: Icon(
-                            item.icon,
-                            size: 24,
-                            color: isSelected
-                                ? AppTheme.primary
-                                : Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.5),
-                          ),
-                        ),
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.elasticOut, // Animasi Pegas (Spring Physics) memantul alami
+                  builder: (context, animatedValue, child) {
+                    return CustomPaint(
+                      painter: _LiquidFloatingDockPainter(
+                        animatedIndex: animatedValue,
+                        itemCount: _items.length,
+                        baseColor: navBgColor,
+                        liquidColor: liquidColor,
                       ),
-                      const SizedBox(height: 4),
-                      // Animasi Skala & Opasitas Label Teks
-                      AnimatedOpacity(
-                        duration: const Duration(milliseconds: 200),
-                        opacity: isSelected ? 1.0 : 0.6,
-                        child: Text(
-                          item.label,
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                            color: isSelected
-                                ? AppTheme.primary
-                                : Theme.of(context).textTheme.bodySmall?.color,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
+                    );
+                  },
                 ),
-              );
-            }),
+              ),
+              // Ikon dan Teks Navigasi
+              Row(
+                children: List.generate(_items.length, (index) {
+                  final isSelected = widget.selectedIndex == index;
+                  final item = _items[index];
+
+                  return Expanded(
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {
+                        // Fitur Sulit Ditiru: Haptic Feedback Terintegrasi
+                        HapticFeedback.lightImpact();
+                        widget.onDestinationSelected(index);
+                      },
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Animasi Pegas (Spring Physics) memantul saat aktif
+                          TweenAnimationBuilder<double>(
+                            tween: Tween<double>(
+                              begin: isSelected ? 1.0 : 0.0,
+                              end: isSelected ? 1.0 : 0.0,
+                            ),
+                            duration: const Duration(milliseconds: 400),
+                            curve: Curves.elasticOut,
+                            builder: (context, val, child) {
+                              final scale = 1.0 + (val * 0.25); // Memantul hingga 1.25x
+                              final translateY = -8.0 * val; // Efek melayang terangkat
+                              return Transform(
+                                alignment: Alignment.center,
+                                transform: Matrix4.identity()..translate(0.0, translateY)..scale(scale),
+                                child: isSelected
+                                    ? ShaderMask(
+                                        // Fitur Sulit Ditiru: Shader Masking efek gradasi pendar bergerak
+                                        shaderCallback: (bounds) => LinearGradient(
+                                          colors: [liquidColor, Colors.purpleAccent, Colors.white],
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                        ).createShader(bounds),
+                                        child: Icon(item.icon, size: 24, color: Colors.white),
+                                      )
+                                    : Icon(
+                                        item.icon,
+                                        size: 24,
+                                        color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.45),
+                                      ),
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 4),
+                          // Animasi Skala & Opasitas Label Teks
+                          AnimatedOpacity(
+                            duration: const Duration(milliseconds: 200),
+                            opacity: isSelected ? 1.0 : 0.5,
+                            child: Text(
+                              item.label,
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                color: isSelected ? liquidColor : Theme.of(context).textTheme.bodySmall?.color,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -748,43 +747,72 @@ class _NavItem {
   _NavItem({required this.icon, required this.label});
 }
 
-class _NotchPainter extends CustomPainter {
+class _LiquidFloatingDockPainter extends CustomPainter {
   final double animatedIndex;
   final int itemCount;
-  final Color bgColor;
-  final Color circleColor;
+  final Color baseColor;
+  final Color liquidColor;
 
-  _NotchPainter({
+  _LiquidFloatingDockPainter({
     required this.animatedIndex,
     required this.itemCount,
-    required this.bgColor,
-    required this.circleColor,
+    required this.baseColor,
+    required this.liquidColor,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
+    // 1. Gambar Dock Melengkung Eksklusif (Liquid Floating Curved Bar)
+    Paint basePaint = Paint()
+      ..color = baseColor
+      ..style = PaintingStyle.fill;
+
+    Path path = Path();
+    final double radius = 24.0;
+    path.moveTo(0, radius);
+    // Kurva atas cekung/cembung dinamis terinspirasi dari SexyBottomBarPainter
+    path.quadraticBezierTo(size.width * 0.5, -6, size.width, radius);
+    path.lineTo(size.width, size.height - radius);
+    path.quadraticBezierTo(size.width, size.height, size.width - radius, size.height);
+    path.lineTo(radius, size.height);
+    path.quadraticBezierTo(0, size.height, 0, size.height - radius);
+    path.close();
+
+    // Cahaya ungu eksklusif memancar seperti di dashboard
+    canvas.drawShadow(path, Colors.purpleAccent, 12, true);
+    canvas.drawPath(path, basePaint);
+
+    // 2. Indikator Cairan (Liquid) yang berpindah secara mulus
     final itemWidth = size.width / itemCount;
     final centerX = (animatedIndex * itemWidth) + (itemWidth / 2);
 
-    // Menggambar latar belakang utama tanpa menutup lekukan atas
-    Paint bgPaint = Paint()..color = bgColor..style = PaintingStyle.fill;
-    Path path = Path();
-    path.moveTo(0, 0);
-    path.lineTo(size.width, 0);
-    path.lineTo(size.width, size.height);
-    path.lineTo(0, size.height);
-    path.close();
-    canvas.drawPath(path, bgPaint);
+    Paint liquidPaint = Paint()
+      ..color = liquidColor
+      ..style = PaintingStyle.fill;
 
-    // Menggambar lingkaran indikator lembut yang mengapung di dalam lekukan
-    Paint circlePaint = Paint()..color = circleColor..style = PaintingStyle.fill;
-    canvas.drawCircle(Offset(centerX, 14), 22, circlePaint);
+    // Tetesan cairan melengkung organik di bawah item yang aktif
+    Path liquidPath = Path();
+    liquidPath.addRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromCenter(center: Offset(centerX, size.height - 8), width: 22, height: 5),
+        const Radius.circular(4),
+      ),
+    );
+    canvas.drawShadow(liquidPath, liquidColor, 8, true);
+    canvas.drawPath(liquidPath, liquidPaint);
+
+    // Pancaran pendar/shimmer melingkar lembut di latar belakang ikon aktif
+    canvas.drawCircle(
+      Offset(centerX, size.height * 0.4),
+      22,
+      Paint()..color = liquidColor.withOpacity(0.12)..style = PaintingStyle.fill,
+    );
   }
 
   @override
-  bool shouldRepaint(covariant _NotchPainter oldDelegate) {
+  bool shouldRepaint(covariant _LiquidFloatingDockPainter oldDelegate) {
     return oldDelegate.animatedIndex != animatedIndex ||
-           oldDelegate.bgColor != bgColor ||
-           oldDelegate.circleColor != circleColor;
+           oldDelegate.baseColor != baseColor ||
+           oldDelegate.liquidColor != liquidColor;
   }
 }

@@ -121,29 +121,67 @@ class _LoginScreenState extends State<LoginScreen> {
       child: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
         children: [
-          const SizedBox(height: 60),
+          const SizedBox(height: 40),
+          // Logotype Premium KAMPUSGO tanpa kotak blok ungu (No Background + Glow)
           Align(
             alignment: Alignment.centerLeft,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(colors: [AppTheme.primary, AppTheme.secondary]),
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: [
-                  BoxShadow(color: AppTheme.primary.withOpacity(0.3), blurRadius: 16, offset: const Offset(0, 8)),
-                ],
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.school_rounded, color: Colors.white, size: 36),
-                  const SizedBox(width: 16),
-                  const Text(
-                    'KAMPUSGO', 
-                    style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: 1.5),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Sentuhan Ikonik yang Minimalis: outline icon dengan efek soft outer glow
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppTheme.primary.withOpacity(0.08),
+                    border: Border.all(color: AppTheme.primary.withOpacity(0.3), width: 1),
+                    boxShadow: [
+                      BoxShadow(color: Colors.purpleAccent.withOpacity(0.2), blurRadius: 16, spreadRadius: 2),
+                    ],
                   ),
-                ],
-              ),
+                  child: const Icon(Icons.school_outlined, color: Colors.purpleAccent, size: 26),
+                ),
+                const SizedBox(width: 16),
+                // Tipografi Custom Logotype (Bold untuk KAMPUS, Light/Thin untuk GO) dengan Shader Gradient & Soft Glow
+                ShaderMask(
+                  shaderCallback: (bounds) => const LinearGradient(
+                    colors: [Colors.white, Colors.purpleAccent],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ).createShader(bounds),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(color: Colors.purple.withOpacity(0.15), blurRadius: 16, offset: const Offset(0, 4)),
+                      ],
+                    ),
+                    child: RichText(
+                      text: const TextSpan(
+                        children: [
+                          TextSpan(
+                            text: 'KAMPUS',
+                            style: TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 2.0,
+                              color: Colors.white,
+                            ),
+                          ),
+                          TextSpan(
+                            text: 'GO',
+                            style: TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.w200,
+                              letterSpacing: 1.0,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 32),
