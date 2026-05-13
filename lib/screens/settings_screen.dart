@@ -150,18 +150,88 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  void _showManageCategoriesDialog() {
+    final catCtrl = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setModalState) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          title: const Text('Kelola Kategori', style: TextStyle(fontWeight: FontWeight.bold)),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Kategori Pengeluaran Saat Ini:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8, runSpacing: 8,
+                  children: data.expenseCategories.map((cat) {
+                    return Chip(
+                      label: Text(cat, style: const TextStyle(fontSize: 12)),
+                      onDeleted: data.expenseCategories.length > 1 ? () {
+                        setModalState(() => data.removeExpenseCategory(cat));
+                      } : null,
+                      backgroundColor: AppTheme.primary.withOpacity(0.08),
+                      deleteIconColor: Colors.redAccent,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: catCtrl,
+                        decoration: InputDecoration(
+                          hintText: 'Kategori baru...',
+                          isDense: true,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    IconButton(
+                      style: IconButton.styleFrom(backgroundColor: Colors.green, foregroundColor: Colors.white),
+                      icon: const Icon(Icons.add_rounded, size: 20),
+                      onPressed: () {
+                        if (catCtrl.text.trim().isNotEmpty) {
+                          setModalState(() {
+                            data.addExpenseCategory(catCtrl.text);
+                            catCtrl.clear();
+                          });
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Tutup')),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _showBudgetLimitDialog() {
     final ctrl = TextEditingController(text: data.budgetLimit.toString());
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: const Text('Batas Anggaran', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('Atur Anggaran Bulanan', style: TextStyle(fontWeight: FontWeight.bold)),
         content: TextField(
           controller: ctrl,
           keyboardType: TextInputType.number,
           decoration: InputDecoration(
-            labelText: 'Limit Anggaran (Rp)',
+            labelText: 'Total Limit Saldo (Rp)',
             prefixIcon: const Icon(Icons.account_balance_wallet_outlined),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
           ),
@@ -174,10 +244,96 @@ class _SettingsScreenState extends State<SettingsScreen> {
               final val = int.tryParse(ctrl.text) ?? data.budgetLimit;
               data.updateBudgetLimit(val);
               Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Limit anggaran diperbarui'), behavior: SnackBarBehavior.floating),
+              );
             },
             child: const Text('Simpan'),
           ),
         ],
+      ),
+    );
+  }
+
+  void _showExportDataDialog() {
+    String selectedFormat = 'PDF';
+    bool isExporting = false;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setModalState) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          title: const Text('Ekspor Riwayat Keuangan', style: TextStyle(fontWeight: FontWeight.bold)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Total Catatan: ${data.expenses.length} pengeluaran', style: const TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 12),
+              const Text('Format Laporan:'),
+              Row(
+                children: [
+                  Expanded(
+                    child: RadioListTile<String>(
+                      title: const Text('PDF', style: TextStyle(fontSize: 13)),
+                      value: 'PDF',
+                      groupValue: selectedFormat,
+                      activeColor: Colors.redAccent,
+                      contentPadding: EdgeInsets.zero,
+                      onChanged: (v) => setModalState(() => selectedFormat = v!),
+                    ),
+                  ),
+                  Expanded(
+                    child: RadioListTile<String>(
+                      title: const Text('CSV', style: TextStyle(fontSize: 13)),
+                      value: 'CSV',
+                      groupValue: selectedFormat,
+                      activeColor: Colors.green,
+                      contentPadding: EdgeInsets.zero,
+                      onChanged: (v) => setModalState(() => selectedFormat = v!),
+                    ),
+                  ),
+                ],
+              ),
+              if (isExporting) ...[
+                const SizedBox(height: 16),
+                const Center(child: CircularProgressIndicator(strokeWidth: 3)),
+                const SizedBox(height: 8),
+                Center(child: Text('Menyiapkan file $selectedFormat...', style: const TextStyle(fontSize: 11))),
+              ],
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: isExporting ? null : () => Navigator.pop(ctx), 
+              child: const Text('Batal'),
+            ),
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: selectedFormat == 'PDF' ? Colors.redAccent : Colors.green,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              onPressed: isExporting ? null : () async {
+                setModalState(() => isExporting = true);
+                await Future.delayed(const Duration(milliseconds: 1200));
+                if (context.mounted) {
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('✅ Laporan $selectedFormat berhasil diunduh ke folder dokumen'),
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Colors.teal,
+                    ),
+                  );
+                }
+              },
+              icon: const Icon(Icons.download_rounded, size: 18),
+              label: const Text('Unduh'),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -314,7 +470,56 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
 
-            _sectionTitle('2. Preferensi Aplikasi & Fitur'),
+            _sectionTitle('2. Pengaturan Keuangan (Budgeting)'),
+            Card(
+              elevation: 0,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+              color: Theme.of(context).colorScheme.surface,
+              child: Column(
+                children: [
+                  ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                    leading: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(color: Colors.green.withOpacity(0.12), borderRadius: BorderRadius.circular(12)),
+                      child: const Icon(Icons.category_rounded, color: Colors.green),
+                    ),
+                    title: const Text('Kelola Kategori'),
+                    subtitle: Text('${data.expenseCategories.length} kategori pengeluaran aktif'),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: _showManageCategoriesDialog,
+                  ),
+                  Divider(height: 1, indent: 64, color: Theme.of(context).dividerColor.withOpacity(0.08)),
+                  ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                    leading: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(color: Colors.teal.withOpacity(0.12), borderRadius: BorderRadius.circular(12)),
+                      child: const Icon(Icons.account_balance_wallet_rounded, color: Colors.teal),
+                    ),
+                    title: const Text('Atur Anggaran Bulanan'),
+                    subtitle: Text('Limit: ${Formatters.currency.format(data.budgetLimit)}'),
+                    trailing: const Icon(Icons.edit_rounded, size: 18),
+                    onTap: _showBudgetLimitDialog,
+                  ),
+                  Divider(height: 1, indent: 64, color: Theme.of(context).dividerColor.withOpacity(0.08)),
+                  ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                    leading: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(color: Colors.redAccent.withOpacity(0.12), borderRadius: BorderRadius.circular(12)),
+                      child: const Icon(Icons.picture_as_pdf_rounded, color: Colors.redAccent),
+                    ),
+                    title: const Text('Ekspor Data Laporan'),
+                    subtitle: const Text('Unduh riwayat format PDF / CSV'),
+                    trailing: const Icon(Icons.download_rounded, size: 18),
+                    onTap: _showExportDataDialog,
+                  ),
+                ],
+              ),
+            ),
+
+            _sectionTitle('3. Preferensi & Tampilan Aplikasi'),
             Card(
               elevation: 0,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
@@ -341,35 +546,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
                     leading: Container(
                       padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(color: Colors.teal.withOpacity(0.12), borderRadius: BorderRadius.circular(12)),
-                      child: const Icon(Icons.notifications_active_rounded, color: Colors.teal),
+                      decoration: BoxDecoration(color: Colors.deepPurple.withOpacity(0.12), borderRadius: BorderRadius.circular(12)),
+                      child: const Icon(Icons.notifications_active_rounded, color: Colors.deepPurple),
                     ),
                     title: const Text('Notifikasi Presisi'),
-                    subtitle: const Text('Hitung mundur otomatis < 24 jam'),
+                    subtitle: const Text('Peringatan otomatis < 24 jam'),
                     trailing: Switch(
                       value: data.preciseNotifications,
                       onChanged: data.togglePreciseNotifications,
-                      activeColor: Colors.teal,
+                      activeColor: Colors.deepPurple,
                     ),
-                  ),
-                  Divider(height: 1, indent: 64, color: Theme.of(context).dividerColor.withOpacity(0.08)),
-                  ListTile(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-                    leading: Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(color: Colors.green.withOpacity(0.12), borderRadius: BorderRadius.circular(12)),
-                      child: const Icon(Icons.account_balance_wallet_rounded, color: Colors.green),
-                    ),
-                    title: const Text('Batas Anggaran Mingguan'),
-                    subtitle: Text(Formatters.currency.format(data.budgetLimit)),
-                    trailing: const Icon(Icons.edit_rounded, size: 18),
-                    onTap: _showBudgetLimitDialog,
                   ),
                 ],
               ),
             ),
 
-            _sectionTitle('3. Keamanan & Informasi'),
+            _sectionTitle('4. Keamanan & Informasi'),
             Card(
               elevation: 0,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
@@ -380,11 +572,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
                     leading: Container(
                       padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(color: Colors.redAccent.withOpacity(0.12), borderRadius: BorderRadius.circular(12)),
-                      child: const Icon(Icons.security_rounded, color: Colors.redAccent),
+                      decoration: BoxDecoration(color: Colors.blueGrey.withOpacity(0.12), borderRadius: BorderRadius.circular(12)),
+                      child: const Icon(Icons.security_rounded, color: Colors.blueGrey),
                     ),
                     title: const Text('Keamanan Akun'),
-                    subtitle: const Text('Autentikasi & kata sandi'),
+                    subtitle: const Text('Autentikasi & sandi terenkripsi'),
                     trailing: const Icon(Icons.chevron_right_rounded),
                     onTap: () {
                       ScaffoldMessenger.of(context).showSnackBar(

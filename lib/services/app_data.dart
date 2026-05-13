@@ -125,6 +125,23 @@ class AppData extends ChangeNotifier {
     notifyListeners();
   }
 
+  List<String> expenseCategories = ['Makanan', 'Fotokopi', 'Transportasi', 'Hiburan', 'Lainnya'];
+
+  void addExpenseCategory(String cat) {
+    final trimmed = cat.trim();
+    if (trimmed.isNotEmpty && !expenseCategories.contains(trimmed)) {
+      expenseCategories.add(trimmed);
+      notifyListeners();
+    }
+  }
+
+  void removeExpenseCategory(String cat) {
+    if (expenseCategories.length > 1) {
+      expenseCategories.remove(cat);
+      notifyListeners();
+    }
+  }
+
   Map<String, int> expenseByCategory() {
     final map = <String, int>{};
     for (final e in expenses) { map[e.category] = (map[e.category] ?? 0) + e.amount; }
