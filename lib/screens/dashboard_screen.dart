@@ -308,7 +308,7 @@ class _NotificationCard extends StatelessWidget {
 }
 
 // ─── Panel Notifikasi Lengkap ────────────────────────────────────────────────
-void _showNotificationPanel(BuildContext context) {
+void _showNotificationPanel(BuildContext context, void Function(int) onTabChange) {
   final data = AppData.instance;
   final now = DateTime.now();
   final fmt = DateFormat('HH:mm', 'id_ID');
@@ -322,17 +322,19 @@ void _showNotificationPanel(BuildContext context) {
       .where((s) => !s.done && s.deadline.difference(now).inDays <= 3)
       .toList();
   for (final s in urgentSchedules) {
+    final id = 'sched_${s.id}';
     final diff = s.deadline.difference(now);
     final label = diff.inHours < 24
         ? '${diff.inHours}j lagi ⚠️'
         : '${diff.inDays} hari lagi';
     notifications.add({
+      'id': id,
       'icon': Icons.alarm_rounded,
       'color': diff.inHours < 24 ? Colors.redAccent : Colors.orangeAccent,
       'title': '⏰ Tenggat Mendekat',
       'time': label,
       'message': '${s.title} — ${s.course} harus dikumpulkan ${dateFmt.format(s.deadline)}.',
-      'isUnread': true,
+      'targetIndex': 1,
     });
   }
 
@@ -340,15 +342,17 @@ void _showNotificationPanel(BuildContext context) {
   final totalExp = data.totalExpense();
   final limit = data.budgetLimit;
   if (totalExp >= limit * 0.8) {
+    final id = 'budget_warn';
     final pct = ((totalExp / limit) * 100).toStringAsFixed(0);
     notifications.add({
+      'id': id,
       'icon': Icons.account_balance_wallet_rounded,
       'color': Colors.green,
       'title': '💸 Peringatan Anggaran',
       'time': fmt.format(now),
       'message': 'Kamu sudah memakai ${pct}% anggaran bulan ini '
           '(${Formatters.currency.format(totalExp)} / ${Formatters.currency.format(limit)}). Bijak dalam belanja!',
-      'isUnread': totalExp >= limit,
+      'targetIndex': 2,
     });
   }
 
@@ -356,7 +360,9 @@ void _showNotificationPanel(BuildContext context) {
   final gpa = data.calculateGpa();
   final gap = (data.targetGpa - gpa).abs();
   if (gap > 0.01) {
+    final id = 'gpa_update';
     notifications.add({
+      'id': id,
       'icon': Icons.school_rounded,
       'color': AppTheme.primary,
       'title': '🎓 Pembaruan IPK',
@@ -364,31 +370,35 @@ void _showNotificationPanel(BuildContext context) {
       'message': 'IPK kamu saat ini ${gpa.toStringAsFixed(2)} — '
           '${gpa < data.targetGpa ? "kurang ${gap.toStringAsFixed(2)} poin" : "sudah melampaui"} '
           'dari target ${data.targetGpa.toStringAsFixed(2)}.',
-      'isUnread': gpa < data.targetGpa,
+      'targetIndex': 3,
     });
   }
 
   // 4. Notifikasi Sumber Belajar Tersimpan
   if (data.resources.isNotEmpty) {
+    final id = 'resource_new';
     final latest = data.resources.first;
     notifications.add({
+      'id': id,
       'icon': Icons.link_rounded,
       'color': Colors.teal,
       'title': '📎 Resource Baru Tersimpan',
       'time': 'Baru saja',
       'message': '"${latest.title}" (${latest.course}) berhasil disematkan ke Resource Hub-mu.',
-      'isUnread': false,
+      'targetIndex': 4,
     });
   }
 
   // 5. Notifikasi Pengingat Sistem / Tips
+  final idTips = 'tips_cloud';
   notifications.add({
+    'id': idTips,
     'icon': Icons.tips_and_updates_rounded,
     'color': Colors.purpleAccent,
     'title': '💡 Tips KampusGo',
     'time': dateFmt.format(now),
     'message': 'Aktifkan backup cloud di Pengaturan agar semua data jadwal dan nilai-mu tersimpan aman.',
-    'isUnread': false,
+    'targetIndex': 0,
   });
 
   showModalBottomSheet(
@@ -396,109 +406,135 @@ void _showNotificationPanel(BuildContext context) {
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     builder: (ctx) {
-      final isDark = Theme.of(ctx).brightness == Brightness.dark;
-      return DraggableScrollableSheet(
-        initialChildSize: 0.72,
-        minChildSize: 0.4,
-        maxChildSize: 0.92,
-        builder: (_, controller) => Container(
-          decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1E1B2E) : Colors.white,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-            boxShadow: [
-              BoxShadow(
-                color: AppTheme.primary.withOpacity(0.15),
-                blurRadius: 30,
-                offset: const Offset(0, -8),
-              ),
-            ],
-          ),
-          child: Column(
-            children: [
-              // Handle bar
-              Padding(
-                padding: const EdgeInsets.only(top: 14),
-                child: Container(
-                  width: 42,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: isDark ? Colors.white24 : Colors.black12,
-                    borderRadius: BorderRadius.circular(2),
+      return StatefulBuilder(
+        builder: (ctx, setSheetState) {
+          final isDark = Theme.of(ctx).brightness == Brightness.dark;
+          // Tentukan status isUnread secara seketika berdasarkan Set memori
+          for (final n in notifications) {
+            final id = n['id'] as String;
+            n['isUnread'] = !data.readNotificationIds.contains(id);
+          }
+          final unreadCount = notifications.where((n) => n['isUnread'] == true).length;
+
+          return DraggableScrollableSheet(
+            initialChildSize: 0.72,
+            minChildSize: 0.4,
+            maxChildSize: 0.92,
+            builder: (_, controller) => Container(
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF1E1B2E) : Colors.white,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppTheme.primary.withOpacity(0.15),
+                    blurRadius: 30,
+                    offset: const Offset(0, -8),
                   ),
-                ),
+                ],
               ),
-              // Header
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
+              child: Column(
+                children: [
+                  // Handle bar
+                  Padding(
+                    padding: const EdgeInsets.only(top: 14),
+                    child: Container(
+                      width: 42,
+                      height: 4,
                       decoration: BoxDecoration(
-                        color: Colors.amber.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: const Icon(Icons.notifications_rounded, color: Colors.amber, size: 22),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Notifikasi',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            '${notifications.where((n) => n['isUnread'] == true).length} belum dibaca',
-                            style: TextStyle(fontSize: 11, color: Colors.amber.shade700),
-                          ),
-                        ],
+                        color: isDark ? Colors.white24 : Colors.black12,
+                        borderRadius: BorderRadius.circular(2),
                       ),
                     ),
-                    TextButton(
-                      onPressed: () => Navigator.pop(ctx),
-                      child: const Text('Tutup', style: TextStyle(fontSize: 12)),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 8),
-              Divider(indent: 24, endIndent: 24, color: isDark ? Colors.white12 : Colors.black12),
-              // Daftar Notifikasi
-              Expanded(
-                child: notifications.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.notifications_off_outlined, size: 56, color: Colors.grey.withOpacity(0.4)),
-                            const SizedBox(height: 12),
-                            const Text('Tidak ada notifikasi saat ini', style: TextStyle(color: Colors.grey)),
-                          ],
+                  ),
+                  // Header
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.amber.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: const Icon(Icons.notifications_rounded, color: Colors.amber, size: 22),
                         ),
-                      )
-                    : ListView.builder(
-                        controller: controller,
-                        padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
-                        itemCount: notifications.length,
-                        itemBuilder: (_, i) {
-                          final n = notifications[i];
-                          return _NotificationCard(
-                            icon: n['icon'] as IconData,
-                            iconColor: n['color'] as Color,
-                            title: n['title'] as String,
-                            time: n['time'] as String,
-                            message: n['message'] as String,
-                            isUnread: n['isUnread'] as bool,
-                            onTap: () {},
-                          );
-                        },
-                      ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Notifikasi',
+                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                '$unreadCount belum dibaca',
+                                style: TextStyle(fontSize: 11, color: Colors.amber.shade700),
+                              ),
+                            ],
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.pop(ctx),
+                          child: const Text('Tutup', style: TextStyle(fontSize: 12)),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Divider(indent: 24, endIndent: 24, color: isDark ? Colors.white12 : Colors.black12),
+                  // Daftar Notifikasi
+                  Expanded(
+                    child: notifications.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.notifications_off_outlined, size: 56, color: Colors.grey.withOpacity(0.4)),
+                                const SizedBox(height: 12),
+                                const Text('Tidak ada notifikasi saat ini', style: TextStyle(color: Colors.grey)),
+                              ],
+                            ),
+                          )
+                        : ListView.builder(
+                            controller: controller,
+                            padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+                            itemCount: notifications.length,
+                            itemBuilder: (_, i) {
+                              final n = notifications[i];
+                              return _NotificationCard(
+                                icon: n['icon'] as IconData,
+                                iconColor: n['color'] as Color,
+                                title: n['title'] as String,
+                                time: n['time'] as String,
+                                message: n['message'] as String,
+                                isUnread: n['isUnread'] as bool,
+                                onTap: () {
+                                  final id = n['id'] as String;
+                                  // Tandai terbaca di AppData
+                                  data.markNotificationRead(id);
+                                  // Perbarui UI BottomSheet secara seketika agar titik hilang & jumlah berkurang
+                                  setSheetState(() {});
+
+                                  // Navigasi ke halaman terkait
+                                  final targetIdx = n['targetIndex'] as int?;
+                                  if (targetIdx != null) {
+                                    Future.delayed(const Duration(milliseconds: 250), () {
+                                      if (Navigator.canPop(ctx)) Navigator.pop(ctx);
+                                      onTabChange(targetIdx);
+                                    });
+                                  }
+                                },
+                              );
+                            },
+                          ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       );
     },
   );
@@ -512,6 +548,22 @@ class _Home extends StatelessWidget {
   Widget build(BuildContext context) {
     final data = AppData.instance;
     final next = data.schedules.where((e) => !e.done).toList()..sort((a,b)=>a.deadline.compareTo(b.deadline));
+    
+    // Hitung status indikator titik unread utama secara dinamis
+    final now = DateTime.now();
+    bool hasUnread = false;
+    if (data.schedules.any((s) => !s.done && s.deadline.difference(now).inDays <= 3 && !data.readNotificationIds.contains('sched_${s.id}'))) {
+      hasUnread = true;
+    } else if (data.totalExpense() >= data.budgetLimit * 0.8 && !data.readNotificationIds.contains('budget_warn')) {
+      hasUnread = true;
+    } else if ((data.targetGpa - data.calculateGpa()).abs() > 0.01 && !data.readNotificationIds.contains('gpa_update')) {
+      hasUnread = true;
+    } else if (data.resources.isNotEmpty && !data.readNotificationIds.contains('resource_new')) {
+      hasUnread = true;
+    } else if (!data.readNotificationIds.contains('tips_cloud')) {
+      hasUnread = true;
+    }
+
     return SafeArea(child: ListView(padding: const EdgeInsets.only(left: 24, right: 24, top: 48, bottom: 20), children: [
       // Tata Letak Header Diperbarui (Foto Profil di atas, disusul Nama Mahasiswa/Sapaan ke bawah seperti Slide 2)
       Column(
@@ -533,16 +585,17 @@ class _Home extends StatelessWidget {
                     behavior: HitTestBehavior.opaque,
                     onTap: () {
                       HapticFeedback.lightImpact();
-                      _showNotificationPanel(context);
+                      _showNotificationPanel(context, onTabChange);
                     },
                     child: Stack(
                       clipBehavior: Clip.none,
                       children: [
                         const Icon(Icons.notifications_none_rounded, color: Colors.amber, size: 20),
-                        Positioned(
-                          top: -2, right: -2,
-                          child: Container(width: 6, height: 6, decoration: const BoxDecoration(color: AppTheme.accent, shape: BoxShape.circle)),
-                        )
+                        if (hasUnread)
+                          Positioned(
+                            top: -2, right: -2,
+                            child: Container(width: 6, height: 6, decoration: const BoxDecoration(color: AppTheme.accent, shape: BoxShape.circle)),
+                          )
                       ]
                     ),
                   ),
