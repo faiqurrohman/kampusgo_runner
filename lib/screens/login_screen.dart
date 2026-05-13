@@ -82,49 +82,17 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   }
 
   void _showForgotPasswordDialog() {
-    final resetCtrl = TextEditingController(text: email.text);
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: const Text('Lupa Kata Sandi', style: TextStyle(fontWeight: FontWeight.bold)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Masukkan alamat email terdaftar untuk menerima instruksi tautan pemulihan kata sandi.',
-              style: TextStyle(fontSize: 13),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: resetCtrl,
-              decoration: InputDecoration(
-                labelText: 'Alamat Email',
-                prefixIcon: const Icon(Icons.email_outlined),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Batal'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.primary,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-            ),
-            onPressed: () {
-              Navigator.pop(ctx);
-              _showSnackBar('✅ Instruksi pemulihan dikirim ke ${resetCtrl.text}', Colors.teal);
-            },
-            child: const Text('Kirim Tautan', style: TextStyle(fontWeight: FontWeight.bold)),
-          ),
-        ],
+      barrierColor: Colors.black.withOpacity(0.6),
+      builder: (ctx) => _ForgotPasswordDialog(
+        initialEmail: email.text,
+        onSuccess: (sentEmail) {
+          _showSnackBar(
+            '✅ Tautan pemulihan dikirim ke $sentEmail',
+            Colors.teal,
+          );
+        },
       ),
     );
   }
@@ -217,7 +185,6 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
       final ok = await AuthService.instance.authenticateWithBiometric();
       if (!mounted) return;
       if (ok) {
-        final savedEmail = await AuthService.instance.getSavedEmail();
         _showSnackBar('✅ Sidik jari/wajah terverifikasi — Selamat datang kembali!', Colors.teal);
         await Future.delayed(const Duration(milliseconds: 400));
         _navigateToDashboard();
@@ -682,4 +649,649 @@ class _GoogleGPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// ─── Widget: Forgot Password Dialog (Premium) ─────────────────────────────────
+
+class _ForgotPasswordDialog extends StatefulWidget {
+  final String initialEmail;
+  final void Function(String email) onSuccess;
+
+  const _ForgotPasswordDialog({
+    required this.initialEmail,
+    required this.onSuccess,
+  });
+
+  @override
+  State<_ForgotPasswordDialog> createState() => _ForgotPasswordDialogState();
+}
+
+class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog>
+    with TickerProviderStateMixin {
+  late final TextEditingController _emailCtrl;
+  late final TextEditingController _captchaCtrl;
+
+  // UI state
+  String? _emailError;
+  String? _captchaError;
+  bool _isSending = false;
+  bool _isSuccess = false;
+
+  // Cooldown timer
+  int _cooldownSeconds = 0;
+  bool get _isCoolingDown => _cooldownSeconds > 0;
+
+  // CAPTCHA
+  late int _captchaA;
+  late int _captchaB;
+
+  // Animations
+  late final AnimationController _fadeCtrl;
+  late final Animation<double> _fadeAnim;
+  late final AnimationController _successCtrl;
+  late final Animation<double> _successAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _emailCtrl = TextEditingController(text: widget.initialEmail);
+    _captchaCtrl = TextEditingController();
+    _generateCaptcha();
+
+    _fadeCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
+    _fadeAnim = CurvedAnimation(parent: _fadeCtrl, curve: Curves.easeOut);
+    _fadeCtrl.forward();
+
+    _successCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 500));
+    _successAnim = CurvedAnimation(parent: _successCtrl, curve: Curves.elasticOut);
+  }
+
+  @override
+  void dispose() {
+    _emailCtrl.dispose();
+    _captchaCtrl.dispose();
+    _fadeCtrl.dispose();
+    _successCtrl.dispose();
+    super.dispose();
+  }
+
+  void _generateCaptcha() {
+    _captchaA = 2 + DateTime.now().millisecond % 8; // 2–9
+    _captchaB = 1 + DateTime.now().microsecond % 7; // 1–7
+  }
+
+  // ── Real-time email validation ──
+  String? _validateEmail(String v) {
+    if (v.trim().isEmpty) return 'Email tidak boleh kosong';
+    final re = RegExp(r'^[\w.+-]+@[\w-]+\.[a-z]{2,}$', caseSensitive: false);
+    if (!re.hasMatch(v.trim())) return 'Format email tidak valid (misal: user@domain.com)';
+    return null;
+  }
+
+  // ── Cooldown logic ──
+  void _startCooldown() {
+    _cooldownSeconds = 60;
+    Future.doWhile(() async {
+      await Future.delayed(const Duration(seconds: 1));
+      if (!mounted) return false;
+      setState(() => _cooldownSeconds--);
+      return _cooldownSeconds > 0;
+    });
+  }
+
+  // ── Submit handler ──
+  Future<void> _handleSend() async {
+    final emailErr = _validateEmail(_emailCtrl.text);
+    final userAnswer = int.tryParse(_captchaCtrl.text.trim());
+    final captchaErr = (userAnswer == null || userAnswer != _captchaA + _captchaB)
+        ? 'Jawaban verifikasi tidak tepat'
+        : null;
+
+    setState(() {
+      _emailError = emailErr;
+      _captchaError = captchaErr;
+    });
+
+    if (emailErr != null || captchaErr != null) return;
+
+    setState(() => _isSending = true);
+
+    // Simulasi API call (ganti dengan Firebase / custom API)
+    await Future.delayed(const Duration(milliseconds: 1800));
+    if (!mounted) return;
+
+    setState(() {
+      _isSending = false;
+      _isSuccess = true;
+    });
+    _successCtrl.forward();
+    _startCooldown();
+    widget.onSuccess(_emailCtrl.text.trim());
+  }
+
+  // ── Resend ──
+  Future<void> _handleResend() async {
+    if (_isCoolingDown || _isSending) return;
+    setState(() {
+      _isSuccess = false;
+      _captchaCtrl.clear();
+      _generateCaptcha();
+      _captchaError = null;
+      _emailError = null;
+    });
+    _successCtrl.reset();
+    await _handleSend();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _fadeAnim,
+      child: Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(28),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  const Color(0xFF1E1E2E).withOpacity(0.96),
+                  const Color(0xFF252540).withOpacity(0.96),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(
+                color: Colors.purpleAccent.withOpacity(0.25),
+                width: 1.2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.purpleAccent.withOpacity(0.15),
+                  blurRadius: 40,
+                  spreadRadius: 4,
+                ),
+              ],
+            ),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 400),
+                switchInCurve: Curves.easeOut,
+                switchOutCurve: Curves.easeIn,
+                child: _isSuccess ? _buildSuccessView() : _buildInputView(),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ── SUCCESS VIEW ──────────────────────────────────────────────────────────
+  Widget _buildSuccessView() {
+    return ScaleTransition(
+      scale: _successAnim,
+      key: const ValueKey('success'),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Icon sukses
+          Container(
+            width: 72,
+            height: 72,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.teal.withOpacity(0.15),
+              border: Border.all(color: Colors.teal.withOpacity(0.4), width: 1.5),
+            ),
+            child: const Icon(Icons.mark_email_read_rounded, color: Colors.tealAccent, size: 36),
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            'Email Terkirim! 🎉',
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+              color: Colors.white,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Tautan pemulihan telah dikirim ke:\n${_emailCtrl.text.trim()}\n\nSilakan cek kotak masuk atau folder spam Anda.',
+            style: TextStyle(
+              fontSize: 13,
+              color: Colors.white.withOpacity(0.75),
+              height: 1.6,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 24),
+
+          // Cooldown / Resend button
+          _isCoolingDown
+              ? Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: Colors.white.withOpacity(0.1)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.timer_outlined, size: 16, color: Colors.grey),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Kirim ulang dalam $_cooldownSeconds detik',
+                        style: const TextStyle(fontSize: 13, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                )
+              : SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.purpleAccent,
+                      side: BorderSide(color: Colors.purpleAccent.withOpacity(0.4)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      padding: const EdgeInsets.symmetric(vertical: 13),
+                    ),
+                    onPressed: _handleResend,
+                    icon: const Icon(Icons.refresh_rounded, size: 18),
+                    label: const Text('Kirim Ulang', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                ),
+
+          const SizedBox(height: 12),
+
+          // Tutup
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF7C5CFC),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                padding: const EdgeInsets.symmetric(vertical: 13),
+                elevation: 0,
+              ),
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Tutup', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // Bantuan alternatif
+          _buildContactAdminLink(),
+        ],
+      ),
+    );
+  }
+
+  // ── INPUT VIEW ────────────────────────────────────────────────────────────
+  Widget _buildInputView() {
+    return Column(
+      key: const ValueKey('input'),
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Header
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.purpleAccent.withOpacity(0.15),
+                border: Border.all(color: Colors.purpleAccent.withOpacity(0.3)),
+              ),
+              child: const Icon(Icons.lock_reset_rounded, color: Colors.purpleAccent, size: 20),
+            ),
+            const SizedBox(width: 14),
+            const Text(
+              'Lupa Kata Sandi',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w800,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 14),
+
+        Text(
+          'Masukkan alamat email terdaftar untuk menerima instruksi tautan pemulihan kata sandi.',
+          style: TextStyle(fontSize: 13, color: Colors.white.withOpacity(0.65), height: 1.5),
+        ),
+        const SizedBox(height: 22),
+
+        // ── Email field ──
+        _buildLabel('Alamat Email'),
+        const SizedBox(height: 8),
+        _GlassTextField(
+          controller: _emailCtrl,
+          hintText: 'contoh@kampusgo.id',
+          prefixIcon: Icons.email_outlined,
+          keyboardType: TextInputType.emailAddress,
+          errorText: _emailError,
+          onChanged: (v) {
+            if (_emailError != null) {
+              setState(() => _emailError = _validateEmail(v));
+            }
+          },
+        ),
+
+        // Error email
+        if (_emailError != null) _buildErrorText(_emailError!),
+
+        const SizedBox(height: 20),
+
+        // ── CAPTCHA ──
+        Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.04),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.purpleAccent.withOpacity(0.15)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.security_rounded, size: 14, color: Colors.purpleAccent),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Verifikasi Keamanan',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.white.withOpacity(0.55),
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  // Soal
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.purpleAccent.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.purpleAccent.withOpacity(0.25)),
+                      ),
+                      child: Text(
+                        '$_captchaA + $_captchaB = ?',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.purpleAccent,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  // Jawaban
+                  Expanded(
+                    child: _GlassTextField(
+                      controller: _captchaCtrl,
+                      hintText: 'Jawaban',
+                      keyboardType: TextInputType.number,
+                      errorText: _captchaError,
+                      onChanged: (v) {
+                        if (_captchaError != null) setState(() => _captchaError = null);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              if (_captchaError != null) _buildErrorText(_captchaError!),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 24),
+
+        // ── Action buttons ──
+        Row(
+          children: [
+            // Batal
+            Expanded(
+              child: TextButton(
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.white.withOpacity(0.55),
+                  padding: const EdgeInsets.symmetric(vertical: 13),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    side: BorderSide(color: Colors.white.withOpacity(0.1)),
+                  ),
+                ),
+                onPressed: _isSending ? null : () => Navigator.pop(context),
+                child: const Text('Batal', style: TextStyle(fontWeight: FontWeight.bold)),
+              ),
+            ),
+            const SizedBox(width: 12),
+            // Kirim Tautan
+            Expanded(
+              flex: 2,
+              child: _AnimatedSendButton(
+                isLoading: _isSending,
+                isCoolingDown: _isCoolingDown,
+                cooldownSeconds: _cooldownSeconds,
+                onPressed: (_isSending || _isCoolingDown) ? null : _handleSend,
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 20),
+
+        // ── Bantuan alternatif ──
+        _buildContactAdminLink(),
+      ],
+    );
+  }
+
+  Widget _buildLabel(String text) => Text(
+        text,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: Colors.white.withOpacity(0.6),
+          letterSpacing: 0.5,
+        ),
+      );
+
+  Widget _buildErrorText(String text) => Padding(
+        padding: const EdgeInsets.only(top: 6, left: 4),
+        child: Row(
+          children: [
+            const Icon(Icons.error_outline_rounded, size: 13, color: Colors.redAccent),
+            const SizedBox(width: 5),
+            Text(text, style: const TextStyle(fontSize: 12, color: Colors.redAccent)),
+          ],
+        ),
+      );
+
+  Widget _buildContactAdminLink() => Center(
+        child: TextButton.icon(
+          style: TextButton.styleFrom(
+            padding: EdgeInsets.zero,
+            foregroundColor: Colors.purpleAccent.withOpacity(0.75),
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            minimumSize: Size.zero,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text('Hubungi Admin Kampus: admin@kampusgo.id'),
+                behavior: SnackBarBehavior.floating,
+                backgroundColor: Colors.blueGrey.shade700,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                action: SnackBarAction(
+                  label: 'Salin',
+                  textColor: Colors.white,
+                  onPressed: () {},
+                ),
+              ),
+            );
+          },
+          icon: const Icon(Icons.help_outline_rounded, size: 14),
+          label: const Text(
+            'Tidak punya akses ke email ini? Hubungi Admin Kampus',
+            style: TextStyle(fontSize: 12, decoration: TextDecoration.underline),
+          ),
+        ),
+      );
+}
+
+// ─── Helper: Glass Text Field ──────────────────────────────────────────────────
+
+class _GlassTextField extends StatelessWidget {
+  final TextEditingController controller;
+  final String hintText;
+  final IconData? prefixIcon;
+  final TextInputType keyboardType;
+  final String? errorText;
+  final void Function(String)? onChanged;
+
+  const _GlassTextField({
+    required this.controller,
+    required this.hintText,
+    this.prefixIcon,
+    this.keyboardType = TextInputType.text,
+    this.errorText,
+    this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final hasError = errorText != null;
+    return TextField(
+      controller: controller,
+      keyboardType: keyboardType,
+      onChanged: onChanged,
+      style: const TextStyle(color: Colors.white, fontSize: 14),
+      decoration: InputDecoration(
+        hintText: hintText,
+        hintStyle: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 13),
+        prefixIcon: prefixIcon != null
+            ? Icon(prefixIcon, color: Colors.purpleAccent.withOpacity(0.7), size: 20)
+            : null,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+        filled: true,
+        fillColor: Colors.white.withOpacity(0.06),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: Colors.white.withOpacity(0.12)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(
+            color: hasError ? Colors.redAccent.withOpacity(0.6) : Colors.white.withOpacity(0.12),
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(
+            color: hasError ? Colors.redAccent : Colors.purpleAccent,
+            width: 1.5,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Helper: Animated Send Button ─────────────────────────────────────────────
+
+class _AnimatedSendButton extends StatelessWidget {
+  final bool isLoading;
+  final bool isCoolingDown;
+  final int cooldownSeconds;
+  final VoidCallback? onPressed;
+
+  const _AnimatedSendButton({
+    required this.isLoading,
+    required this.isCoolingDown,
+    required this.cooldownSeconds,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        gradient: onPressed != null
+            ? const LinearGradient(
+                colors: [Color(0xFF7C5CFC), Color(0xFF5B8DEF)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              )
+            : null,
+        color: onPressed == null ? Colors.grey.withOpacity(0.25) : null,
+        boxShadow: onPressed != null
+            ? [
+                BoxShadow(
+                  color: const Color(0xFF7C5CFC).withOpacity(0.4),
+                  blurRadius: 16,
+                  offset: const Offset(0, 6),
+                )
+              ]
+            : null,
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(14),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 13),
+            child: Center(
+              child: isLoading
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.2,
+                        valueColor: AlwaysStoppedAnimation(Colors.white),
+                      ),
+                    )
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.send_rounded, size: 16, color: Colors.white),
+                        const SizedBox(width: 8),
+                        Text(
+                          isCoolingDown ? 'Tunggu ${cooldownSeconds}d' : 'Kirim Tautan',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
