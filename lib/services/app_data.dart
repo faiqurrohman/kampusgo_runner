@@ -79,8 +79,26 @@ class AppData extends ChangeNotifier {
 
   ThemeMode themeMode = ThemeMode.dark;
 
+  void setThemeMode(ThemeMode mode) {
+    themeMode = mode;
+    notifyListeners();
+  }
+
   void toggleTheme() {
     themeMode = themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
+    notifyListeners();
+  }
+
+  String appLanguage = 'Bahasa Indonesia';
+  int notificationReminderHours = 24;
+
+  void updateLanguage(String lang) {
+    appLanguage = lang;
+    notifyListeners();
+  }
+
+  void updateNotificationReminder(int hours) {
+    notificationReminderHours = hours;
     notifyListeners();
   }
 

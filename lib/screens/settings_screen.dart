@@ -338,6 +338,166 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  void _showThemeSelectionDialog() {
+    ThemeMode currentMode = data.themeMode;
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setModalState) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          title: const Text('Tampilan (Theme)', style: TextStyle(fontWeight: FontWeight.bold)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RadioListTile<ThemeMode>(
+                title: const Text('Mode Gelap'),
+                secondary: const Icon(Icons.dark_mode_rounded, color: Colors.amber),
+                value: ThemeMode.dark,
+                groupValue: currentMode,
+                activeColor: Colors.orange,
+                onChanged: (v) => setModalState(() => currentMode = v!),
+              ),
+              RadioListTile<ThemeMode>(
+                title: const Text('Mode Terang'),
+                secondary: const Icon(Icons.light_mode_rounded, color: Colors.amber),
+                value: ThemeMode.light,
+                groupValue: currentMode,
+                activeColor: Colors.orange,
+                onChanged: (v) => setModalState(() => currentMode = v!),
+              ),
+              RadioListTile<ThemeMode>(
+                title: const Text('Mengikuti Sistem'),
+                secondary: const Icon(Icons.brightness_auto_rounded, color: Colors.blue),
+                value: ThemeMode.system,
+                groupValue: currentMode,
+                activeColor: Colors.orange,
+                onChanged: (v) => setModalState(() => currentMode = v!),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal')),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.orange, foregroundColor: Colors.white),
+              onPressed: () {
+                data.setThemeMode(currentMode);
+                Navigator.pop(ctx);
+              },
+              child: const Text('Terapkan'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showNotificationReminderDialog() {
+    int hours = data.notificationReminderHours;
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setModalState) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          title: const Text('Pengingat Deadline', style: TextStyle(fontWeight: FontWeight.bold)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Munculkan tanda urgensi di dasbor sebelum:'),
+              const SizedBox(height: 12),
+              RadioListTile<int>(
+                title: const Text('24 Jam (1 Hari)'),
+                value: 24,
+                groupValue: hours,
+                activeColor: Colors.deepPurple,
+                contentPadding: EdgeInsets.zero,
+                onChanged: (v) => setModalState(() => hours = v!),
+              ),
+              RadioListTile<int>(
+                title: const Text('12 Jam'),
+                value: 12,
+                groupValue: hours,
+                activeColor: Colors.deepPurple,
+                contentPadding: EdgeInsets.zero,
+                onChanged: (v) => setModalState(() => hours = v!),
+              ),
+              RadioListTile<int>(
+                title: const Text('6 Jam'),
+                value: 6,
+                groupValue: hours,
+                activeColor: Colors.deepPurple,
+                contentPadding: EdgeInsets.zero,
+                onChanged: (v) => setModalState(() => hours = v!),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal')),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.deepPurple, foregroundColor: Colors.white),
+              onPressed: () {
+                data.updateNotificationReminder(hours);
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Pengingat diatur ke $hours jam sebelum deadline'), behavior: SnackBarBehavior.floating),
+                );
+              },
+              child: const Text('Simpan'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showLanguageSelectionDialog() {
+    String lang = data.appLanguage;
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setModalState) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          title: const Text('Pilihan Bahasa', style: TextStyle(fontWeight: FontWeight.bold)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RadioListTile<String>(
+                title: const Text('Bahasa Indonesia'),
+                subtitle: const Text('ID'),
+                value: 'Bahasa Indonesia',
+                groupValue: lang,
+                activeColor: Colors.blue,
+                onChanged: (v) => setModalState(() => lang = v!),
+              ),
+              RadioListTile<String>(
+                title: const Text('English'),
+                subtitle: const Text('EN'),
+                value: 'English',
+                groupValue: lang,
+                activeColor: Colors.blue,
+                onChanged: (v) => setModalState(() => lang = v!),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal')),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, foregroundColor: Colors.white),
+              onPressed: () {
+                data.updateLanguage(lang);
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Bahasa diubah ke $lang'), behavior: SnackBarBehavior.floating),
+                );
+              },
+              child: const Text('Terapkan'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _sectionTitle(String title) {
     return Padding(
       padding: const EdgeInsets.only(left: 8, bottom: 12, top: 24),
@@ -519,7 +679,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
 
-            _sectionTitle('3. Preferensi & Tampilan Aplikasi'),
+            _sectionTitle('3. Preferensi Aplikasi'),
             Card(
               elevation: 0,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
@@ -533,13 +693,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       decoration: BoxDecoration(color: Colors.orange.withOpacity(0.12), borderRadius: BorderRadius.circular(12)),
                       child: const Icon(Icons.palette_rounded, color: Colors.orange),
                     ),
-                    title: const Text('Tema Tampilan'),
-                    subtitle: Text(data.themeMode == ThemeMode.dark ? 'Mode Gelap Aktif' : 'Mode Terang Aktif'),
-                    trailing: Switch(
-                      value: data.themeMode == ThemeMode.dark,
-                      onChanged: (_) => data.toggleTheme(),
-                      activeColor: Colors.orange,
+                    title: const Text('Tampilan (Theme)'),
+                    subtitle: Text(
+                      data.themeMode == ThemeMode.dark ? 'Mode Gelap' : 
+                      (data.themeMode == ThemeMode.light ? 'Mode Terang' : 'Mengikuti Sistem')
                     ),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: _showThemeSelectionDialog,
                   ),
                   Divider(height: 1, indent: 64, color: Theme.of(context).dividerColor.withOpacity(0.08)),
                   ListTile(
@@ -547,15 +707,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     leading: Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(color: Colors.deepPurple.withOpacity(0.12), borderRadius: BorderRadius.circular(12)),
-                      child: const Icon(Icons.notifications_active_rounded, color: Colors.deepPurple),
+                      child: const Icon(Icons.timer_rounded, color: Colors.deepPurple),
                     ),
-                    title: const Text('Notifikasi Presisi'),
-                    subtitle: const Text('Peringatan otomatis < 24 jam'),
-                    trailing: Switch(
-                      value: data.preciseNotifications,
-                      onChanged: data.togglePreciseNotifications,
-                      activeColor: Colors.deepPurple,
+                    title: const Text('Pengingat Deadline Aktif'),
+                    subtitle: Text('Muncul urgensi < ${data.notificationReminderHours} jam'),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: _showNotificationReminderDialog,
+                  ),
+                  Divider(height: 1, indent: 64, color: Theme.of(context).dividerColor.withOpacity(0.08)),
+                  ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                    leading: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(color: Colors.blue.withOpacity(0.12), borderRadius: BorderRadius.circular(12)),
+                      child: const Icon(Icons.language_rounded, color: Colors.blue),
                     ),
+                    title: const Text('Bahasa Aplikasi'),
+                    subtitle: Text(data.appLanguage),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: _showLanguageSelectionDialog,
                   ),
                 ],
               ),
