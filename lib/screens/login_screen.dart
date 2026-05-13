@@ -117,32 +117,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    bottomNavigationBar: SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(28, 16, 28, 24),
-        child: Container(
-          padding: const EdgeInsets.all(20), 
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface, 
-            border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)), 
-            borderRadius: BorderRadius.circular(24),
-          ), 
-          child: Row(children: [
-            const Icon(Icons.info_outline_rounded, color: Colors.grey), 
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                'Demo login: demo@kampusgo.id / 123456', 
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ),
-          ])
-        ),
-      ),
-    ),
     body: SafeArea(
       child: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24), 
+        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
         children: [
           const SizedBox(height: 60),
           Align(
@@ -357,6 +334,36 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ),
+          const SizedBox(height: 16),
+          // Demo info dipindahkan menjadi kotak kecil yang efisien untuk mode produksi
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: Theme.of(context).dividerColor.withOpacity(0.04),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.08)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.info_outline_rounded, size: 16, color: Colors.grey),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Demo akun: demo@kampusgo.id / 123456',
+                    style: TextStyle(fontSize: 11, color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.8)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 32),
+          // Aspek Legalitas: Ketentuan Layanan
+          Text(
+            'Dengan masuk, Anda menyetujui Syarat & Ketentuan serta Kebijakan Privasi kami.',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 11, color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.6), height: 1.4),
+          ),
+          const SizedBox(height: 12),
         ],
       ),
     ),
