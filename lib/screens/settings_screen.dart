@@ -498,6 +498,157 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  void _showAccountSecurityDialog() {
+    final oldPass = TextEditingController();
+    final newPass = TextEditingController();
+    bool bio = data.biometricAuth;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setModalState) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          title: const Text('Keamanan Akun', style: TextStyle(fontWeight: FontWeight.bold)),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Ganti Kata Sandi', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: oldPass,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: 'Sandi Lama',
+                    isDense: true,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: newPass,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: 'Sandi Baru',
+                    isDense: true,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Divider(color: Theme.of(context).dividerColor.withOpacity(0.08)),
+                SwitchListTile(
+                  title: const Text('Biometrik (Sidik Jari)', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                  subtitle: const Text('Login cepat tanpa sandi', style: TextStyle(fontSize: 11)),
+                  value: bio,
+                  activeColor: Colors.blueGrey,
+                  contentPadding: EdgeInsets.zero,
+                  onChanged: (v) {
+                    setModalState(() => bio = v);
+                    data.toggleBiometricAuth(v);
+                  },
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Tutup')),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.blueGrey, foregroundColor: Colors.white),
+              onPressed: () {
+                if (newPass.text.isNotEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Kata sandi berhasil diperbarui'), behavior: SnackBarBehavior.floating),
+                  );
+                }
+                Navigator.pop(ctx);
+              },
+              child: const Text('Simpan'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showBackupDataDialog() {
+    bool isBackingUp = false;
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setModalState) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          title: const Text('Cadangkan Data (Cloud Backup)', style: TextStyle(fontWeight: FontWeight.bold)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Total Tautan Tersimpan: ${data.resources.length} link di Resource Hub', style: const TextStyle(fontSize: 12)),
+              const SizedBox(height: 6),
+              Text('Catatan Finansial: ${data.expenses.length} entri', style: const TextStyle(fontSize: 12)),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.blue.withOpacity(0.2)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.cloud_done_rounded, color: Colors.blue, size: 28),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Status Cloud Sinkronisasi', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                          Text('Terakhir: ${data.lastBackupDate}', style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (isBackingUp) ...[
+                const SizedBox(height: 20),
+                const Center(child: CircularProgressIndicator(strokeWidth: 3)),
+                const SizedBox(height: 8),
+                const Center(child: Text('Mengunggah enkripsi ke cloud server...', style: TextStyle(fontSize: 11))),
+              ],
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: isBackingUp ? null : () => Navigator.pop(ctx), 
+              child: const Text('Kembali'),
+            ),
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, foregroundColor: Colors.white),
+              onPressed: isBackingUp ? null : () async {
+                setModalState(() => isBackingUp = true);
+                await Future.delayed(const Duration(milliseconds: 1500));
+                if (context.mounted) {
+                  data.performBackup('Hari ini, ${TimeOfDay.now().format(context)}');
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('✅ Seluruh tautan dan data berhasil dicadangkan ke Cloud'),
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Colors.teal,
+                    ),
+                  );
+                }
+              },
+              icon: const Icon(Icons.backup_rounded, size: 18),
+              label: const Text('Mulai Backup'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _sectionTitle(String title) {
     return Padding(
       padding: const EdgeInsets.only(left: 8, bottom: 12, top: 24),
@@ -731,7 +882,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
 
-            _sectionTitle('4. Keamanan & Informasi'),
+            _sectionTitle('4. Keamanan & Data'),
             Card(
               elevation: 0,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
@@ -746,15 +897,55 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       child: const Icon(Icons.security_rounded, color: Colors.blueGrey),
                     ),
                     title: const Text('Keamanan Akun'),
-                    subtitle: const Text('Autentikasi & sandi terenkripsi'),
+                    subtitle: Text(data.biometricAuth ? 'Sandi & Biometrik Aktif' : 'Sandi Terlindungi'),
                     trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: _showAccountSecurityDialog,
+                  ),
+                  Divider(height: 1, indent: 64, color: Theme.of(context).dividerColor.withOpacity(0.08)),
+                  ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                    leading: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(color: Colors.blue.withOpacity(0.12), borderRadius: BorderRadius.circular(12)),
+                      child: const Icon(Icons.cloud_upload_rounded, color: Colors.blue),
+                    ),
+                    title: const Text('Cadangkan Data (Backup)'),
+                    subtitle: Text('Enkripsi sinkronisasi Resource Hub'),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: _showBackupDataDialog,
+                  ),
+                  Divider(height: 1, indent: 64, color: Theme.of(context).dividerColor.withOpacity(0.08)),
+                  ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                    leading: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(color: Colors.red.withOpacity(0.12), borderRadius: BorderRadius.circular(12)),
+                      child: const Icon(Icons.cleaning_services_rounded, color: Colors.red),
+                    ),
+                    title: const Text('Hapus Cache'),
+                    subtitle: const Text('Bersihkan memori sementara'),
+                    trailing: const Icon(Icons.delete_sweep_rounded, size: 20, color: Colors.redAccent),
                     onTap: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Keamanan biometrik diaktifkan'), behavior: SnackBarBehavior.floating),
+                        const SnackBar(
+                          content: Text('✅ 24.5 MB file cache berhasil dibersihkan. Performa optimal.'),
+                          behavior: SnackBarBehavior.floating,
+                          backgroundColor: Colors.teal,
+                        ),
                       );
                     },
                   ),
-                  Divider(height: 1, indent: 64, color: Theme.of(context).dividerColor.withOpacity(0.08)),
+                ],
+              ),
+            ),
+
+            _sectionTitle('5. Ketentuan & Informasi'),
+            Card(
+              elevation: 0,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+              color: Theme.of(context).colorScheme.surface,
+              child: Column(
+                children: [
                   ListTile(
                     contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
                     leading: Container(

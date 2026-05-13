@@ -111,6 +111,8 @@ class AppData extends ChangeNotifier {
   int activeSemester = 5;
   bool calendarIntegration = true;
   bool preciseNotifications = true;
+  bool biometricAuth = true;
+  String lastBackupDate = 'Kemarin, 14:20';
 
   void updateProfile({String? name, String? email, String? prodi, int? semester, double? target}) {
     if (name != null && name.trim().isNotEmpty) userName = name;
@@ -128,6 +130,16 @@ class AppData extends ChangeNotifier {
 
   void togglePreciseNotifications(bool val) {
     preciseNotifications = val;
+    notifyListeners();
+  }
+
+  void toggleBiometricAuth(bool val) {
+    biometricAuth = val;
+    notifyListeners();
+  }
+
+  void performBackup(String dateStr) {
+    lastBackupDate = dateStr;
     notifyListeners();
   }
 
