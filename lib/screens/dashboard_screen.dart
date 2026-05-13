@@ -391,17 +391,50 @@ class _Home extends StatelessWidget {
         ),
       ),
       const SizedBox(height: 24),
-      Row(children: [
-        Expanded(child: InfoCard(title: 'Deadline Aktif', value: '${next.length}', icon: Icons.timer_outlined, color: Colors.amber, onTap: () => onTabChange(1))),
-        const SizedBox(width: 16),
-        Expanded(child: InfoCard(title: 'Pengeluaran', value: Formatters.currency.format(data.totalExpense()), icon: Icons.receipt_long_rounded, color: Colors.green, onTap: () => onTabChange(2))),
-      ]),
-      const SizedBox(height: 16),
-      Row(children: [
-        Expanded(child: InfoCard(title: 'IPK Sementara', value: data.calculateGpa().toStringAsFixed(2), icon: Icons.grade_rounded, color: Colors.orange, onTap: () => onTabChange(3))),
-        const SizedBox(width: 16),
-        Expanded(child: InfoCard(title: 'Resource Hub', value: '${data.resources.length}', icon: Icons.folder_shared_outlined, color: AppTheme.primary, onTap: () => onTabChange(4))),
-      ]),
+      InfoCard(
+        title: 'Deadline Aktif', 
+        value: '${next.length} tugas', 
+        icon: Icons.assignment_rounded, 
+        color: Colors.amber, 
+        onTap: () => onTabChange(1),
+      ),
+      InfoCard(
+        title: 'Total Pengeluaran', 
+        value: Formatters.currency.format(data.totalExpense()), 
+        valueColor: Colors.redAccent,
+        icon: Icons.payments_rounded, 
+        color: Colors.green, 
+        onTap: () => onTabChange(2),
+      ),
+      InfoCard(
+        title: 'Prediksi IPK', 
+        value: data.calculateGpa().toStringAsFixed(2), 
+        icon: Icons.workspace_premium_rounded, 
+        color: Colors.purpleAccent, 
+        trailingWidget: SizedBox(
+          width: 40, height: 40,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              CircularProgressIndicator(
+                value: data.calculateGpa() / 4.0,
+                strokeWidth: 3.5,
+                backgroundColor: Theme.of(context).dividerColor.withOpacity(0.08),
+                color: Colors.purpleAccent,
+              ),
+              const Icon(Icons.star_rounded, size: 16, color: Colors.purpleAccent),
+            ],
+          ),
+        ),
+        onTap: () => onTabChange(3),
+      ),
+      InfoCard(
+        title: 'Resource Hub', 
+        value: '${data.resources.length} tautan', 
+        icon: Icons.folder_shared_rounded, 
+        color: AppTheme.primary, 
+        onTap: () => onTabChange(4),
+      ),
     ]));
   }
 }
