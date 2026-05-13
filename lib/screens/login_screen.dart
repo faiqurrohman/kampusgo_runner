@@ -15,6 +15,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final password = TextEditingController(text: '123456');
   bool hide = true;
   bool rememberMe = true; // Keamanan & Aksesibilitas: Ingat Saya
+  bool isLoading = false; // Status Loading saat autentikasi berjalan
+  String? errorMessage; // Pesan Kesalahan (Error Handling)
 
   void _showForgotPasswordDialog() {
     final resetCtrl = TextEditingController(text: email.text);
@@ -66,6 +68,49 @@ class _LoginScreenState extends State<LoginScreen> {
             child: const Text('Kirim Tautan', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
         ],
+      ),
+    );
+  }
+
+  Future<void> _handleLogin() async {
+    // 1. Memicu Validasi visual (garis tepi otomatis merah jika salah)
+    if (!formKey.currentState!.validate()) return;
+
+    setState(() {
+      isLoading = true;
+      errorMessage = null;
+    });
+
+    // Simulasi jeda autentikasi / proses verifikasi server
+    await Future.delayed(const Duration(milliseconds: 1500));
+
+    if (!mounted) return;
+
+    // Verifikasi kredensial demo
+    if (email.text.trim() == 'demo@kampusgo.id' && password.text == '123456') {
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const DashboardScreen()));
+    } else {
+      setState(() {
+        isLoading = false;
+        errorMessage = 'Kredensial tidak sesuai. Periksa kembali penulisan email dan password Anda.';
+      });
+    }
+  }
+
+  InputDecoration _customInputDeco({required String label, required Widget prefixIcon, Widget? suffixIcon}) {
+    return InputDecoration(
+      labelText: label,
+      prefixIcon: prefixIcon,
+      suffixIcon: suffixIcon,
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+      // Desain mempertimbangkan garis tepi kolom berubah menjadi merah jika email/password salah
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.redAccent, width: 1.5),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.redAccent, width: 2.0),
       ),
     );
   }
@@ -134,22 +179,50 @@ class _LoginScreenState extends State<LoginScreen> {
             'Kelola jadwal, uang saku, IPK, dan link kuliahmu dengan lebih cerdas.', 
             style: Theme.of(context).textTheme.bodyMedium,
           ),
-          const SizedBox(height: 48),
+          const SizedBox(height: 36),
+
+          // Feedback Visual: Banner Pesan Kesalahan jika login tidak valid
+          if (errorMessage != null) ...[
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.redAccent.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.redAccent.withOpacity(0.3)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.error_outline_rounded, color: Colors.redAccent),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      errorMessage!, 
+                      style: const TextStyle(fontSize: 12, color: Colors.redAccent, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+          ],
+
           Form(
             key: formKey, 
             child: Column(
               children: [
                 TextFormField(
                   controller: email, 
-                  decoration: const InputDecoration(labelText: 'Email', prefixIcon: Icon(Icons.email_outlined)), 
-                  validator: (v) => v != null && v.contains('@') ? null : 'Email tidak valid',
+                  enabled: !isLoading,
+                  decoration: _customInputDeco(label: 'Email', prefixIcon: const Icon(Icons.email_outlined)), 
+                  validator: (v) => v != null && v.contains('@') ? null : 'Alamat email tidak valid',
                 ),
                 const SizedBox(height: 20),
                 TextFormField(
                   controller: password, 
                   obscureText: hide, 
-                  decoration: InputDecoration(
-                    labelText: 'Password', 
+                  enabled: !isLoading,
+                  decoration: _customInputDeco(
+                    label: 'Password', 
                     prefixIcon: const Icon(Icons.lock_outline), 
                     suffixIcon: IconButton(
                       icon: Icon(hide ? Icons.visibility : Icons.visibility_off), 
@@ -166,14 +239,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       height: 24, width: 24,
                       child: Checkbox(
                         value: rememberMe,
-                        onChanged: (v) => setState(() => rememberMe = v ?? false),
+                        onChanged: isLoading ? null : (v) => setState(() => rememberMe = v ?? false),
                         activeColor: AppTheme.primary,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                       ),
                     ),
                     const SizedBox(width: 8),
                     GestureDetector(
-                      onTap: () => setState(() => rememberMe = !rememberMe),
+                      onTap: isLoading ? null : () => setState(() => rememberMe = !rememberMe),
                       child: Text(
                         'Ingat Saya', 
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600),
@@ -187,19 +260,26 @@ class _LoginScreenState extends State<LoginScreen> {
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         foregroundColor: AppTheme.primary,
                       ),
-                      onPressed: _showForgotPasswordDialog,
+                      onPressed: isLoading ? null : _showForgotPasswordDialog,
                       child: const Text('Lupa Kata Sandi?', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                     ),
                   ],
                 ),
                 const SizedBox(height: 32),
+                
+                // Status Loading: Tampilan tombol saat proses autentikasi berjalan
                 ElevatedButton(
-                  onPressed: () { 
-                    if (formKey.currentState!.validate()) {
-                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const DashboardScreen())); 
-                    }
-                  }, 
-                  child: const Text('Masuk Sekarang'),
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(52),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  ),
+                  onPressed: isLoading ? null : _handleLogin, 
+                  child: isLoading 
+                      ? const SizedBox(
+                          height: 24, width: 24,
+                          child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
+                        )
+                      : const Text('Masuk Sekarang', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 ),
               ],
             ),
@@ -230,7 +310,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     side: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.15)),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
-                  onPressed: () {
+                  onPressed: isLoading ? null : () {
                     Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const DashboardScreen()));
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('🔑 Berhasil masuk cepat dengan Akun Google'), behavior: SnackBarBehavior.floating, backgroundColor: Colors.teal),
@@ -248,7 +328,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     side: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.15)),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
-                  onPressed: () {
+                  onPressed: isLoading ? null : () {
                     Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const DashboardScreen()));
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('✅ Sensor biometrik wajah/sidik jari terverifikasi'), behavior: SnackBarBehavior.floating, backgroundColor: Colors.teal),
@@ -262,7 +342,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           const SizedBox(height: 24),
           TextButton(
-            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RegisterScreen())), 
+            onPressed: isLoading ? null : () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RegisterScreen())), 
             style: TextButton.styleFrom(foregroundColor: Theme.of(context).textTheme.bodyMedium?.color),
             child: RichText(
               text: TextSpan(
