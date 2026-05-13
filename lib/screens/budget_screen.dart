@@ -325,7 +325,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
             ),
             const SizedBox(height: 12),
             Container(
-              maxHeight: 180,
+              constraints: const BoxConstraints(maxHeight: 180),
               width: double.infinity,
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(

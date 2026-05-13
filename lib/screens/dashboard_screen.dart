@@ -202,62 +202,95 @@ class _Home extends StatelessWidget {
     final data = AppData.instance;
     final next = data.schedules.where((e) => !e.done).toList()..sort((a,b)=>a.deadline.compareTo(b.deadline));
     return SafeArea(child: ListView(padding: const EdgeInsets.only(left: 24, right: 24, top: 48, bottom: 20), children: [
-      Row(children: [
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('Halo, Mahasiswa 👋', style: Theme.of(context).textTheme.headlineMedium),
-          const SizedBox(height: 6), 
-          Text('Pantau hidup kampusmu hari ini.', style: Theme.of(context).textTheme.bodyMedium),
-        ])),
-        Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Dark Mode Toggle Button yang sangat mulus
-              IconButton(
-                onPressed: () {
-                  data.toggleTheme();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(data.themeMode == ThemeMode.dark ? '🌙 Beralih ke Dark Mode' : '☀️ Beralih ke Light Mode'),
-                      behavior: SnackBarBehavior.floating,
-                      duration: const Duration(milliseconds: 1000),
+      Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Flexible(
+                      child: Text(
+                        'Halo, Mahasiswa',
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                  );
-                },
-                icon: Icon(
-                  data.themeMode == ThemeMode.dark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
-                  color: Colors.amber,
+                    const SizedBox(width: 6),
+                    const Text('👋', style: TextStyle(fontSize: 20)),
+                  ],
                 ),
-                tooltip: 'Ganti Mode Tampilan',
-              ),
-              Stack(
-                alignment: Alignment.topRight,
-                children: [
-                  IconButton(onPressed: () {}, icon: const Icon(Icons.notifications_none_rounded)),
-                  Positioned(
-                    top: 12, right: 12,
-                    child: Container(width: 8, height: 8, decoration: const BoxDecoration(color: AppTheme.accent, shape: BoxShape.circle)),
-                  )
-                ]
-              ),
-              IconButton(
-                onPressed: () {
-                  showModalBottomSheet(
-                    context: context,
-                    builder: (_) => _SettingsSheet(onLogout: onLogout),
-                  );
-                }, 
-                icon: const Icon(Icons.settings_rounded)
-              ),
-            ],
+                const SizedBox(height: 4), 
+                Text('Pantau hidup kampusmu hari ini.', style: Theme.of(context).textTheme.bodySmall),
+              ],
+            ),
           ),
-        ),
-      ]),
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.12)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 1. Ikon Lonceng Notifikasi berwarna kuning/amber
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () {},
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      const Icon(Icons.notifications_none_rounded, color: Colors.amber, size: 20),
+                      Positioned(
+                        top: -2, right: -2,
+                        child: Container(width: 6, height: 6, decoration: const BoxDecoration(color: AppTheme.accent, shape: BoxShape.circle)),
+                      )
+                    ]
+                  ),
+                ),
+                const SizedBox(width: 14),
+                // 2. Ikon Toggle Tema (Matahari/Bulan) berwarna kuning/amber
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () {
+                    data.toggleTheme();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(data.themeMode == ThemeMode.dark ? '🌙 Beralih ke Dark Mode' : '☀️ Beralih ke Light Mode'),
+                        behavior: SnackBarBehavior.floating,
+                        duration: const Duration(milliseconds: 1000),
+                      ),
+                    );
+                  },
+                  child: Icon(
+                    data.themeMode == ThemeMode.dark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+                    color: Colors.amber,
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                // 3. Ikon Pengaturan (Roda Gigi)
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      builder: (_) => _SettingsSheet(onLogout: onLogout),
+                    );
+                  },
+                  child: const Icon(Icons.settings_rounded, size: 20),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
       const SizedBox(height: 32),
       Container(
         padding: const EdgeInsets.fromLTRB(28, 28, 28, 36), 
@@ -359,15 +392,15 @@ class _Home extends StatelessWidget {
       ),
       const SizedBox(height: 24),
       Row(children: [
-        Expanded(child: InfoCard(title: 'Deadline Aktif', value: '${next.length}', subtitle: 'Tugas tertunda', icon: Icons.timer_outlined, color: Colors.amber, onTap: () => onTabChange(1))),
+        Expanded(child: InfoCard(title: 'Deadline Aktif', value: '${next.length}', icon: Icons.timer_outlined, color: Colors.amber, onTap: () => onTabChange(1))),
         const SizedBox(width: 16),
-        Expanded(child: InfoCard(title: 'Pengeluaran', value: Formatters.currency.format(data.totalExpense()), subtitle: 'Minggu ini', icon: Icons.receipt_long_rounded, color: Colors.green, onTap: () => onTabChange(2))),
+        Expanded(child: InfoCard(title: 'Pengeluaran', value: Formatters.currency.format(data.totalExpense()), icon: Icons.receipt_long_rounded, color: Colors.green, onTap: () => onTabChange(2))),
       ]),
       const SizedBox(height: 16),
       Row(children: [
-        Expanded(child: InfoCard(title: 'IPK Sementara', value: data.calculateGpa().toStringAsFixed(2), subtitle: 'Target: ${data.targetGpa.toStringAsFixed(2)}', icon: Icons.grade_rounded, color: Colors.orange, onTap: () => onTabChange(3))),
+        Expanded(child: InfoCard(title: 'IPK Sementara', value: data.calculateGpa().toStringAsFixed(2), icon: Icons.grade_rounded, color: Colors.orange, onTap: () => onTabChange(3))),
         const SizedBox(width: 16),
-        Expanded(child: InfoCard(title: 'Resource Hub', value: '${data.resources.length}', subtitle: 'Link tersimpan', icon: Icons.folder_shared_outlined, color: AppTheme.primary, onTap: () => onTabChange(4))),
+        Expanded(child: InfoCard(title: 'Resource Hub', value: '${data.resources.length}', icon: Icons.folder_shared_outlined, color: AppTheme.primary, onTap: () => onTabChange(4))),
       ]),
     ]));
   }
