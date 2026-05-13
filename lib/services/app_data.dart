@@ -113,13 +113,15 @@ class AppData extends ChangeNotifier {
   bool preciseNotifications = true;
   bool biometricAuth = true;
   String lastBackupDate = 'Kemarin, 14:20';
+  String userAvatarUrl = '🧑‍🎓';
 
-  void updateProfile({String? name, String? email, String? prodi, int? semester, double? target}) {
+  void updateProfile({String? name, String? email, String? prodi, int? semester, double? target, String? avatar}) {
     if (name != null && name.trim().isNotEmpty) userName = name;
     if (email != null && email.trim().isNotEmpty) userEmail = email;
     if (prodi != null && prodi.trim().isNotEmpty) userProdi = prodi;
     if (semester != null) activeSemester = semester;
     if (target != null) targetGpa = target;
+    if (avatar != null) userAvatarUrl = avatar;
     notifyListeners();
   }
 

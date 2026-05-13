@@ -230,6 +230,22 @@ class _Home extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
+          // Foto profil mahasiswa melingkar di tengah baris atas
+          Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: AppTheme.primary.withOpacity(0.5), width: 2),
+              boxShadow: [
+                BoxShadow(color: AppTheme.primary.withOpacity(0.2), blurRadius: 8, spreadRadius: 1),
+              ],
+            ),
+            child: CircleAvatar(
+              radius: 20,
+              backgroundColor: Colors.white.withOpacity(0.12),
+              child: Text(data.userAvatarUrl, style: const TextStyle(fontSize: 20)),
+            ),
+          ),
+          const SizedBox(width: 12),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(

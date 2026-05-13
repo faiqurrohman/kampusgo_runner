@@ -37,29 +37,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
     Color? iconBgColor,
     Color? iconColor,
     Widget? trailingWidget,
+    bool isSmaller = false,
   }) {
     return Column(
       children: [
         ListTile(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          contentPadding: EdgeInsets.symmetric(horizontal: isSmaller ? 24 : 16, vertical: isSmaller ? 0 : 4),
+          dense: isSmaller,
           leading: Container(
-            padding: const EdgeInsets.all(10),
+            padding: EdgeInsets.all(isSmaller ? 8 : 10),
             decoration: BoxDecoration(
-              color: iconBgColor ?? AppTheme.primary.withOpacity(0.12), 
-              borderRadius: BorderRadius.circular(12),
+              color: iconBgColor ?? AppTheme.primary.withOpacity(isSmaller ? 0.08 : 0.12), 
+              borderRadius: BorderRadius.circular(isSmaller ? 10 : 12),
             ),
-            child: Icon(icon, color: iconColor ?? AppTheme.primary, size: 20),
+            child: Icon(icon, color: iconColor ?? AppTheme.primary, size: isSmaller ? 16 : 20),
           ),
-          title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-          subtitle: Text(subtitle, style: TextStyle(fontSize: 12, color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.7))),
+          title: Text(title, style: TextStyle(fontWeight: isSmaller ? FontWeight.w500 : FontWeight.w600, fontSize: isSmaller ? 13 : 14)),
+          subtitle: Text(subtitle, style: TextStyle(fontSize: isSmaller ? 11 : 12, color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.7))),
           trailing: trailingWidget ?? Icon(
             Icons.chevron_right_rounded, 
-            size: 20, 
+            size: isSmaller ? 16 : 20, 
             color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.4),
           ),
           onTap: onTap,
         ),
-        Divider(height: 1, indent: 64, color: Theme.of(context).dividerColor.withOpacity(0.06)),
+        Divider(height: 1, indent: isSmaller ? 72 : 64, color: Theme.of(context).dividerColor.withOpacity(0.06)),
       ],
     );
   }
@@ -73,7 +75,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           child: ListView(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
             children: [
-              // Header Kiri Atas Tebal Beserta Tombol Kembali Sesuai Rekomendasi UI
+              // Bilah navigasi atas dengan '<- Pengaturan'
               Row(
                 children: [
                   IconButton(
@@ -95,7 +97,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Kartu Profil Utama
+              // Kartu profil ungu gradien besar yang diperbarui
+              // Emoji tangan melambai diganti dengan foto profil mahasiswa melingkar yang sama dari dasbor
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
@@ -110,10 +113,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 child: Row(
                   children: [
-                    CircleAvatar(
-                      radius: 36,
-                      backgroundColor: Colors.white.withOpacity(0.2),
-                      child: const Text('👋', style: TextStyle(fontSize: 32)),
+                    // Foto profil mahasiswa melingkar diposisikan sebelum nama dan prodi
+                    Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white.withOpacity(0.4), width: 2),
+                        boxShadow: [
+                          BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 8, spreadRadius: 1),
+                        ],
+                      ),
+                      child: CircleAvatar(
+                        radius: 36,
+                        backgroundColor: Colors.white.withOpacity(0.15),
+                        child: Text(data.userAvatarUrl, style: const TextStyle(fontSize: 34)),
+                      ),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
@@ -137,6 +150,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ],
                       ),
                     ),
+                    // Pertahankan ikon pensil 'Edit'
                     IconButton(
                       style: IconButton.styleFrom(backgroundColor: Colors.white.withOpacity(0.2)),
                       icon: const Icon(Icons.edit_rounded, color: Colors.white, size: 20),
@@ -156,11 +170,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 color: Theme.of(context).colorScheme.surface,
                 child: Column(
                   children: [
+                    // 'Edit Profil' diperbarui menyertakan teks 'Ubah nama, email, dan info akademik'
                     _buildTile(
                       icon: Icons.person_rounded,
                       title: 'Edit Profil',
-                      subtitle: 'Ubah nama, foto, dan email',
+                      subtitle: 'Ubah nama, email, dan info akademik',
                       onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => _EditProfileScreen(data: data))),
+                    ),
+                    // Opsi baru spesifik yang lebih kecil 'Edit foto profil' dengan ikon pensil
+                    _buildTile(
+                      icon: Icons.edit_rounded,
+                      title: 'Edit foto profil',
+                      subtitle: 'Pilih avatar grafis personalisasi',
+                      isSmaller: true,
+                      iconColor: Colors.purpleAccent,
+                      iconBgColor: Colors.purpleAccent.withOpacity(0.1),
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => _EditAvatarScreen(data: data))),
                     ),
                     _buildTile(
                       icon: Icons.school_rounded,
@@ -375,6 +400,47 @@ class _CustomSubScaffold extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: bottomNavigationBar,
+    );
+  }
+}
+
+class _EditAvatarScreen extends StatelessWidget {
+  final AppData data;
+  const _EditAvatarScreen({required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    final list = ['🧑‍🎓', '👨‍💻', '👩‍💻', '🎓', '⚡', '🚀', '🌟', '🎯', '💡'];
+    return _CustomSubScaffold(
+      title: 'Edit Foto Profil',
+      body: GridView.builder(
+        padding: const EdgeInsets.all(24),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3, crossAxisSpacing: 16, mainAxisSpacing: 16,
+        ),
+        itemCount: list.length,
+        itemBuilder: (context, index) {
+          final item = list[index];
+          final isSelected = data.userAvatarUrl == item;
+          return InkWell(
+            borderRadius: BorderRadius.circular(24),
+            onTap: () {
+              data.updateProfile(avatar: item);
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Foto profil diperbarui'), behavior: SnackBarBehavior.floating));
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                color: isSelected ? AppTheme.primary.withOpacity(0.2) : Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: isSelected ? AppTheme.primary : Theme.of(context).dividerColor.withOpacity(0.08), width: isSelected ? 2 : 1),
+              ),
+              alignment: Alignment.center,
+              child: Text(item, style: const TextStyle(fontSize: 40)),
+            ),
+          );
+        },
+      ),
     );
   }
 }
