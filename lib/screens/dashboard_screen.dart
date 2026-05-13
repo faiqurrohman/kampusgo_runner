@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../services/app_data.dart';
@@ -13,9 +14,19 @@ import 'resource_screen.dart';
 class DashboardScreen extends StatefulWidget { const DashboardScreen({super.key}); @override State<DashboardScreen> createState() => _DashboardScreenState(); }
 class _DashboardScreenState extends State<DashboardScreen> {
   int index = 0;
+  bool _isLoading = true;
   final data = AppData.instance;
   late final pages = [_Home(onLogout: _logout, onTabChange: (i) => setState(() => index = i)), const PlannerScreen(), const BudgetScreen(), const GpaScreen(), const ResourceScreen()];
   void _logout() => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen()));
+
+  @override
+  void initState() {
+    super.initState();
+    // Efek Skeleton Loading saat pertama kali mengambil data agar terasa instan & mulus
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      if (mounted) setState(() => _isLoading = false);
+    });
+  }
 
   void _showQuickActionSheet(BuildContext context) {
     showModalBottomSheet(
@@ -50,10 +61,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             const SizedBox(height: 24),
             _QuickActionTile(
-              icon: Icons.event_note_rounded,
-              color: Colors.orange,
-              title: 'Tambah Jadwal / Deadline',
-              subtitle: 'Catat tugas kuliah atau jadwal ujian baru',
+              icon: Icons.alarm_add_rounded,
+              color: Colors.redAccent,
+              title: 'Tambah Jadwal / Tugas',
+              subtitle: 'Tetapkan tenggat waktu otomatis di Smart Planner',
               onTap: () {
                 Navigator.pop(ctx);
                 setState(() => index = 1);
@@ -61,10 +72,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             const SizedBox(height: 12),
             _QuickActionTile(
-              icon: Icons.account_balance_wallet_rounded,
+              icon: Icons.receipt_long_rounded,
               color: Colors.green,
               title: 'Catat Pengeluaran',
-              subtitle: 'Lacak pengeluaran dan sisa uang saku mingguan',
+              subtitle: 'Lacak saku dan sinkronisasi di Budget Buddy',
               onTap: () {
                 Navigator.pop(ctx);
                 setState(() => index = 2);
@@ -72,10 +83,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             const SizedBox(height: 12),
             _QuickActionTile(
-              icon: Icons.workspace_premium_rounded,
-              color: AppTheme.secondary,
-              title: 'Simulasi Nilai IPK',
-              subtitle: 'Tambah bobot SKS dan target nilai mata kuliah',
+              icon: Icons.grade_rounded,
+              color: Colors.orange,
+              title: 'Input Nilai Matkul',
+              subtitle: 'Hitung dan bandingkan di GPA Predictor',
               onTap: () {
                 Navigator.pop(ctx);
                 setState(() => index = 3);
@@ -83,10 +94,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             const SizedBox(height: 12),
             _QuickActionTile(
-              icon: Icons.folder_rounded,
+              icon: Icons.link_rounded,
               color: AppTheme.primary,
-              title: 'Simpan Arsip / Link',
-              subtitle: 'Simpan materi, tugas, atau panduan penting',
+              title: 'Simpan Resource Link',
+              subtitle: 'Sematkan pintasan materi kuliah di Resource Hub',
               onTap: () {
                 Navigator.pop(ctx);
                 setState(() => index = 4);
@@ -108,8 +119,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         systemNavigationBarIconBrightness: Brightness.light,
       ),
       child: Scaffold(
-        body: pages[index],
-        floatingActionButton: index == 0 ? FloatingActionButton(
+        body: _isLoading ? const _SkeletonLoaderView() : pages[index],
+        floatingActionButton: (index == 0 && !_isLoading) ? FloatingActionButton(
           onPressed: () => _showQuickActionSheet(context),
           backgroundColor: AppTheme.primary,
           elevation: 4,
@@ -117,7 +128,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ) : null,
         bottomNavigationBar: _AnimatedMotionNavBar(
           selectedIndex: index,
-          onDestinationSelected: (v) => setState(() => index = v),
+          onDestinationSelected: (v) {
+            if (!_isLoading) setState(() => index = v);
+          },
         ),
       ),
     ),
@@ -204,6 +217,24 @@ class _Home extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // Dark Mode Toggle Button yang sangat mulus
+              IconButton(
+                onPressed: () {
+                  data.toggleTheme();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(data.themeMode == ThemeMode.dark ? '🌙 Beralih ke Dark Mode' : '☀️ Beralih ke Light Mode'),
+                      behavior: SnackBarBehavior.floating,
+                      duration: const Duration(milliseconds: 1000),
+                    ),
+                  );
+                },
+                icon: Icon(
+                  data.themeMode == ThemeMode.dark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+                  color: Colors.amber,
+                ),
+                tooltip: 'Ganti Mode Tampilan',
+              ),
               Stack(
                 alignment: Alignment.topRight,
                 children: [
@@ -238,12 +269,7 @@ class _Home extends StatelessWidget {
           ), 
           borderRadius: BorderRadius.circular(32),
           boxShadow: [
-            BoxShadow(
-              color: AppTheme.secondary.withOpacity(0.4),
-              blurRadius: 24,
-              spreadRadius: 2,
-              offset: const Offset(0, 12),
-            ),
+            BoxShadow(color: AppTheme.primary.withOpacity(0.3), blurRadius: 24, offset: const Offset(0, 12)),
           ]
         ), 
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -289,182 +315,212 @@ class _Home extends StatelessWidget {
           Text(next.isEmpty ? 'Semua tugas selesai. Mantap!' : next.first.title, style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold)),
           if (next.isNotEmpty) ...[
             const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(next.first.course, style: const TextStyle(color: Colors.white, fontSize: 16)),
-                const Text('65%', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
-              ],
-            ),
-            const SizedBox(height: 12),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: LinearProgressIndicator(
-                value: 0.65,
-                backgroundColor: Colors.white.withOpacity(0.2),
-                valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
-                minHeight: 6,
-              ),
-            ),
-          ]
-        ])
-      ),
-      const SizedBox(height: 16),
-      Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, borderRadius: BorderRadius.circular(32), border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1))),
-        child: Row(children: [
-          Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: AppTheme.primary.withOpacity(0.1), borderRadius: BorderRadius.circular(16)), child: const Icon(Icons.door_front_door_outlined, color: AppTheme.primary)),
-          const SizedBox(width: 16),
-          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('Kelas Selanjutnya', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppTheme.primary, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 4),
-            const Text('Mobile Programming • R. A3.1', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-          ])),
-          const Text('10:00', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.primary)),
+            Text('${next.first.course} • ${Formatters.date.format(next.first.deadline)}', style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 13)),
+          ],
+          const SizedBox(height: 24),
+          Row(children: [
+            Expanded(child: ElevatedButton(onPressed: () => onTabChange(1), style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: AppTheme.primary, padding: const EdgeInsets.symmetric(vertical: 12), elevation: 0), child: const Text('Lihat Semua Jadwal'))),
+          ]),
         ]),
       ),
-      const SizedBox(height: 28),
-      Text('Ringkasan', style: Theme.of(context).textTheme.titleLarge),
-      const SizedBox(height: 16),
-      InfoCard(icon: Icons.assignment_rounded, title: 'Deadline Aktif', value: data.schedules.where((e)=>!e.done).isEmpty ? 'Tugas beres! 🎉' : '${data.schedules.where((e)=>!e.done).length} tugas', color: const Color(0xFFF59E0B), onTap: () => onTabChange(1)),
-      const SizedBox(height: 12),
-      InfoCard(icon: Icons.payments_rounded, title: 'Total Pengeluaran', value: data.expenses.isEmpty ? 'Belum jajan 💸' : Formatters.currency.format(data.totalExpense()), color: const Color(0xFF10B981), valueColor: data.expenses.isEmpty ? null : AppTheme.accent, onTap: () => onTabChange(2), trailingWidget: data.expenses.isEmpty ? null : CustomPaint(size: const Size(40, 24), painter: _SparklinePainter(color: const Color(0xFF10B981)))),
-      const SizedBox(height: 12),
-      InfoCard(
-        icon: Icons.workspace_premium_rounded, title: 'Prediksi IPK', value: data.gpaItems.isEmpty ? 'Belum ada nilai 🎯' : data.calculateGpa().toStringAsFixed(2), color: AppTheme.secondary, onTap: () => onTabChange(3),
-        trailingWidget: data.gpaItems.isEmpty ? null : SizedBox(
-          width: 80,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text('${((data.calculateGpa() / data.targetGpa).clamp(0.0, 1.0) * 100).toInt()}% ke ${data.targetGpa.toStringAsFixed(2)}', style: const TextStyle(fontSize: 10, color: AppTheme.secondary, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 6),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: LinearProgressIndicator(
-                  value: (data.calculateGpa() / data.targetGpa).clamp(0.0, 1.0),
-                  backgroundColor: AppTheme.secondary.withOpacity(0.2),
-                  valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.secondary),
-                  minHeight: 6,
-                ),
+      const SizedBox(height: 24),
+      // Komponen Produktivitas Ekstra: Kelas Selanjutnya
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.08)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.amber.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(14),
               ),
-            ]
-          )
-        )
+              child: const Icon(Icons.event_seat_rounded, color: Colors.amber, size: 20),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Kelas Selanjutnya', style: Theme.of(context).textTheme.bodySmall),
+                  const SizedBox(height: 2),
+                  const Text('Struktur Data - Ruang B302', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                ],
+              ),
+            ),
+            const Text('13:00', style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primary)),
+          ],
+        ),
       ),
-      const SizedBox(height: 12),
-      InfoCard(icon: Icons.lightbulb_rounded, title: 'Tips Hari Ini', value: 'Fokus 25 menit, istirahat 5 menit', color: Colors.amber, onTap: () {}),
-      // Margin bawah ekstra agar FAB tidak menutupi item/teks ringkasan terakhir
-      const SizedBox(height: 88),
+      const SizedBox(height: 24),
+      Row(children: [
+        Expanded(child: InfoCard(title: 'Deadline Aktif', value: '${next.length}', subtitle: 'Tugas tertunda', icon: Icons.timer_outlined, color: Colors.amber, onTap: () => onTabChange(1))),
+        const SizedBox(width: 16),
+        Expanded(child: InfoCard(title: 'Pengeluaran', value: Formatters.currency.format(data.totalExpense()), subtitle: 'Minggu ini', icon: Icons.receipt_long_rounded, color: Colors.green, onTap: () => onTabChange(2))),
+      ]),
+      const SizedBox(height: 16),
+      Row(children: [
+        Expanded(child: InfoCard(title: 'IPK Sementara', value: data.calculateGpa().toStringAsFixed(2), subtitle: 'Target: ${data.targetGpa.toStringAsFixed(2)}', icon: Icons.grade_rounded, color: Colors.orange, onTap: () => onTabChange(3))),
+        const SizedBox(width: 16),
+        Expanded(child: InfoCard(title: 'Resource Hub', value: '${data.resources.length}', subtitle: 'Link tersimpan', icon: Icons.folder_shared_outlined, color: AppTheme.primary, onTap: () => onTabChange(4))),
+      ]),
     ]));
   }
 }
 
-class _SparklinePainter extends CustomPainter {
-  final Color color;
-  _SparklinePainter({required this.color});
+// Skeleton Loader Premium untuk Play Store Ready Experience
+class _SkeletonLoaderView extends StatefulWidget {
+  const _SkeletonLoaderView();
   @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = color..strokeWidth = 2.5..style = PaintingStyle.stroke..strokeCap = StrokeCap.round;
-    final path = Path()
-      ..moveTo(0, size.height * 0.8)
-      ..lineTo(size.width * 0.3, size.height * 0.4)
-      ..lineTo(size.width * 0.6, size.height * 0.6)
-      ..lineTo(size.width, size.height * 0.1);
-    canvas.drawPath(path, paint);
-  }
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  State<_SkeletonLoaderView> createState() => _SkeletonLoaderViewState();
 }
 
-class _SettingsSheet extends StatelessWidget {
-  final VoidCallback onLogout;
-  const _SettingsSheet({required this.onLogout});
+class _SkeletonLoaderViewState extends State<_SkeletonLoaderView> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 800),
+  )..repeat(reverse: true);
+
+  late final Animation<double> _animation = Tween<double>(begin: 0.25, end: 0.6).animate(
+    CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+  );
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Widget _box(double width, double height, {double borderRadius = 16}) {
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, _) => Container(
+        width: width,
+        height: height,
+        decoration: BoxDecoration(
+          color: Theme.of(context).dividerColor.withOpacity(_animation.value * 0.15),
+          borderRadius: BorderRadius.circular(borderRadius),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final data = AppData.instance;
-    return AnimatedBuilder(
-      animation: data,
-      builder: (_, __) => Padding(
-        padding: const EdgeInsets.only(top: 24, bottom: 8),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Text('Pengaturan', style: Theme.of(context).textTheme.titleLarge),
-            ),
-            const SizedBox(height: 16),
-            Flexible(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ListTile(
-                      leading: const CircleAvatar(backgroundColor: AppTheme.primary, child: Text('MH', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
-                      title: const Text('Mahasiswa Hebat', style: TextStyle(fontWeight: FontWeight.bold)),
-                      subtitle: const Text('NIM: 12345678 • Universitas A'),
-                      trailing: const Icon(Icons.chevron_right_rounded),
-                      onTap: () {},
-                    ),
-                    const Divider(height: 24),
-                    ListTile(
-                      leading: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: AppTheme.primary.withOpacity(0.1), borderRadius: BorderRadius.circular(12)), child: const Icon(Icons.dark_mode_rounded, color: AppTheme.primary)),
-                      title: const Text('Mode Gelap'),
-                      trailing: Switch(value: data.themeMode == ThemeMode.dark, onChanged: (v) => data.toggleTheme(), activeColor: AppTheme.primary),
-                    ),
-                    ListTile(
-                      leading: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.orange.withOpacity(0.1), borderRadius: BorderRadius.circular(12)), child: const Icon(Icons.notifications_active_rounded, color: Colors.orange)),
-                      title: const Text('Pengingat Tugas'),
-                      subtitle: const Text('1 hari sebelum deadline', style: TextStyle(fontSize: 12)),
-                      trailing: const Icon(Icons.chevron_right_rounded),
-                      onTap: () {},
-                    ),
-                    ListTile(
-                      leading: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: AppTheme.secondary.withOpacity(0.1), borderRadius: BorderRadius.circular(12)), child: const Icon(Icons.track_changes_rounded, color: AppTheme.secondary)),
-                      title: const Text('Target IPK Semester'),
-                      subtitle: const Text('Saat ini: 4.00', style: TextStyle(fontSize: 12)),
-                      trailing: const Icon(Icons.chevron_right_rounded),
-                      onTap: () {},
-                    ),
-                    ListTile(
-                      leading: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(12)), child: const Icon(Icons.sync_rounded, color: Colors.blue)),
-                      title: const Text('Sinkronisasi Kalender'),
-                      subtitle: const Text('Terhubung ke Google Calendar', style: TextStyle(fontSize: 12)),
-                      trailing: const Icon(Icons.chevron_right_rounded),
-                      onTap: () {},
-                    ),
-                    ListTile(
-                      leading: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.teal.withOpacity(0.1), borderRadius: BorderRadius.circular(12)), child: const Icon(Icons.help_outline_rounded, color: Colors.teal)),
-                      title: const Text('Bantuan & Masukan'),
-                      subtitle: const Text('Lapor bug atau saran fitur', style: TextStyle(fontSize: 12)),
-                      trailing: const Icon(Icons.chevron_right_rounded),
-                      onTap: () {},
-                    ),
-                    const Divider(height: 32),
-                    ListTile(
-                      leading: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: AppTheme.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(12)), child: const Icon(Icons.logout_rounded, color: AppTheme.accent)),
-                      title: const Text('Keluar Akun', style: TextStyle(color: AppTheme.accent, fontWeight: FontWeight.bold)),
-                      onTap: () { Navigator.pop(context); onLogout(); },
-                    ),
-                    const SizedBox(height: 16),
-                  ],
-                ),
+    return SafeArea(
+      child: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
+        physics: const NeverScrollableScrollPhysics(),
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _box(140, 28),
+                  const SizedBox(height: 8),
+                  _box(180, 14),
+                ],
               ),
-            ),
-          ],
-        ),
+              _box(110, 44, borderRadius: 16),
+            ],
+          ),
+          const SizedBox(height: 32),
+          // Main banner skeleton
+          _box(double.infinity, 200, borderRadius: 32),
+          const SizedBox(height: 24),
+          _box(double.infinity, 64, borderRadius: 24),
+          const SizedBox(height: 24),
+          // Summaries row skeleton
+          Row(
+            children: [
+              Expanded(child: _box(double.infinity, 110, borderRadius: 24)),
+              const SizedBox(width: 16),
+              Expanded(child: _box(double.infinity, 110, borderRadius: 24)),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(child: _box(double.infinity, 110, borderRadius: 24)),
+              const SizedBox(width: 16),
+              Expanded(child: _box(double.infinity, 110, borderRadius: 24)),
+            ],
+          ),
+        ],
       ),
     );
   }
 }
 
-class _AnimatedMotionNavBar extends StatelessWidget {
+class _SettingsSheet extends StatelessWidget {
+  final VoidCallback onLogout;
+  const _SettingsSheet({required this.onLogout});
+  @override
+  Widget build(BuildContext context) {
+    final data = AppData.instance;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(width: 40, height: 4, decoration: BoxDecoration(color: Theme.of(context).dividerColor.withOpacity(0.2), borderRadius: BorderRadius.circular(2))),
+          const SizedBox(height: 24),
+          const Text('Pengaturan Dasbor', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 24),
+          ListTile(
+            leading: const Icon(Icons.dark_mode_rounded, color: Colors.amber),
+            title: const Text('Tema Gelap / Terang'),
+            subtitle: const Text('Beralih mode warna UI'),
+            trailing: Switch(
+              value: data.themeMode == ThemeMode.dark,
+              onChanged: (_) => data.toggleTheme(),
+              activeColor: AppTheme.primary,
+            ),
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.security_rounded, color: Colors.green),
+            title: const Text('Keamanan & Sandi'),
+            subtitle: const Text('Perbarui kredensial autentikasi'),
+            trailing: const Icon(Icons.chevron_right_rounded),
+            onTap: () {},
+          ),
+          ListTile(
+            leading: const Icon(Icons.description_rounded, color: Colors.blue),
+            title: const Text('Ketentuan & Privasi'),
+            subtitle: const Text('Baca dokumen legal KAMPUSGO'),
+            trailing: const Icon(Icons.chevron_right_rounded),
+            onTap: () {},
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton.icon(
+            onPressed: onLogout, 
+            icon: const Icon(Icons.logout_rounded), 
+            label: const Text('Keluar Akun'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.accent,
+              foregroundColor: Colors.white,
+              minimumSize: const Size(double.infinity, 48),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AnimatedMotionNavBar extends StatefulWidget {
   final int selectedIndex;
   final ValueChanged<int> onDestinationSelected;
 
@@ -474,144 +530,159 @@ class _AnimatedMotionNavBar extends StatelessWidget {
   });
 
   @override
+  State<_AnimatedMotionNavBar> createState() => _AnimatedMotionNavBarState();
+}
+
+class _AnimatedMotionNavBarState extends State<_AnimatedMotionNavBar> {
+  final List<_NavItem> _items = [
+    _NavItem(icon: Icons.dashboard_rounded, label: 'Dasbor'),
+    _NavItem(icon: Icons.event_note_rounded, label: 'Jadwal'),
+    _NavItem(icon: Icons.account_balance_wallet_rounded, label: 'Keuangan'),
+    _NavItem(icon: Icons.school_rounded, label: 'Nilai'),
+    _NavItem(icon: Icons.folder_special_rounded, label: 'Arsip'),
+  ];
+
+  @override
   Widget build(BuildContext context) {
-    final items = [
-      (icon: Icons.home_outlined, activeIcon: Icons.home, label: 'Home'),
-      (icon: Icons.event_note_outlined, activeIcon: Icons.event_note, label: 'Jadwal'),
-      (icon: Icons.account_balance_wallet_outlined, activeIcon: Icons.account_balance_wallet, label: 'Keuangan'),
-      (icon: Icons.show_chart, activeIcon: Icons.show_chart, label: 'Nilai'),
-      (icon: Icons.folder_outlined, activeIcon: Icons.folder, label: 'Arsip'),
-    ];
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final navBgColor = isDark ? const Color(0xFF1E1B2E) : Colors.white;
+    final activeCircleColor = isDark ? const Color(0xFF2D2747) : AppTheme.primary.withOpacity(0.08);
 
-    // Menggunakan warna Teal utama sesuai instruksi dan gambar referensi user
-    const bgColor = Color(0xFF338385);
-    const circleColor = Color(0xFF1A3D3E);
-
-    return SizedBox(
+    return Container(
       height: 80,
-      child: TweenAnimationBuilder<double>(
-        tween: Tween<double>(begin: selectedIndex.toDouble(), end: selectedIndex.toDouble()),
-        duration: const Duration(milliseconds: 400),
-        curve: Curves.easeOutCubic,
-        builder: (context, animatedIndex, child) {
-          return Stack(
-            clipBehavior: Clip.none,
-            children: [
-              // 1. Custom Painter untuk menggambar bar beserta notch dan lingkaran indikator
-              CustomPaint(
-                size: Size(MediaQuery.of(context).size.width, 80),
-                painter: _NotchPainter(
-                  animatedIndex: animatedIndex,
-                  bgColor: bgColor,
-                  circleColor: circleColor,
-                ),
+      decoration: BoxDecoration(
+        color: navBgColor,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 20,
+            offset: const Offset(0, -5),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          // Custom Painter untuk Background dan Indikator Notch Bergerak
+          Positioned.fill(
+            child: TweenAnimationBuilder<double>(
+              tween: Tween<double>(
+                begin: widget.selectedIndex.toDouble(),
+                end: widget.selectedIndex.toDouble(),
               ),
-              // 2. Ikon-ikon navigasi beserta nama/labelnya
-              Row(
-                children: List.generate(items.length, (index) {
-                  final isSelected = index == selectedIndex;
-                  final item = items[index];
-                  return Expanded(
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () => onDestinationSelected(index),
-                      child: SizedBox(
-                        height: 80,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            // Animasi pergerakan ikon ke atas memasuki lingkaran indikator
-                            AnimatedPositioned(
-                              duration: const Duration(milliseconds: 350),
-                              curve: Curves.easeOutCubic,
-                              top: isSelected ? 0 : 22,
-                              child: AnimatedSwitcher(
-                                duration: const Duration(milliseconds: 300),
-                                transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
-                                child: Icon(
-                                  isSelected ? item.activeIcon : item.icon,
-                                  key: ValueKey<bool>(isSelected),
-                                  color: isSelected ? Colors.white : Colors.white70,
-                                  size: isSelected ? 26 : 24,
-                                ),
-                              ),
-                            ),
-                            // Nama label tetap dipertahankan di bagian bawah tab
-                            Positioned(
-                              bottom: 10,
-                              child: Text(
-                                item.label,
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                                  color: isSelected ? Colors.white : Colors.white70,
-                                ),
-                              ),
-                            ),
-                          ],
+              duration: const Duration(milliseconds: 350),
+              curve: Curves.easeOutCubic,
+              builder: (context, animatedValue, child) {
+                return CustomPaint(
+                  painter: _NotchPainter(
+                    animatedIndex: animatedValue,
+                    itemCount: _items.length,
+                    bgColor: navBgColor,
+                    circleColor: activeCircleColor,
+                  ),
+                );
+              },
+            ),
+          ),
+          // Ikon dan Teks Navigasi
+          Row(
+            children: List.generate(_items.length, (index) {
+              final isSelected = widget.selectedIndex == index;
+              final item = _items[index];
+
+              return Expanded(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => widget.onDestinationSelected(index),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Animasi Translasi Ikon (Naik saat aktif)
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeOutCubic,
+                        transform: Matrix4.translationValues(
+                          0,
+                          isSelected ? -6 : 2,
+                          0,
+                        ),
+                        child: AnimatedTheme(
+                          data: Theme.of(context),
+                          child: Icon(
+                            item.icon,
+                            size: 24,
+                            color: isSelected
+                                ? AppTheme.primary
+                                : Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.5),
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                }),
-              ),
-            ],
-          );
-        },
+                      const SizedBox(height: 4),
+                      // Animasi Skala & Opasitas Label Teks
+                      AnimatedOpacity(
+                        duration: const Duration(milliseconds: 200),
+                        opacity: isSelected ? 1.0 : 0.6,
+                        child: Text(
+                          item.label,
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                            color: isSelected
+                                ? AppTheme.primary
+                                : Theme.of(context).textTheme.bodySmall?.color,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
+          ),
+        ],
       ),
     );
   }
 }
 
+class _NavItem {
+  final IconData icon;
+  final String label;
+  _NavItem({required this.icon, required this.label});
+}
+
 class _NotchPainter extends CustomPainter {
   final double animatedIndex;
+  final int itemCount;
   final Color bgColor;
   final Color circleColor;
 
   _NotchPainter({
     required this.animatedIndex,
+    required this.itemCount,
     required this.bgColor,
     required this.circleColor,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
-    double itemWidth = size.width / 5;
-    double centerX = (itemWidth * animatedIndex) + (itemWidth / 2);
+    final itemWidth = size.width / itemCount;
+    final centerX = (animatedIndex * itemWidth) + (itemWidth / 2);
 
-    // Jalur (Path) dari Bottom Navigation Bar dengan lekukan (notch) yang dinamis
+    // Menggambar latar belakang utama tanpa menutup lekukan atas
+    Paint bgPaint = Paint()..color = bgColor..style = PaintingStyle.fill;
     Path path = Path();
     path.moveTo(0, 0);
-    path.lineTo(centerX - 42, 0);
-    
-    // Kurva masuk ke dalam lekukan (notch)
-    path.quadraticBezierTo(centerX - 22, 0, centerX - 18, 12);
-    
-    // Busur melingkar cekung ke bawah
-    path.arcToPoint(
-      Offset(centerX + 18, 12),
-      radius: const Radius.circular(20),
-      clockwise: false,
-    );
-    
-    // Kurva keluar dari lekukan (notch)
-    path.quadraticBezierTo(centerX + 22, 0, centerX + 42, 0);
-    
     path.lineTo(size.width, 0);
     path.lineTo(size.width, size.height);
     path.lineTo(0, size.height);
     path.close();
-
-    // Menggambar bayangan halus di bawah bar agar terlihat lebih hidup dan premium
-    canvas.drawShadow(path, Colors.black, 8, true);
-
-    // Mengisi warna latar belakang bar utama
-    Paint bgPaint = Paint()..color = bgColor..style = PaintingStyle.fill;
     canvas.drawPath(path, bgPaint);
 
-    // Menggambar lingkaran indikator gelap yang mengapung di dalam lekukan
+    // Menggambar lingkaran indikator lembut yang mengapung di dalam lekukan
     Paint circlePaint = Paint()..color = circleColor..style = PaintingStyle.fill;
-    canvas.drawCircle(Offset(centerX, 13), 22, circlePaint);
+    canvas.drawCircle(Offset(centerX, 14), 22, circlePaint);
   }
 
   @override
