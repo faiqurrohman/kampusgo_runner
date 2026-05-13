@@ -26,8 +26,10 @@ class AppData extends ChangeNotifier {
   ];
 
   final List<ResourceModel> resources = [
-    ResourceModel(id: 'r1', course: 'Flutter', title: 'Materi Minggu 1', link: 'https://drive.google.com'),
-    ResourceModel(id: 'r2', course: 'Database', title: 'Link Kelas Online', link: 'https://meet.google.com'),
+    ResourceModel(id: 'r1', course: 'Flutter', title: 'Materi Minggu 1', link: 'https://drive.google.com', tag: 'Kuliah'),
+    ResourceModel(id: 'r2', course: 'Database', title: 'Link Kelas Online', link: 'https://meet.google.com', tag: 'Kuliah'),
+    ResourceModel(id: 'r3', course: 'BEM', title: 'Pedoman Kaderisasi', link: 'https://docs.google.com', tag: 'Organisasi'),
+    ResourceModel(id: 'r4', course: 'Gemastik', title: 'Guidebook Lomba UI/UX', link: 'https://gemastik.kemdikbud.go.id', tag: 'Lomba'),
   ];
 
   String _id() => DateTime.now().microsecondsSinceEpoch.toString();
@@ -60,8 +62,8 @@ class AppData extends ChangeNotifier {
 
   void deleteGpa(String id) { gpaItems.removeWhere((e) => e.id == id); notifyListeners(); }
 
-  void addResource(String course, String title, String link) {
-    resources.insert(0, ResourceModel(id: _id(), course: course, title: title, link: link));
+  void addResource(String course, String title, String link, String tag) {
+    resources.insert(0, ResourceModel(id: _id(), course: course, title: title, link: link, tag: tag));
     notifyListeners();
   }
 
