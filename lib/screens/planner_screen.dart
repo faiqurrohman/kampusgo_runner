@@ -59,14 +59,41 @@ class _PlannerScreenState extends State<PlannerScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            // Daftar Jadwal/Tugas
+            // Daftar Jadwal/Tugas dengan Premium Empty State
             if (data.schedules.isEmpty)
               Center(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 32),
-                  child: Text(
-                    'Belum ada jadwal tugas atau ujian aktif 🎉',
-                    style: Theme.of(context).textTheme.bodyMedium,
+                  padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 20),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: AppTheme.primary.withOpacity(0.12),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.nightlight_round_rounded,
+                          size: 64,
+                          color: AppTheme.primary,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        'Santai dulu, belum ada tugas yang mendekat!',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Tekan tombol "Tambah Deadline Baru" di atas untuk mulai menyusun riwayat dan target studimu.',
+                        style: Theme.of(context).textTheme.bodySmall,
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
                 ),
               )
@@ -76,25 +103,30 @@ class _PlannerScreenState extends State<PlannerScreen> {
                 final hoursRemaining = duration.inHours;
                 final daysRemaining = duration.inDays;
 
-                // Penentuan Prioritas Visual (Kode Warna)
+                // Penentuan Prioritas Visual & Countdown Presisi (Jam/Menit)
                 Color priorityColor;
                 String timeLabel;
 
                 if (item.done) {
                   priorityColor = Colors.grey;
                   timeLabel = 'Selesai';
-                } else if (hoursRemaining < 0) {
+                } else if (duration.isNegative) {
                   priorityColor = AppTheme.accent;
                   timeLabel = 'Terlambat';
                 } else if (hoursRemaining < 24) {
                   priorityColor = Colors.redAccent;
-                  timeLabel = '< 24 Jam Lagi';
+                  if (hoursRemaining > 0) {
+                    timeLabel = '$hoursRemaining Jam Lagi';
+                  } else {
+                    final minsRemaining = duration.inMinutes;
+                    timeLabel = '$minsRemaining Menit Lagi';
+                  }
                 } else if (daysRemaining < 3) {
                   priorityColor = Colors.orange;
-                  timeLabel = '< 3 Hari Lagi';
+                  timeLabel = '$daysRemaining Hari Lagi';
                 } else {
                   priorityColor = Colors.green;
-                  timeLabel = 'Waktu Aman';
+                  timeLabel = '$daysRemaining Hari Lagi';
                 }
 
                 return Dismissible(
@@ -177,7 +209,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
                               ),
                             ),
                             const SizedBox(width: 8),
-                            // Lencana Kode Warna Visual
+                            // Lencana Kode Warna Visual Countdown Presisi
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
@@ -223,6 +255,108 @@ class _PlannerScreenState extends State<PlannerScreen> {
                   ),
                 );
               }),
+            const SizedBox(height: 24),
+            // Widget Layar Utama (Home Screen Widget Simulator)
+            Card(
+              elevation: 0,
+              color: AppTheme.primary.withOpacity(0.06),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(28),
+                side: BorderSide(color: AppTheme.primary.withOpacity(0.2), width: 1.5),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.widgets_rounded, color: AppTheme.primary, size: 20),
+                        const SizedBox(width: 8),
+                        const Text(
+                          'Widget Layar Utama Tersedia',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Tambahkan widget KampusGo ke HP kamu untuk pantau tugas mendesak langsung dari Home Screen.',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                    const SizedBox(height: 14),
+                    // Widget Preview / Mockup
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).cardColor,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Colors.redAccent.withOpacity(0.12),
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: const Icon(Icons.alarm_rounded, color: Colors.redAccent, size: 20),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Tugas Kritis Terdekat',
+                                  style: TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  data.schedules.where((e) => !e.done).isEmpty
+                                      ? 'Semua tugas tuntas! 🎉'
+                                      : data.schedules.where((e) => !e.done).first.title,
+                                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Center(
+                      child: TextButton.icon(
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Petunjuk: Tekan lama (long press) di Home Screen HP kamu, pilih menu Widgets, lalu cari KampusGo.'),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.help_outline_rounded, size: 14),
+                        label: const Text('Cara Pasang Widget', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 88), // Spasi bawah ekstra
           ],
         ),
       ),

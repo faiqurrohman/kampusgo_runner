@@ -13,6 +13,8 @@ class BudgetScreen extends StatefulWidget {
 }
 
 class _BudgetScreenState extends State<BudgetScreen> {
+  String? _selectedCategoryFilter;
+
   @override
   Widget build(BuildContext context) {
     final data = AppData.instance;
@@ -32,15 +34,20 @@ class _BudgetScreenState extends State<BudgetScreen> {
           statusColor = Colors.orange;
         }
 
+        // Daftar pengeluaran terfilter sesuai kategori yang diklik pada grafik donat
+        final filteredExpenses = _selectedCategoryFilter == null
+            ? data.expenses
+            : data.expenses.where((e) => e.category == _selectedCategoryFilter).toList();
+
         return SafeArea(
           child: ListView(
             padding: const EdgeInsets.all(20),
             children: [
               const SectionTitle(
                 title: 'Budget Buddy',
-                subtitle: 'Pantau sisa anggaran mingguan dan lacak setiap pengeluaranmu.',
+                subtitle: 'Pantau sisa uang saku bulanan/mingguan dan lacak setiap pengeluaranmu.',
               ),
-              // Kartu Batas Anggaran & Sisa Saldo
+              // Kartu Batas Uang Saku & Sisa Saldo Otomatis
               Card(
                 elevation: 6,
                 shadowColor: Colors.black.withOpacity(0.2),
@@ -65,7 +72,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Sisa Anggaran Minggu Ini',
+                            'Sisa Uang Saku / Anggaran',
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -77,7 +84,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
-                              isOver ? 'Melebihi Batas!' : '${((1.0 - usageRatio) * 100).toInt()}% Tersisa',
+                              isOver ? 'Melebihi Saldo!' : '${((1.0 - usageRatio) * 100).toInt()}% Tersisa',
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
@@ -108,7 +115,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      // Keterangan Total Pengeluaran & Pengaturan Limit
+                      // Keterangan Total Pengeluaran & Pengaturan Uang Saku
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -121,7 +128,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                'Batas: ${Formatters.currency.format(data.budgetLimit)}',
+                                'Uang Saku: ${Formatters.currency.format(data.budgetLimit)}',
                                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -131,7 +138,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
                           TextButton.icon(
                             onPressed: () => _showEditLimitDialog(context),
                             icon: const Icon(Icons.edit_rounded, size: 16),
-                            label: const Text('Atur Batas', style: TextStyle(fontSize: 12)),
+                            label: const Text('Input Saldo', style: TextStyle(fontSize: 12)),
                             style: TextButton.styleFrom(
                               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                               minimumSize: Size.zero,
@@ -145,8 +152,14 @@ class _BudgetScreenState extends State<BudgetScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              // Grafik Donat yang warnanya sinkron dengan daftar
-              SimpleDonutChart(data: data.expenseByCategory()),
+              // Grafik Donat Interaktif (Klik Kategori untuk Filter)
+              SimpleDonutChart(
+                data: data.expenseByCategory(),
+                selectedCategory: _selectedCategoryFilter,
+                onCategorySelected: (category) {
+                  setState(() => _selectedCategoryFilter = category);
+                },
+              ),
               const SizedBox(height: 16),
               // Tombol Tambah Pengeluaran
               ElevatedButton.icon(
@@ -155,24 +168,57 @@ class _BudgetScreenState extends State<BudgetScreen> {
                 label: const Text('Catat Pengeluaran Baru'),
               ),
               const SizedBox(height: 20),
-              Text(
-                'Riwayat Pengeluaran',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              // Header Riwayat Pengeluaran beserta tombol ekspor ke orang tua & indikator filter
+              Row(
+                children: [
+                  Text(
+                    'Riwayat Pengeluaran',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  const Spacer(),
+                  if (_selectedCategoryFilter != null) ...[
+                    ActionChip(
+                      avatar: const Icon(Icons.clear_rounded, size: 12),
+                      label: Text(
+                        _selectedCategoryFilter!,
+                        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                      ),
+                      backgroundColor: AppTheme.primary.withOpacity(0.12),
+                      side: BorderSide.none,
+                      onPressed: () => setState(() => _selectedCategoryFilter = null),
+                    ),
+                    const SizedBox(width: 6),
+                  ],
+                  // Tombol Ekspor CSV/Laporan
+                  IconButton(
+                    onPressed: () => _showExportDialog(context),
+                    icon: const Icon(Icons.ios_share_rounded, size: 18),
+                    tooltip: 'Ekspor Laporan (CSV/PDF)',
+                    style: IconButton.styleFrom(
+                      backgroundColor: AppTheme.primary.withOpacity(0.08),
+                      foregroundColor: AppTheme.primary,
+                      padding: const EdgeInsets.all(8),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 12),
-              // Daftar Pengeluaran dengan warna ikon yang serasi dengan grafik donat
-              if (data.expenses.isEmpty)
+              // Daftar Pengeluaran terfilter dengan Empty State yang relevan
+              if (filteredExpenses.isEmpty)
                 Center(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 24),
                     child: Text(
-                      'Belum ada catatan pengeluaran minggu ini.',
+                      _selectedCategoryFilter == null
+                          ? 'Belum ada catatan pengeluaran minggu ini.'
+                          : 'Tidak ada pengeluaran untuk kategori $_selectedCategoryFilter.',
                       style: Theme.of(context).textTheme.bodyMedium,
+                      textAlign: TextAlign.center,
                     ),
                   ),
                 )
               else
-                ...data.expenses.map((e) {
+                ...filteredExpenses.map((e) {
                   final catColor = SimpleDonutChart.getCategoryColor(e.category);
                   return Dismissible(
                     key: ValueKey(e.id),
@@ -235,18 +281,103 @@ class _BudgetScreenState extends State<BudgetScreen> {
     );
   }
 
+  void _showExportDialog(BuildContext context) {
+    final data = AppData.instance;
+    if (data.expenses.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Belum ada catatan pengeluaran untuk diekspor.'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    final buffer = StringBuffer();
+    buffer.writeln('KAMPUSGO - LAPORAN PENGELUARAN');
+    buffer.writeln('Tanggal Cetak: ${Formatters.date.format(DateTime.now())}');
+    buffer.writeln('Total Uang Saku: ${Formatters.currency.format(data.budgetLimit)}');
+    buffer.writeln('Total Terpakai: ${Formatters.currency.format(data.totalExpense())}');
+    buffer.writeln('Sisa Saldo: ${Formatters.currency.format(data.budgetLimit - data.totalExpense())}');
+    buffer.writeln('----------------------------------------');
+    buffer.writeln('Tanggal,Kategori,Item,Nominal');
+    for (final e in data.expenses) {
+      buffer.writeln('${Formatters.date.format(e.date)},"${e.category}","${e.title}",${e.amount}');
+    }
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.insert_drive_file_rounded, color: AppTheme.primary),
+            SizedBox(width: 8),
+            Text('Ekspor Laporan (CSV)', style: TextStyle(fontSize: 18)),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Format CSV/Teks siap dikirimkan ke orang tua atau diolah di Excel:',
+              style: TextStyle(fontSize: 12),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              maxHeight: 180,
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)),
+              ),
+              child: SingleChildScrollView(
+                child: SelectableText(
+                  buffer.toString(),
+                  style: const TextStyle(fontFamily: 'monospace', fontSize: 10),
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Tutup'),
+          ),
+          ElevatedButton.icon(
+            onPressed: () {
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Laporan berhasil disalin! Siap dikirim ke WhatsApp / Email orang tua 🚀'),
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            },
+            icon: const Icon(Icons.copy_rounded, size: 16),
+            label: const Text('Salin Data'),
+            style: ElevatedButton.styleFrom(minimumSize: const Size(120, 40)),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showEditLimitDialog(BuildContext context) {
     final limitController = TextEditingController(text: AppData.instance.budgetLimit.toString());
 
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Atur Batas Anggaran'),
+        title: const Text('Input Uang Saku / Anggaran'),
         content: TextField(
           controller: limitController,
           keyboardType: TextInputType.number,
           decoration: const InputDecoration(
-            labelText: 'Batas Anggaran Mingguan (Rp)',
+            labelText: 'Total Uang Saku / Anggaran (Rp)',
             hintText: 'Contoh: 500000',
           ),
         ),

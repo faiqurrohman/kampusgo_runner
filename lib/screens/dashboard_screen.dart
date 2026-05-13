@@ -256,12 +256,34 @@ class _Home extends StatelessWidget {
             const SizedBox(width: 12),
             const Text('Prioritas Terdekat', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
             const Spacer(),
-            if (next.isNotEmpty)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(20)),
-                child: Text('Sisa ${next.first.deadline.difference(DateTime.now()).inDays} hari', style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
-              ),
+            if (next.isNotEmpty) ...[
+              (() {
+                final diff = next.first.deadline.difference(DateTime.now());
+                final hrs = diff.inHours;
+                final isUrgent = hrs < 24 && !diff.isNegative;
+                String label;
+                if (diff.isNegative) {
+                  label = 'Terlambat';
+                } else if (hrs >= 24) {
+                  label = 'Sisa ${diff.inDays} hari';
+                } else if (hrs > 0) {
+                  label = 'Sisa $hrs jam';
+                } else {
+                  label = 'Sisa ${diff.inMinutes} menit';
+                }
+                return Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: isUrgent ? AppTheme.accent : Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    label,
+                    style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                  ),
+                );
+              })(),
+            ],
           ]),
           const SizedBox(height: 16),
           Text(next.isEmpty ? 'Semua tugas selesai. Mantap!' : next.first.title, style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold)),
