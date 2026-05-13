@@ -87,6 +87,32 @@ class AppData extends ChangeNotifier {
   double targetGpa = 3.80;
   double previousGpa = 3.66;
 
+  String userName = 'Mahasiswa';
+  String userEmail = 'mahasiswa@kampusgo.ac.id';
+  String userProdi = 'Teknik Informatika';
+  int activeSemester = 5;
+  bool calendarIntegration = true;
+  bool preciseNotifications = true;
+
+  void updateProfile({String? name, String? email, String? prodi, int? semester, double? target}) {
+    if (name != null && name.trim().isNotEmpty) userName = name;
+    if (email != null && email.trim().isNotEmpty) userEmail = email;
+    if (prodi != null && prodi.trim().isNotEmpty) userProdi = prodi;
+    if (semester != null) activeSemester = semester;
+    if (target != null) targetGpa = target;
+    notifyListeners();
+  }
+
+  void toggleCalendarIntegration(bool val) {
+    calendarIntegration = val;
+    notifyListeners();
+  }
+
+  void togglePreciseNotifications(bool val) {
+    preciseNotifications = val;
+    notifyListeners();
+  }
+
   void updateTargetGpa(double val) {
     targetGpa = val;
     notifyListeners();

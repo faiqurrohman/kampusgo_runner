@@ -10,6 +10,7 @@ import 'gpa_screen.dart';
 import 'login_screen.dart';
 import 'planner_screen.dart';
 import 'resource_screen.dart';
+import 'settings_screen.dart';
 
 class DashboardScreen extends StatefulWidget { const DashboardScreen({super.key}); @override State<DashboardScreen> createState() => _DashboardScreenState(); }
 class _DashboardScreenState extends State<DashboardScreen> {
@@ -211,10 +212,10 @@ class _Home extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    const Flexible(
+                    Flexible(
                       child: Text(
-                        'Halo, Mahasiswa',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        'Halo, ${data.userName}',
+                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -279,9 +280,9 @@ class _Home extends StatelessWidget {
                 GestureDetector(
                   behavior: HitTestBehavior.opaque,
                   onTap: () {
-                    showModalBottomSheet(
-                      context: context,
-                      builder: (_) => _SettingsSheet(onLogout: onLogout),
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => SettingsScreen(onLogout: onLogout)),
                     );
                   },
                   child: const Icon(Icons.settings_rounded, size: 20),
