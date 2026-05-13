@@ -206,31 +206,7 @@ class _Home extends StatelessWidget {
       Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Flexible(
-                      child: Text(
-                        'Halo, ${data.userName}',
-                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    const Text('👋', style: TextStyle(fontSize: 20)),
-                  ],
-                ),
-                const SizedBox(height: 4), 
-                Text('Pantau hidup kampusmu hari ini.', style: Theme.of(context).textTheme.bodySmall),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          // Foto profil mahasiswa melingkar di tengah baris atas
+          // 1. Paling Kiri: Foto profil mahasiswa melingkar (Sesuai tata letak Slide 2)
           Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
@@ -240,12 +216,43 @@ class _Home extends StatelessWidget {
               ],
             ),
             child: CircleAvatar(
-              radius: 20,
+              radius: 22,
               backgroundColor: Colors.white.withOpacity(0.12),
-              child: Text(data.userAvatarUrl, style: const TextStyle(fontSize: 20)),
+              child: Text(data.userAvatarUrl, style: const TextStyle(fontSize: 22)),
             ),
           ),
           const SizedBox(width: 12),
+          // 2. Tengah: Kolom teks sapaan dan sub-teks
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        'Halo, ${data.userName}',
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Text('👋', style: TextStyle(fontSize: 18)),
+                  ],
+                ),
+                const SizedBox(height: 2), 
+                Text(
+                  'Pantau hidup kampusmu hari ini.', 
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 11),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          // 3. Kanan: Kapsul tombol kontrol aksi
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
