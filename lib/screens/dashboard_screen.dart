@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../services/app_data.dart';
 import '../utils/app_theme.dart';
 import '../utils/formatters.dart';
@@ -16,20 +17,167 @@ class _DashboardScreenState extends State<DashboardScreen> {
   late final pages = [_Home(onLogout: _logout, onTabChange: (i) => setState(() => index = i)), const PlannerScreen(), const BudgetScreen(), const GpaScreen(), const ResourceScreen()];
   void _logout() => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen()));
 
+  void _showQuickActionSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+      ),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Theme.of(ctx).dividerColor.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Aksi Cepat',
+              style: Theme.of(ctx).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Pilih item baru yang ingin ditambahkan ke ruang kerjamu.',
+              style: Theme.of(ctx).textTheme.bodySmall,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            _QuickActionTile(
+              icon: Icons.event_note_rounded,
+              color: Colors.orange,
+              title: 'Tambah Jadwal / Deadline',
+              subtitle: 'Catat tugas kuliah atau jadwal ujian baru',
+              onTap: () {
+                Navigator.pop(ctx);
+                setState(() => index = 1);
+              },
+            ),
+            const SizedBox(height: 12),
+            _QuickActionTile(
+              icon: Icons.account_balance_wallet_rounded,
+              color: Colors.green,
+              title: 'Catat Pengeluaran',
+              subtitle: 'Lacak pengeluaran dan sisa uang saku mingguan',
+              onTap: () {
+                Navigator.pop(ctx);
+                setState(() => index = 2);
+              },
+            ),
+            const SizedBox(height: 12),
+            _QuickActionTile(
+              icon: Icons.workspace_premium_rounded,
+              color: AppTheme.secondary,
+              title: 'Simulasi Nilai IPK',
+              subtitle: 'Tambah bobot SKS dan target nilai mata kuliah',
+              onTap: () {
+                Navigator.pop(ctx);
+                setState(() => index = 3);
+              },
+            ),
+            const SizedBox(height: 12),
+            _QuickActionTile(
+              icon: Icons.folder_rounded,
+              color: AppTheme.primary,
+              title: 'Simpan Arsip / Link',
+              subtitle: 'Simpan materi, tugas, atau panduan penting',
+              onTap: () {
+                Navigator.pop(ctx);
+                setState(() => index = 4);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
-  Widget build(BuildContext context) => AnimatedBuilder(animation: data, builder: (_, __) => Scaffold(
-    body: pages[index],
-    floatingActionButton: index == 0 ? FloatingActionButton(
-      onPressed: () {},
-      backgroundColor: AppTheme.primary,
-      elevation: 4,
-      child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
-    ) : null,
-    bottomNavigationBar: _AnimatedMotionNavBar(
-      selectedIndex: index,
-      onDestinationSelected: (v) => setState(() => index = v),
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: data,
+    builder: (_, __) => AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light.copyWith(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+        systemNavigationBarIconBrightness: Brightness.light,
+      ),
+      child: Scaffold(
+        body: pages[index],
+        floatingActionButton: index == 0 ? FloatingActionButton(
+          onPressed: () => _showQuickActionSheet(context),
+          backgroundColor: AppTheme.primary,
+          elevation: 4,
+          child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
+        ) : null,
+        bottomNavigationBar: _AnimatedMotionNavBar(
+          selectedIndex: index,
+          onDestinationSelected: (v) => setState(() => index = v),
+        ),
+      ),
     ),
-  ));
+  );
+}
+
+class _QuickActionTile extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  const _QuickActionTile({
+    required this.icon,
+    required this.color,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.08)),
+          color: Theme.of(context).colorScheme.surface,
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Icon(icon, color: color, size: 24),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  const SizedBox(height: 2),
+                  Text(subtitle, style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 11)),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right_rounded, size: 20, color: Colors.grey),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _Home extends StatelessWidget {
@@ -40,7 +188,7 @@ class _Home extends StatelessWidget {
   Widget build(BuildContext context) {
     final data = AppData.instance;
     final next = data.schedules.where((e) => !e.done).toList()..sort((a,b)=>a.deadline.compareTo(b.deadline));
-    return SafeArea(child: ListView(padding: const EdgeInsets.only(left: 24, right: 24, top: 48, bottom: 32), children: [
+    return SafeArea(child: ListView(padding: const EdgeInsets.only(left: 24, right: 24, top: 48, bottom: 20), children: [
       Row(children: [
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text('Halo, Mahasiswa 👋', style: Theme.of(context).textTheme.headlineMedium),
@@ -181,6 +329,8 @@ class _Home extends StatelessWidget {
       ),
       const SizedBox(height: 12),
       InfoCard(icon: Icons.lightbulb_rounded, title: 'Tips Hari Ini', value: 'Fokus 25 menit, istirahat 5 menit', color: Colors.amber, onTap: () {}),
+      // Margin bawah ekstra agar FAB tidak menutupi item/teks ringkasan terakhir
+      const SizedBox(height: 88),
     ]));
   }
 }
