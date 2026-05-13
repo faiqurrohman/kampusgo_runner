@@ -92,6 +92,13 @@ class AppData extends ChangeNotifier {
     notifyListeners();
   }
 
+  int budgetLimit = 500000; // Contoh anggaran mingguan default Rp500.000
+
+  void updateBudgetLimit(int limit) {
+    budgetLimit = limit;
+    notifyListeners();
+  }
+
   Map<String, int> expenseByCategory() {
     final map = <String, int>{};
     for (final e in expenses) { map[e.category] = (map[e.category] ?? 0) + e.amount; }
