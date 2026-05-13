@@ -3,6 +3,7 @@ import 'dashboard_screen.dart';
 import 'register_screen.dart';
 import '../utils/app_theme.dart';
 import '../services/auth_service.dart';
+import '../services/app_data.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -138,11 +139,14 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     final inputEmail = email.text.trim();
     // Mendukung login fleksibel dengan email pribadi apa pun yang terdaftar / berformat valid
     if (inputEmail.contains('@') && password.text.length >= 6) {
+      final effectiveName = inputEmail == 'nama@gmail.com' ? 'Mahasiswa Demo' : inputEmail.split('@').first;
       // Simpan sesi aman setelah login berhasil
       await AuthService.instance.saveManualSession(
         email: inputEmail,
-        name: inputEmail == 'nama@gmail.com' ? 'Mahasiswa Demo' : inputEmail.split('@').first,
+        name: effectiveName,
       );
+      // Sinkronisasi memori global aplikasi secara reaktif
+      AppData.instance.updateProfile(name: effectiveName, email: inputEmail);
       // Refresh status biometrik (kini tombol bisa aktif)
       await _checkBiometricAvailability();
       _navigateToDashboard();
@@ -159,6 +163,10 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
       final account = await AuthService.instance.signInWithGoogle();
       if (!mounted) return;
       if (account != null) {
+        AppData.instance.updateProfile(
+          name: account.displayName ?? account.email.split('@').first,
+          email: account.email,
+        );
         _showSnackBar('🔑 Berhasil masuk dengan akun Google: ${account.email}', Colors.teal);
         await Future.delayed(const Duration(milliseconds: 400));
         _navigateToDashboard();
@@ -187,6 +195,11 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
       final ok = await AuthService.instance.authenticateWithBiometric();
       if (!mounted) return;
       if (ok) {
+        // Muat nama tersimpan ke memori aktif
+        final savedName = await AuthService.instance.getSavedName();
+        final savedEmail = await AuthService.instance.getSavedEmail();
+        if (savedName != null) AppData.instance.updateProfile(name: savedName, email: savedEmail);
+
         _showSnackBar('✅ Sidik jari/wajah terverifikasi — Selamat datang kembali!', Colors.teal);
         await Future.delayed(const Duration(milliseconds: 400));
         _navigateToDashboard();

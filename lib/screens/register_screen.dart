@@ -3,6 +3,7 @@ import 'dashboard_screen.dart';
 import 'privacy_screen.dart';
 import '../utils/app_theme.dart';
 import '../services/auth_service.dart';
+import '../services/app_data.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -142,10 +143,17 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
     await Future.delayed(const Duration(milliseconds: 1500));
     if (!mounted) return;
 
+    final inputName = name.text.trim();
+    final inputEmail = email.text.trim();
     // Simpan data sesi aman secara lokal agar terhubung lancar dengan database/fitur login
     await AuthService.instance.saveManualSession(
-      email: email.text.trim(),
-      name: name.text.trim(),
+      email: inputEmail,
+      name: inputName,
+    );
+    // Sinkronisasi langsung ke memori global aplikasi secara reaktif
+    AppData.instance.updateProfile(
+      name: inputName.isEmpty ? 'Mahasiswa' : inputName,
+      email: inputEmail,
     );
 
     _showSnackBar('🎉 Pendaftaran berhasil! Selamat datang di KAMPUSGO.', Colors.teal);
@@ -169,6 +177,10 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
       final account = await AuthService.instance.signInWithGoogle();
       if (!mounted) return;
       if (account != null) {
+        AppData.instance.updateProfile(
+          name: account.displayName ?? account.email.split('@').first,
+          email: account.email,
+        );
         _showSnackBar('🔑 Akun Google berhasil terhubung: ${account.email}', Colors.teal);
         await Future.delayed(const Duration(milliseconds: 400));
         if (!mounted) return;
@@ -229,6 +241,10 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
               await AuthService.instance.saveManualSession(
                 email: 'sso.student@kampusgo.id',
                 name: 'Mahasiswa Terverifikasi SSO',
+              );
+              AppData.instance.updateProfile(
+                name: 'Mahasiswa Terverifikasi SSO',
+                email: 'sso.student@kampusgo.id',
               );
               _showSnackBar('✅ Verifikasi Single Sign-On sukses.', Colors.teal);
               await Future.delayed(const Duration(milliseconds: 400));

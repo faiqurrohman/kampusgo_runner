@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import '../services/app_data.dart';
+import '../services/auth_service.dart';
 import '../utils/app_theme.dart';
 import '../utils/formatters.dart';
 import '../widgets/info_card.dart';
@@ -25,6 +26,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   void initState() {
     super.initState();
+    // Muat profil tersimpan dari sesi lokal ke dalam memori reaktif global AppData
+    AuthService.instance.getSavedName().then((name) {
+      if (name != null && name.isNotEmpty) AppData.instance.updateProfile(name: name);
+    });
+    AuthService.instance.getSavedEmail().then((email) {
+      if (email != null && email.isNotEmpty) AppData.instance.updateProfile(email: email);
+    });
+
     // Efek Skeleton Loading saat pertama kali mengambil data agar terasa instan & mulus
     Future.delayed(const Duration(milliseconds: 1000), () {
       if (mounted) setState(() => _isLoading = false);
