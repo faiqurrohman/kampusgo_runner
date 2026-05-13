@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../services/app_data.dart';
 import '../utils/app_theme.dart';
 import '../utils/formatters.dart';
@@ -125,7 +127,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       child: CircleAvatar(
                         radius: 36,
                         backgroundColor: Colors.white.withOpacity(0.15),
-                        child: Text(data.userAvatarUrl, style: const TextStyle(fontSize: 34)),
+                        backgroundImage: data.userAvatarUrl.contains('/') || data.userAvatarUrl.contains('\\')
+                            ? FileImage(File(data.userAvatarUrl))
+                            : null,
+                        child: data.userAvatarUrl.contains('/') || data.userAvatarUrl.contains('\\')
+                            ? null
+                            : Text(data.userAvatarUrl, style: const TextStyle(fontSize: 34)),
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -413,33 +420,108 @@ class _EditAvatarScreen extends StatelessWidget {
     final list = ['🧑‍🎓', '👨‍💻', '👩‍💻', '🎓', '⚡', '🚀', '🌟', '🎯', '💡'];
     return _CustomSubScaffold(
       title: 'Edit Foto Profil',
-      body: GridView.builder(
-        padding: const EdgeInsets.all(24),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3, crossAxisSpacing: 16, mainAxisSpacing: 16,
-        ),
-        itemCount: list.length,
-        itemBuilder: (context, index) {
-          final item = list[index];
-          final isSelected = data.userAvatarUrl == item;
-          return InkWell(
-            borderRadius: BorderRadius.circular(24),
-            onTap: () {
-              data.updateProfile(avatar: item);
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Foto profil diperbarui'), behavior: SnackBarBehavior.floating));
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                color: isSelected ? AppTheme.primary.withOpacity(0.2) : Theme.of(context).colorScheme.surface,
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: isSelected ? AppTheme.primary : Theme.of(context).dividerColor.withOpacity(0.08), width: isSelected ? 2 : 1),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Pilihan Utama: Tambahkan dari Galeri HP Sendiri
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(24),
+              onTap: () async {
+                try {
+                  final picker = ImagePicker();
+                  final pickedFile = await picker.pickImage(
+                    source: ImageSource.gallery,
+                    imageQuality: 50,
+                  );
+                  if (pickedFile != null && context.mounted) {
+                    data.updateProfile(avatar: pickedFile.path);
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('🖼️ Foto profil kustom berhasil diunggah dari Galeri'),
+                        behavior: SnackBarBehavior.floating,
+                        backgroundColor: Colors.teal,
+                      ),
+                    );
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    data.updateProfile(avatar: '📸');
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Foto disimulasikan dari Galeri'), behavior: SnackBarBehavior.floating),
+                    );
+                  }
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.purpleAccent.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: Colors.purpleAccent.withOpacity(0.4), width: 2),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(color: Colors.purpleAccent, borderRadius: BorderRadius.circular(16)),
+                      child: const Icon(Icons.photo_library_rounded, color: Colors.white, size: 28),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Pilih dari Galeri HP', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.purpleAccent)),
+                          const SizedBox(height: 4),
+                          Text('Gunakan foto asli milikmu sendiri dari galeri internal', style: TextStyle(fontSize: 12, color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.8))),
+                        ],
+                      ),
+                    ),
+                    const Icon(Icons.chevron_right_rounded, color: Colors.purpleAccent),
+                  ],
+                ),
               ),
-              alignment: Alignment.center,
-              child: Text(item, style: const TextStyle(fontSize: 40)),
             ),
-          );
-        },
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(28, 24, 24, 8),
+            child: Text('ATAU PILIH AVATAR GRAFIS TERSEDIA:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.6))),
+          ),
+          Expanded(
+            child: GridView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3, crossAxisSpacing: 16, mainAxisSpacing: 16,
+              ),
+              itemCount: list.length,
+              itemBuilder: (context, index) {
+                final item = list[index];
+                final isSelected = data.userAvatarUrl == item;
+                return InkWell(
+                  borderRadius: BorderRadius.circular(24),
+                  onTap: () {
+                    data.updateProfile(avatar: item);
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Foto profil diperbarui'), behavior: SnackBarBehavior.floating));
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: isSelected ? AppTheme.primary.withOpacity(0.2) : Theme.of(context).colorScheme.surface,
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: isSelected ? AppTheme.primary : Theme.of(context).dividerColor.withOpacity(0.08), width: isSelected ? 2 : 1),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(item, style: const TextStyle(fontSize: 40)),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

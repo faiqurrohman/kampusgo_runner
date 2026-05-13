@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -218,7 +219,12 @@ class _Home extends StatelessWidget {
             child: CircleAvatar(
               radius: 22,
               backgroundColor: Colors.white.withOpacity(0.12),
-              child: Text(data.userAvatarUrl, style: const TextStyle(fontSize: 22)),
+              backgroundImage: data.userAvatarUrl.contains('/') || data.userAvatarUrl.contains('\\')
+                  ? FileImage(File(data.userAvatarUrl))
+                  : null,
+              child: data.userAvatarUrl.contains('/') || data.userAvatarUrl.contains('\\')
+                  ? null
+                  : Text(data.userAvatarUrl, style: const TextStyle(fontSize: 22)),
             ),
           ),
           const SizedBox(width: 12),
