@@ -159,17 +159,17 @@ class _Home extends StatelessWidget {
       InfoCard(
         icon: Icons.workspace_premium_rounded, title: 'Prediksi IPK', value: data.gpaItems.isEmpty ? 'Belum ada nilai 🎯' : data.calculateGpa().toStringAsFixed(2), color: AppTheme.secondary, onTap: () => onTabChange(3),
         trailingWidget: data.gpaItems.isEmpty ? null : SizedBox(
-          width: 70,
+          width: 80,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text('${((data.calculateGpa() / 4.0) * 100).toInt()}% ke 4.0', style: const TextStyle(fontSize: 10, color: AppTheme.secondary, fontWeight: FontWeight.bold)),
+              Text('${((data.calculateGpa() / data.targetGpa).clamp(0.0, 1.0) * 100).toInt()}% ke ${data.targetGpa.toStringAsFixed(2)}', style: const TextStyle(fontSize: 10, color: AppTheme.secondary, fontWeight: FontWeight.bold)),
               const SizedBox(height: 6),
               ClipRRect(
                 borderRadius: BorderRadius.circular(4),
                 child: LinearProgressIndicator(
-                  value: data.calculateGpa() / 4.0,
+                  value: (data.calculateGpa() / data.targetGpa).clamp(0.0, 1.0),
                   backgroundColor: AppTheme.secondary.withOpacity(0.2),
                   valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.secondary),
                   minHeight: 6,

@@ -84,6 +84,14 @@ class AppData extends ChangeNotifier {
     notifyListeners();
   }
 
+  double targetGpa = 3.80;
+  double previousGpa = 3.66;
+
+  void updateTargetGpa(double val) {
+    targetGpa = val;
+    notifyListeners();
+  }
+
   Map<String, int> expenseByCategory() {
     final map = <String, int>{};
     for (final e in expenses) { map[e.category] = (map[e.category] ?? 0) + e.amount; }
