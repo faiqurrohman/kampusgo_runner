@@ -73,14 +73,21 @@ class _ResourceScreenState extends State<ResourceScreen> {
                       onChanged: (value) => setState(() => _searchQuery = value),
                       decoration: InputDecoration(
                         hintText: 'Cari judul, matkul, atau link...',
-                        prefixIcon: const Icon(Icons.search_rounded),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                        prefixIcon: const Padding(
+                          padding: EdgeInsets.only(left: 16, right: 12),
+                          child: Icon(Icons.search_rounded),
+                        ),
                         suffixIcon: _searchQuery.isNotEmpty
-                            ? IconButton(
-                                icon: const Icon(Icons.clear_rounded),
-                                onPressed: () {
-                                  _searchController.clear();
-                                  setState(() => _searchQuery = '');
-                                },
+                            ? Padding(
+                                padding: const EdgeInsets.only(right: 8),
+                                child: IconButton(
+                                  icon: const Icon(Icons.clear_rounded),
+                                  onPressed: () {
+                                    _searchController.clear();
+                                    setState(() => _searchQuery = '');
+                                  },
+                                ),
                               )
                             : null,
                       ),
