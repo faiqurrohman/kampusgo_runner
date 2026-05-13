@@ -190,6 +190,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 TextFormField(
                   controller: email, 
                   enabled: !isLoading,
+                  keyboardType: TextInputType.emailAddress,
+                  textInputAction: TextInputAction.next,
                   decoration: _customInputDeco(label: 'Email', prefixIcon: const Icon(Icons.email_outlined)), 
                   validator: (v) => v != null && v.contains('@') ? null : 'Alamat email tidak valid',
                 ),
@@ -198,6 +200,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: password, 
                   obscureText: hide, 
                   enabled: !isLoading,
+                  textInputAction: TextInputAction.done,
+                  onFieldSubmitted: (_) => _handleLogin(),
                   decoration: _customInputDeco(
                     label: 'Password', 
                     prefixIcon: const Icon(Icons.lock_outline), 
