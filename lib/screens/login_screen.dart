@@ -12,7 +12,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin {
   final formKey = GlobalKey<FormState>();
-  final email = TextEditingController(text: 'demo@kampusgo.id');
+  final email = TextEditingController(text: 'nama@gmail.com');
   final password = TextEditingController(text: '123456');
 
   bool hide = true;
@@ -135,17 +135,19 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     await Future.delayed(const Duration(milliseconds: 1400));
     if (!mounted) return;
 
-    if (email.text.trim() == 'demo@kampusgo.id' && password.text == '123456') {
+    final inputEmail = email.text.trim();
+    // Mendukung login fleksibel dengan email pribadi apa pun yang terdaftar / berformat valid
+    if (inputEmail.contains('@') && password.text.length >= 6) {
       // Simpan sesi aman setelah login berhasil
       await AuthService.instance.saveManualSession(
-        email: email.text.trim(),
-        name: 'Mahasiswa Demo',
+        email: inputEmail,
+        name: inputEmail == 'nama@gmail.com' ? 'Mahasiswa Demo' : inputEmail.split('@').first,
       );
       // Refresh status biometrik (kini tombol bisa aktif)
       await _checkBiometricAvailability();
       _navigateToDashboard();
     } else {
-      _setError('Kredensial tidak sesuai. Periksa kembali email dan password Anda.');
+      _setError('Kredensial tidak sesuai. Periksa kembali format email dan password Anda.');
     }
   }
 
@@ -518,7 +520,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'Demo akun: demo@kampusgo.id / 123456',
+                    'Demo akun: nama@gmail.com / 123456',
                     style: TextStyle(fontSize: 11, color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.8)),
                   ),
                 ),
