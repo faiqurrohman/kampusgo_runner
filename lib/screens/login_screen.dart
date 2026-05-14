@@ -252,16 +252,22 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  width: 54,
+                  height: 54,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: AppTheme.primary.withOpacity(0.08),
-                    border: Border.all(color: AppTheme.primary.withOpacity(0.3), width: 1),
+                    border: Border.all(color: Colors.purpleAccent.withOpacity(0.5), width: 1.5),
                     boxShadow: [
-                      BoxShadow(color: Colors.purpleAccent.withOpacity(0.2), blurRadius: 16, spreadRadius: 2),
+                      BoxShadow(color: Colors.purpleAccent.withOpacity(0.4), blurRadius: 20, spreadRadius: 2),
+                      BoxShadow(color: Colors.deepPurple.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 4)),
                     ],
                   ),
-                  child: const Icon(Icons.school_outlined, color: Colors.purpleAccent, size: 26),
+                  child: ClipOval(
+                    child: Image.asset(
+                      'assets/images/logo_mewah.png',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
                 const SizedBox(width: 16),
                 ShaderMask(
