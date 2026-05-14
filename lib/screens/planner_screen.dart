@@ -17,26 +17,23 @@ class _PlannerScreenState extends State<PlannerScreen> {
     final data = AppData.instance;
     return AnimatedBuilder(
       animation: data,
-      builder: (_, __) => SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(20),
+      builder: (_, __) => Scaffold(
+        backgroundColor: Colors.transparent,
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => _showAdd(context),
+          backgroundColor: AppTheme.primary,
+          elevation: 4,
+          child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
+        ),
+        body: SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 80),
           children: [
             const SectionTitle(
               title: 'Smart Study Planner',
               subtitle: 'Kelola jadwal tugas dan ujian dengan panduan prioritas visual otomatis.',
             ),
-            // Tombol Tambah & Petunjuk Interaksi
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () => _showAdd(context),
-                    icon: const Icon(Icons.add_rounded),
-                    label: const Text('Tambah Deadline Baru'),
-                  ),
-                ),
-              ],
-            ),
+            // Tombol Tambah dihapus, dipindah ke FAB
             const SizedBox(height: 12),
             // Petunjuk Gestur Swipe
             Container(
@@ -360,8 +357,9 @@ class _PlannerScreenState extends State<PlannerScreen> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   void _showAdd(BuildContext context) {
     final title = TextEditingController();

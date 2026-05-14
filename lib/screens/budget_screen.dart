@@ -39,9 +39,17 @@ class _BudgetScreenState extends State<BudgetScreen> {
             ? data.expenses
             : data.expenses.where((e) => e.category == _selectedCategoryFilter).toList();
 
-        return SafeArea(
-          child: ListView(
-            padding: const EdgeInsets.all(20),
+        return Scaffold(
+          backgroundColor: Colors.transparent,
+          floatingActionButton: FloatingActionButton(
+            onPressed: () => _showAdd(context),
+            backgroundColor: AppTheme.primary,
+            elevation: 4,
+            child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
+          ),
+          body: SafeArea(
+            child: ListView(
+              padding: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 80),
             children: [
               const SectionTitle(
                 title: 'Budget Buddy',
@@ -161,12 +169,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
                 },
               ),
               const SizedBox(height: 16),
-              // Tombol Tambah Pengeluaran
-              ElevatedButton.icon(
-                onPressed: () => _showAdd(context),
-                icon: const Icon(Icons.add_rounded),
-                label: const Text('Catat Pengeluaran Baru'),
-              ),
+              // Tombol Tambah dihapus, dipindah ke FAB
               const SizedBox(height: 20),
               // Header Riwayat Pengeluaran beserta tombol ekspor ke orang tua & indikator filter
               Row(
@@ -276,9 +279,10 @@ class _BudgetScreenState extends State<BudgetScreen> {
                 }),
             ],
           ),
-        );
-      },
-    );
+        ),
+      );
+    },
+  );
   }
 
   void _showExportDialog(BuildContext context) {

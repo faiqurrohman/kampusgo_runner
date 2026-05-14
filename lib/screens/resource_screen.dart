@@ -54,7 +54,15 @@ class _ResourceScreenState extends State<ResourceScreen> {
           return matchesTag && matchesSearch;
         }).toList();
 
-        return SafeArea(
+        return Scaffold(
+          backgroundColor: Colors.transparent,
+          floatingActionButton: FloatingActionButton(
+            onPressed: () => _showAddSheet(context),
+            backgroundColor: AppTheme.primary,
+            elevation: 4,
+            child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
+          ),
+          body: SafeArea(
           child: Column(
             children: [
               // Header & Section Title with padding
@@ -127,11 +135,11 @@ class _ResourceScreenState extends State<ResourceScreen> {
                     ),
                     const SizedBox(height: 16),
                     // Add Resource Button
-                    ElevatedButton.icon(
-                      onPressed: () => _showAddSheet(context),
-                      icon: const Icon(Icons.add_link_rounded),
-                      label: const Text('Tambah Resource Baru'),
-                    ),
+                    // Elevated button dihapus
+
+
+
+
                     const SizedBox(height: 16),
                   ],
                 ),
@@ -164,7 +172,7 @@ class _ResourceScreenState extends State<ResourceScreen> {
                         ),
                       )
                     : ListView.builder(
-                        padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                        padding: const EdgeInsets.fromLTRB(20, 0, 20, 80),
                         itemCount: filteredResources.length,
                         itemBuilder: (context, index) {
                           final res = filteredResources[index];
@@ -280,7 +288,8 @@ class _ResourceScreenState extends State<ResourceScreen> {
               ),
             ],
           ),
-        );
+        ),
+      );
       },
     );
   }

@@ -22,9 +22,17 @@ class _GpaScreenState extends State<GpaScreen> {
         final isUp = diff >= 0;
         final progressToTarget = data.targetGpa > 0 ? (currentGpa / data.targetGpa).clamp(0.0, 1.0) : 0.0;
 
-        return SafeArea(
-          child: ListView(
-            padding: const EdgeInsets.all(20),
+        return Scaffold(
+          backgroundColor: Colors.transparent,
+          floatingActionButton: FloatingActionButton(
+            onPressed: () => _showAdd(context),
+            backgroundColor: AppTheme.primary,
+            elevation: 4,
+            child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
+          ),
+          body: SafeArea(
+            child: ListView(
+              padding: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 80),
             children: [
               const SectionTitle(
                 title: 'GPA Predictor',
@@ -226,12 +234,7 @@ class _GpaScreenState extends State<GpaScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              // Tombol Tambah Matkul
-              ElevatedButton.icon(
-                onPressed: () => _showAdd(context),
-                icon: const Icon(Icons.add_rounded),
-                label: const Text('Tambah Simulasi Mata Kuliah'),
-              ),
+              // Tombol Tambah dihapus, dipindah ke FAB
               const SizedBox(height: 16),
               // Daftar Matkul Simulasi
               ...data.gpaItems.map((e) {
@@ -290,9 +293,10 @@ class _GpaScreenState extends State<GpaScreen> {
               }),
             ],
           ),
-        );
-      },
-    );
+        ),
+      );
+    },
+  );
   }
 
   void _showEditTargetDialog(BuildContext context) {
