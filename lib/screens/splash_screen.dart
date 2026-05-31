@@ -30,16 +30,14 @@ class _SplashScreenState extends State<SplashScreen> {
         ),
       ),
       child: Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        Container(
-          width: 120, height: 120,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(colors: [AppTheme.primary, AppTheme.secondary]),
-            borderRadius: BorderRadius.circular(36),
-            boxShadow: [
-              BoxShadow(color: AppTheme.primary.withOpacity(0.4), blurRadius: 24, offset: const Offset(0, 12)),
-            ]
+        ClipRRect(
+          borderRadius: BorderRadius.circular(36),
+          child: Image.asset(
+            'assets/images/logo_mewah.png',
+            width: 150,
+            height: 150,
+            fit: BoxFit.cover,
           ),
-          child: const Icon(Icons.school_rounded, color: Colors.white, size: 64)
         ),
         const SizedBox(height: 32),
         Text('KAMPUSGO', style: Theme.of(context).textTheme.displayMedium?.copyWith(letterSpacing: 2)),
