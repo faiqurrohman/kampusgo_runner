@@ -101,6 +101,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
       // Autentikasi ke database lokal Secure Storage
       await AuthService.instance.loginManual(inputEmail, inputPassword);
+      await AppData.instance.loadUserData(inputEmail);
 
       if (!mounted) return;
       final savedName = await AuthService.instance.getSavedName();

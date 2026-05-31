@@ -4,6 +4,7 @@ import 'login_screen.dart';
 import 'dashboard_screen.dart';
 import '../utils/app_theme.dart';
 import '../services/auth_service.dart';
+import '../services/app_data.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -23,6 +24,8 @@ class _SplashScreenState extends State<SplashScreen> {
     if (!mounted) return;
     final loggedIn = await AuthService.instance.isLoggedIn();
     if (loggedIn) {
+      final email = await AuthService.instance.getSavedEmail();
+      if (email != null) await AppData.instance.loadUserData(email);
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const DashboardScreen()));
     } else {
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen()));

@@ -13,50 +13,70 @@ class AppData extends ChangeNotifier {
   Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
 
-    final schedulesData = prefs.getString('schedules_data');
-    if (schedulesData != null) {
-      final List dec = jsonDecode(schedulesData);
-      schedules.clear();
-      schedules.addAll(dec.map((e) => ScheduleModel.fromJson(e)).toList());
-    }
-
-    final expensesData = prefs.getString('expenses_data');
-    if (expensesData != null) {
-      final List dec = jsonDecode(expensesData);
-      expenses.clear();
-      expenses.addAll(dec.map((e) => ExpenseModel.fromJson(e)).toList());
-    }
-
-    final gpasData = prefs.getString('gpas_data');
-    if (gpasData != null) {
-      final List dec = jsonDecode(gpasData);
-      gpaItems.clear();
-      gpaItems.addAll(dec.map((e) => GpaModel.fromJson(e)).toList());
-    }
-
-    final resourcesData = prefs.getString('resources_data');
-    if (resourcesData != null) {
-      final List dec = jsonDecode(resourcesData);
-      resources.clear();
-      resources.addAll(dec.map((e) => ResourceModel.fromJson(e)).toList());
-    }
 
     final isDark = prefs.getBool('theme_is_dark');
     if (isDark != null) {
       themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
     }
     
-    final limit = prefs.getInt('budget_limit');
-    if (limit != null) {
-      budgetLimit = limit;
-    }
-
     final readIds = prefs.getStringList('read_notifications');
     if (readIds != null) {
       readNotificationIds.addAll(readIds);
     }
   }
 
+
+
+  Future<void> loadUserData(String email) async {
+    userEmail = email;
+    final prefs = await SharedPreferences.getInstance();
+
+    final limit = prefs.getInt('${userEmail}_budget_limit');
+    if (limit != null) {
+      budgetLimit = limit;
+    } else {
+      budgetLimit = 500000; // Reset to default if new user
+    }
+
+    final schedulesData = prefs.getString('${userEmail}_schedules_data');
+    schedules.clear();
+    if (schedulesData != null) {
+      final List dec = jsonDecode(schedulesData);
+      schedules.addAll(dec.map((e) => ScheduleModel.fromJson(e)).toList());
+    }
+
+    final expensesData = prefs.getString('${userEmail}_expenses_data');
+    expenses.clear();
+    if (expensesData != null) {
+      final List dec = jsonDecode(expensesData);
+      expenses.addAll(dec.map((e) => ExpenseModel.fromJson(e)).toList());
+    }
+
+    final gpasData = prefs.getString('${userEmail}_gpas_data');
+    gpaItems.clear();
+    if (gpasData != null) {
+      final List dec = jsonDecode(gpasData);
+      gpaItems.addAll(dec.map((e) => GpaModel.fromJson(e)).toList());
+    }
+
+    final resourcesData = prefs.getString('${userEmail}_resources_data');
+    resources.clear();
+    if (resourcesData != null) {
+      final List dec = jsonDecode(resourcesData);
+      resources.addAll(dec.map((e) => ResourceModel.fromJson(e)).toList());
+    }
+    notifyListeners();
+  }
+
+  void clearUserData() {
+    schedules.clear();
+    expenses.clear();
+    gpaItems.clear();
+    resources.clear();
+    userEmail = '';
+    userName = '';
+    notifyListeners();
+  }
 
   final List<ScheduleModel> schedules = [];
 
@@ -69,22 +89,22 @@ class AppData extends ChangeNotifier {
 
   void _saveSchedules() async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString('schedules_data', jsonEncode(schedules.map((e) => e.toJson()).toList()));
+    prefs.setString('${userEmail}_schedules_data', jsonEncode(schedules.map((e) => e.toJson()).toList()));
   }
   
   void _saveExpenses() async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString('expenses_data', jsonEncode(expenses.map((e) => e.toJson()).toList()));
+    prefs.setString('${userEmail}_expenses_data', jsonEncode(expenses.map((e) => e.toJson()).toList()));
   }
 
   void _saveGpas() async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString('gpas_data', jsonEncode(gpaItems.map((e) => e.toJson()).toList()));
+    prefs.setString('${userEmail}_gpas_data', jsonEncode(gpaItems.map((e) => e.toJson()).toList()));
   }
 
   void _saveResources() async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString('resources_data', jsonEncode(resources.map((e) => e.toJson()).toList()));
+    prefs.setString('${userEmail}_resources_data', jsonEncode(resources.map((e) => e.toJson()).toList()));
   }
 
   String _id() => DateTime.now().microsecondsSinceEpoch.toString();
@@ -236,7 +256,7 @@ class AppData extends ChangeNotifier {
     budgetLimit = limit;
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('budget_limit', limit);
+    await prefs.setInt('${userEmail}_budget_limit', limit);
   }
 
   List<String> expenseCategories = ['Makanan', 'Fotokopi', 'Transportasi', 'Hiburan', 'Lainnya'];

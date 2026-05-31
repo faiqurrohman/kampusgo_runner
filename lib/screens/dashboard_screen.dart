@@ -22,7 +22,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
   bool _isLoading = true;
   final data = AppData.instance;
   late final pages = [_Home(onLogout: _logout, onTabChange: (i) => setState(() => index = i)), const PlannerScreen(), const BudgetScreen(), const GpaScreen(), const ResourceScreen()];
-  void _logout() => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen()));
+  void _logout() async {
+    AppData.instance.clearUserData();
+    await AuthService.instance.signOut();
+    if (!mounted) return;
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen()));
+  }
 
   @override
   void initState() {
