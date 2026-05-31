@@ -131,19 +131,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
         statusBarIconBrightness: Brightness.light,
         systemNavigationBarIconBrightness: Brightness.light,
       ),
-      child: Scaffold(
-        body: _isLoading ? const _SkeletonLoaderView() : pages[index],
-        floatingActionButton: (index == 0 && !_isLoading) ? FloatingActionButton(
-          onPressed: () => _showQuickActionSheet(context),
-          backgroundColor: AppTheme.primary,
-          elevation: 4,
-          child: Icon(Icons.add_rounded, color: Colors.white, size: 28),
-        ) : null,
-        bottomNavigationBar: _AnimatedMotionNavBar(
-          selectedIndex: index,
-          onDestinationSelected: (v) {
-            if (!_isLoading) setState(() => index = v);
-          },
+      child: PopScope(
+        canPop: index == 0,
+        onPopInvoked: (didPop) {
+          if (!didPop && index != 0) {
+            setState(() => index = 0);
+          }
+        },
+        child: Scaffold(
+          body: _isLoading ? const _SkeletonLoaderView() : pages[index],
+          floatingActionButton: (index == 0 && !_isLoading) ? FloatingActionButton(
+            onPressed: () => _showQuickActionSheet(context),
+            backgroundColor: AppTheme.primary,
+            elevation: 4,
+            child: Icon(Icons.add_rounded, color: Colors.white, size: 28),
+          ) : null,
+          bottomNavigationBar: _AnimatedMotionNavBar(
+            selectedIndex: index,
+            onDestinationSelected: (v) {
+              if (!_isLoading) setState(() => index = v);
+            },
+          ),
         ),
       ),
     ),
