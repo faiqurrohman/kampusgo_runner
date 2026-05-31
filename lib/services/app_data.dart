@@ -35,7 +35,7 @@ class AppData extends ChangeNotifier {
     if (limit != null) {
       budgetLimit = limit;
     } else {
-      budgetLimit = 500000; // Reset to default if new user
+      budgetLimit = 0; // Reset to 0 for new user so they input it themselves
     }
 
     final schedulesData = prefs.getString('${userEmail}_schedules_data');
@@ -250,7 +250,7 @@ class AppData extends ChangeNotifier {
     notifyListeners();
   }
 
-  int budgetLimit = 500000; // Contoh anggaran mingguan default Rp500.000
+  int budgetLimit = 0; // Default awal 0 untuk pengguna baru
 
   void updateBudgetLimit(int limit) async {
     budgetLimit = limit;

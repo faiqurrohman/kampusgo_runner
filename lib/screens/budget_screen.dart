@@ -24,7 +24,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
       builder: (_, __) {
         final totalExp = data.totalExpense();
         final sisa = data.budgetLimit - totalExp;
-        final usageRatio = data.budgetLimit > 0 ? (totalExp / data.budgetLimit).clamp(0.0, 1.0) : 1.0;
+        final usageRatio = data.budgetLimit > 0 ? (totalExp / data.budgetLimit).clamp(0.0, 1.0) : 0.0;
         final isOver = sisa < 0;
 
         // Tentukan warna status berdasarkan pemakaian

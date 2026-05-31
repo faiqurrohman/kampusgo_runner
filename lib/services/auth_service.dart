@@ -18,6 +18,7 @@ class AuthService {
   static const _keyLoggedIn = 'kampusgo_is_logged_in';
   static const _keyUserEmail = 'kampusgo_user_email';
   static const _keyUserName = 'kampusgo_user_name';
+  static const _keySavedAccounts = 'kampusgo_saved_accounts';
   static const _keyUsersDb = 'kampusgo_users_db'; 
 
 
@@ -61,6 +62,33 @@ class AuthService {
 
   /// Simpan sesi login manual (email/password).
   Future<void> saveManualSession({required String email, required String name}) async {
+    await _storage.write(key: _keyLoggedIn, value: 'true');
+    await _storage.write(key: _keyUserEmail, value: email);
+    await _storage.write(key: _keyUserName, value: name);
+
+    // Add to saved accounts list
+    final accountsStr = await _storage.read(key: _keySavedAccounts);
+    List<dynamic> accounts = [];
+    if (accountsStr != null) {
+      accounts = jsonDecode(accountsStr);
+    }
+    
+    // Remove if already exists so we can update/move to top
+    accounts.removeWhere((acc) => acc['email'] == email);
+    accounts.insert(0, {'email': email, 'name': name});
+    
+    await _storage.write(key: _keySavedAccounts, value: jsonEncode(accounts));
+  }
+
+
+  Future<List<Map<String, String>>> getSavedAccounts() async {
+    final accountsStr = await _storage.read(key: _keySavedAccounts);
+    if (accountsStr == null) return [];
+    final List<dynamic> dec = jsonDecode(accountsStr);
+    return dec.map((e) => {'email': e['email'].toString(), 'name': e['name'].toString()}).toList();
+  }
+
+  Future<void> switchAccount(String email, String name) async {
     await _storage.write(key: _keyLoggedIn, value: 'true');
     await _storage.write(key: _keyUserEmail, value: email);
     await _storage.write(key: _keyUserName, value: name);

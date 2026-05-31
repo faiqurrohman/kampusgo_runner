@@ -2,6 +2,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import '../services/auth_service.dart';
 import '../services/app_data.dart';
 import '../utils/app_theme.dart';
 import '../utils/formatters.dart';
@@ -16,6 +17,75 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   final data = AppData.instance;
+
+
+  void _showSwitchAccountModal(BuildContext context) async {
+    final accounts = await AuthService.instance.getSavedAccounts();
+    if (!context.mounted) return;
+    
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        decoration: BoxDecoration(
+          color: Theme.of(ctx).colorScheme.surface,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+        ),
+        padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, MediaQuery.of(ctx).padding.bottom + 20.h),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(width: 40.w, height: 4.h, decoration: BoxDecoration(color: Colors.grey.withOpacity(0.3), borderRadius: BorderRadius.circular(2.r))),
+            SizedBox(height: 20.h),
+            Text('Beralih Akun', style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold)),
+            SizedBox(height: 8.h),
+            Text('Pilih akun yang pernah login sebelumnya', style: TextStyle(fontSize: 13.sp, color: Colors.grey)),
+            SizedBox(height: 24.h),
+            ...accounts.map((acc) {
+              final isCurrent = acc['email'] == data.userEmail;
+              return ListTile(
+                contentPadding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                leading: CircleAvatar(
+                  backgroundColor: isCurrent ? AppTheme.primary.withOpacity(0.1) : Colors.grey.withOpacity(0.1),
+                  child: Text(acc['name']![0].toUpperCase(), style: TextStyle(color: isCurrent ? AppTheme.primary : Colors.grey)),
+                ),
+                title: Text(acc['name']!, style: TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: Text(acc['email']!),
+                trailing: isCurrent ? Icon(Icons.check_circle_rounded, color: AppTheme.primary) : null,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+                tileColor: isCurrent ? AppTheme.primary.withOpacity(0.05) : null,
+                onTap: () async {
+                  if (isCurrent) {
+                    Navigator.pop(ctx);
+                    return;
+                  }
+                  await AuthService.instance.switchAccount(acc['email']!, acc['name']!);
+                  await AppData.instance.loadUserData(acc['email']!);
+                  if (ctx.mounted) Navigator.pop(ctx);
+                },
+              );
+            }).toList(),
+            SizedBox(height: 16.h),
+            Divider(height: 1, color: Colors.grey.withOpacity(0.2)),
+            SizedBox(height: 16.h),
+            ListTile(
+              contentPadding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+              leading: CircleAvatar(
+                backgroundColor: Colors.transparent,
+                child: Icon(Icons.add_rounded, color: AppTheme.primary),
+              ),
+              title: Text('Tambah Akun KampusGo Baru', style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primary)),
+              onTap: () {
+                Navigator.pop(ctx);
+                widget.onLogout();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   Widget _sectionTitle(String title) {
     return Padding(
@@ -345,7 +415,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
 
-              SizedBox(height: 36.h),
+              SizedBox(height: 24.h),
+              ElevatedButton.icon(
+                onPressed: () => _showSwitchAccountModal(context),
+                icon: Icon(Icons.people_alt_rounded, color: AppTheme.primary),
+                label: Text('Beralih Akun', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp, color: AppTheme.primary)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primary.withOpacity(0.1),
+                  foregroundColor: AppTheme.primary,
+                  padding: EdgeInsets.symmetric(vertical: 16.h),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.r)),
+                  elevation: 0,
+                ),
+              ),
+              SizedBox(height: 16.h),
               // Tombol Keluar Akun (Logout) Paling Bawah dengan Warna Kontras Merah
               ElevatedButton.icon(
                 onPressed: widget.onLogout,
