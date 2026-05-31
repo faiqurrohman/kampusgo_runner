@@ -53,6 +53,12 @@ class AuthService {
 
   // ─── Session Management ───────────────────────────────────────────────────
 
+  /// Cek apakah ada sesi login tersimpan
+  Future<bool> isLoggedIn() async {
+    final val = await _storage.read(key: _keyLoggedIn);
+    return val == 'true';
+  }
+
   /// Simpan sesi login manual (email/password).
   Future<void> saveManualSession({required String email, required String name}) async {
     await _storage.write(key: _keyLoggedIn, value: 'true');
