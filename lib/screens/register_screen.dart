@@ -140,31 +140,37 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
       errorMessage = null;
     });
 
-    // Simulasi proses pendaftaran dan penyimpanan ke sistem
-    await Future.delayed(const Duration(milliseconds: 1500));
-    if (!mounted) return;
+    try {
+      final inputName = name.text.trim();
+      final inputEmail = email.text.trim();
+      final inputPassword = password.text;
+      
+      final finalName = inputName.isEmpty ? 'Mahasiswa' : inputName;
 
-    final inputName = name.text.trim();
-    final inputEmail = email.text.trim();
-    // Simpan data sesi aman secara lokal agar terhubung lancar dengan database/fitur login
-    await AuthService.instance.saveManualSession(
-      email: inputEmail,
-      name: inputName,
-    );
-    // Sinkronisasi langsung ke memori global aplikasi secara reaktif
-    AppData.instance.updateProfile(
-      name: inputName.isEmpty ? 'Mahasiswa' : inputName,
-      email: inputEmail,
-    );
+      // Pendaftaran ke database lokal Secure Storage
+      await AuthService.instance.registerManual(finalName, inputEmail, inputPassword);
 
-    _showSnackBar('🎉 Pendaftaran berhasil! Selamat datang di KAMPUSGO.', Colors.teal);
-    await Future.delayed(const Duration(milliseconds: 400));
-    if (!mounted) return;
+      if (!mounted) return;
+      
+      // Sinkronisasi memori global
+      AppData.instance.updateProfile(
+        name: finalName,
+        email: inputEmail,
+      );
 
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const DashboardScreen()),
-    );
+      _showSnackBar('🎉 Pendaftaran berhasil! Selamat datang di KAMPUSGO.', Colors.teal);
+      await Future.delayed(const Duration(milliseconds: 400));
+      if (!mounted) return;
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const DashboardScreen()),
+      );
+    } on AuthException catch (e) {
+      _setError(e.message);
+    } catch (_) {
+      _setError('Pendaftaran gagal. Silakan coba lagi.');
+    }
   }
 
   // ─── Pendaftaran OAuth Google ─────────────────────────────────────────────

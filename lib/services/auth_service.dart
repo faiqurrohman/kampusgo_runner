@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:local_auth/local_auth.dart';
@@ -28,7 +29,8 @@ class AuthService {
   static const _keyLoggedIn = 'kampusgo_is_logged_in';
   static const _keyUserEmail = 'kampusgo_user_email';
   static const _keyUserName = 'kampusgo_user_name';
-  static const _keyAuthMethod = 'kampusgo_auth_method'; // 'google' | 'manual'
+  static const _keyAuthMethod = 'kampusgo_auth_method';
+  static const _keyUsersDb = 'kampusgo_users_db'; // 'google' | 'manual'
 
   // ─── Google Sign-In ───────────────────────────────────────────────────────
 
@@ -109,6 +111,37 @@ class AuthService {
       }
       throw AuthException('Autentikasi biometrik gagal: ${e.message}');
     }
+  }
+
+
+  // ─── Manual Auth (Lokal) ──────────────────────────────────────────────────
+
+  Future<void> registerManual(String name, String email, String password) async {
+    final dbStr = await _storage.read(key: _keyUsersDb) ?? '{}';
+    final db = jsonDecode(dbStr) as Map<String, dynamic>;
+    if (db.containsKey(email)) {
+      throw AuthException('Email sudah terdaftar. Silakan gunakan email lain atau masuk ke akun Anda.');
+    }
+    db[email] = {
+      'name': name,
+      'email': email,
+      'password': password, // Untuk aplikasi nyata wajib di-hash, ini hanya demonstrasi lokal
+    };
+    await _storage.write(key: _keyUsersDb, value: jsonEncode(db));
+    await saveManualSession(email: email, name: name);
+  }
+
+  Future<void> loginManual(String email, String password) async {
+    final dbStr = await _storage.read(key: _keyUsersDb) ?? '{}';
+    final db = jsonDecode(dbStr) as Map<String, dynamic>;
+    if (!db.containsKey(email)) {
+      throw AuthException('Akun tidak ditemukan. Periksa email Anda atau daftar terlebih dahulu.');
+    }
+    final userData = db[email] as Map<String, dynamic>;
+    if (userData['password'] != password) {
+      throw AuthException('Kata sandi yang Anda masukkan salah.');
+    }
+    await saveManualSession(email: email, name: userData['name'] as String);
   }
 
   // ─── Session Management ───────────────────────────────────────────────────

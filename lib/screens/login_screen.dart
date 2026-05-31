@@ -14,8 +14,8 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin {
   final formKey = GlobalKey<FormState>();
-  final email = TextEditingController(text: 'nama@gmail.com');
-  final password = TextEditingController(text: '123456');
+  final email = TextEditingController();
+  final password = TextEditingController();
 
   bool hide = true;
   bool rememberMe = true;
@@ -134,25 +134,31 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     if (!formKey.currentState!.validate()) return;
     setState(() { isLoading = true; errorMessage = null; });
 
-    await Future.delayed(const Duration(milliseconds: 1400));
-    if (!mounted) return;
+    try {
+      final inputEmail = email.text.trim();
+      final inputPassword = password.text;
 
-    final inputEmail = email.text.trim();
-    // Mendukung login fleksibel dengan email pribadi apa pun yang terdaftar / berformat valid
-    if (inputEmail.contains('@') && password.text.length >= 6) {
-      final effectiveName = inputEmail == 'nama@gmail.com' ? 'Mahasiswa Demo' : inputEmail.split('@').first;
-      // Simpan sesi aman setelah login berhasil
-      await AuthService.instance.saveManualSession(
-        email: inputEmail,
-        name: effectiveName,
-      );
-      // Sinkronisasi memori global aplikasi secara reaktif
-      AppData.instance.updateProfile(name: effectiveName, email: inputEmail);
-      // Refresh status biometrik (kini tombol bisa aktif)
+      // Autentikasi ke database lokal Secure Storage
+      await AuthService.instance.loginManual(inputEmail, inputPassword);
+
+      if (!mounted) return;
+      final savedName = await AuthService.instance.getSavedName();
+      
+      // Sinkronisasi memori global
+      AppData.instance.updateProfile(name: savedName ?? 'Mahasiswa', email: inputEmail);
+      
+      // Refresh status biometrik
       await _checkBiometricAvailability();
+      
+      _showSnackBar('✅ Login berhasil! Selamat datang kembali.', Colors.teal);
+      await Future.delayed(const Duration(milliseconds: 300));
+      if (!mounted) return;
+      
       _navigateToDashboard();
-    } else {
-      _setError('Kredensial tidak sesuai. Periksa kembali format email dan password Anda.');
+    } on AuthException catch (e) {
+      _setError(e.message);
+    } catch (_) {
+      _setError('Terjadi kesalahan. Silakan coba lagi.');
     }
   }
 
@@ -526,28 +532,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
           ),
           SizedBox(height: 16.h),
 
-          // ── Info Demo ──
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-            decoration: BoxDecoration(
-              color: Theme.of(context).dividerColor.withOpacity(0.04),
-              borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.08)),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.info_outline_rounded, size: 16, color: Colors.grey),
-                SizedBox(width: 8.w),
-                Expanded(
-                  child: Text(
-                    'Demo akun: nama@gmail.com / 123456',
-                    style: TextStyle(fontSize: 11.sp, color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.8)),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 32.h),
+          SizedBox(height: 8.h),
           Text(
             'Dengan masuk, Anda menyetujui Syarat & Ketentuan serta Kebijakan Privasi kami.',
             textAlign: TextAlign.center,
