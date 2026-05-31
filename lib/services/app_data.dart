@@ -109,6 +109,11 @@ class AppData extends ChangeNotifier {
     notifyListeners();
   }
 
+  void markAllNotificationsRead(Iterable<String> ids) {
+    readNotificationIds.addAll(ids);
+    notifyListeners();
+  }
+
   double targetGpa = 3.80;
   double previousGpa = 3.66;
 

@@ -476,6 +476,22 @@ void _showNotificationPanel(BuildContext context, void Function(int) onTabChange
                             ],
                           ),
                         ),
+                        if (unreadCount > 0)
+                          TextButton(
+                            onPressed: () {
+                              final unreadIds = notifications
+                                  .where((n) => n['isUnread'] == true)
+                                  .map((n) => n['id'] as String)
+                                  .toList();
+                              data.markAllNotificationsRead(unreadIds);
+                              setSheetState(() {
+                                for (final n in notifications) {
+                                  n['isUnread'] = false;
+                                }
+                              });
+                            },
+                            child: Text('Baca Semua', style: TextStyle(fontSize: 12.sp, color: AppTheme.primary)),
+                          ),
                         TextButton(
                           onPressed: () => Navigator.pop(ctx),
                           child: Text('Tutup', style: TextStyle(fontSize: 12.sp)),

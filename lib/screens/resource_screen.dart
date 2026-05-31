@@ -192,96 +192,29 @@ class _ResourceScreenState extends State<ResourceScreen> {
                               ),
                               child: Icon(Icons.delete_rounded, color: Colors.white),
                             ),
-                            child: Card(
-                              margin: EdgeInsets.only(bottom: 12.h),
-                              child: Padding(
-                                padding: EdgeInsets.all(8.0.w),
-                                child: ListTile(
-                                  leading: Container(
-                                    padding: EdgeInsets.all(10.w),
-                                    decoration: BoxDecoration(
-                                      color: tagColor.withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(16.r),
+                            child: _ExpandableResourceCard(
+                              res: res,
+                              tagColor: tagColor,
+                              onCopy: () async {
+                                await Clipboard.setData(ClipboardData(text: res.link));
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Link berhasil disalin!'),
+                                      behavior: SnackBarBehavior.floating,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16.r),
+                                      ),
                                     ),
-                                    child: Icon(Icons.link_rounded, color: tagColor),
-                                  ),
-                                  title: Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          res.title,
-                                          style: TextStyle(fontWeight: FontWeight.bold),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                      SizedBox(width: 8.w),
-                                      Container(
-                                        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
-                                        decoration: BoxDecoration(
-                                          color: tagColor.withOpacity(0.1),
-                                          borderRadius: BorderRadius.circular(10.r),
-                                          border: Border.all(color: tagColor.withOpacity(0.3)),
-                                        ),
-                                        child: Text(
-                                          res.tag,
-                                          style: TextStyle(
-                                            fontSize: 10.sp,
-                                            fontWeight: FontWeight.bold,
-                                            color: tagColor,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  subtitle: Padding(
-                                    padding: EdgeInsets.only(top: 4.h),
-                                    child: Text(
-                                      '${res.course}\n${res.link}',
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  isThreeLine: true,
-                                  trailing: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      // Tombol Copy Link
-                                      IconButton(
-                                        tooltip: 'Salin Link',
-                                        icon: Icon(Icons.copy_rounded, size: 20),
-                                        color: Theme.of(context).textTheme.bodyMedium?.color,
-                                        onPressed: () async {
-                                          await Clipboard.setData(ClipboardData(text: res.link));
-                                          if (context.mounted) {
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              SnackBar(
-                                                content: Text('Link berhasil disalin!'),
-                                                behavior: SnackBarBehavior.floating,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(16.r),
-                                                ),
-                                              ),
-                                            );
-                                          }
-                                        },
-                                      ),
-                                      // Tombol Buka Link
-                                      IconButton(
-                                        tooltip: 'Buka di Browser',
-                                        icon: Icon(Icons.open_in_new_rounded, size: 20),
-                                        color: AppTheme.primary,
-                                        onPressed: () async {
-                                          final uri = Uri.tryParse(res.link);
-                                          if (uri != null) {
-                                            await launchUrl(uri, mode: LaunchMode.externalApplication);
-                                          }
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
+                                  );
+                                }
+                              },
+                              onOpen: () async {
+                                final uri = Uri.tryParse(res.link);
+                                if (uri != null) {
+                                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                                }
+                              },
                             ),
                           );
                         },
@@ -415,6 +348,189 @@ class _AddResourceSheetState extends State<_AddResourceSheet> {
             child: Text('Simpan Resource'),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _ExpandableResourceCard extends StatefulWidget {
+  final dynamic res;
+  final Color tagColor;
+  final VoidCallback onCopy;
+  final VoidCallback onOpen;
+
+  const _ExpandableResourceCard({
+    required this.res,
+    required this.tagColor,
+    required this.onCopy,
+    required this.onOpen,
+  });
+
+  @override
+  State<_ExpandableResourceCard> createState() => _ExpandableResourceCardState();
+}
+
+class _ExpandableResourceCardState extends State<_ExpandableResourceCard> {
+  bool _isExpanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: EdgeInsets.only(bottom: 12.h),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => setState(() => _isExpanded = !_isExpanded),
+        child: AnimatedSize(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          child: Padding(
+            padding: EdgeInsets.all(16.w),
+            child: _isExpanded ? _buildExpanded() : _buildCollapsed(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCollapsed() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        _buildIcon(),
+        SizedBox(width: 12.w),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      widget.res.title,
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  SizedBox(width: 8.w),
+                  _buildTagBadge(),
+                ],
+              ),
+              SizedBox(height: 4.h),
+              Text(
+                '${widget.res.course}\n${widget.res.link}',
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 13.sp, color: Colors.grey[400]),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(width: 8.w),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.copy_rounded, size: 20),
+              onPressed: widget.onCopy,
+              color: Theme.of(context).textTheme.bodyMedium?.color,
+            ),
+            IconButton(
+              icon: const Icon(Icons.open_in_new_rounded, size: 20),
+              onPressed: widget.onOpen,
+              color: AppTheme.primary,
+            ),
+            Icon(Icons.keyboard_arrow_down_rounded, color: Colors.grey),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildExpanded() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            _buildIcon(),
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Text(
+                widget.res.title,
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
+              ),
+            ),
+            SizedBox(width: 8.w),
+            _buildTagBadge(),
+          ],
+        ),
+        SizedBox(height: 12.h),
+        Text(
+          widget.res.course,
+          style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
+        ),
+        SizedBox(height: 8.h),
+        SelectableText(
+          widget.res.link,
+          style: TextStyle(fontSize: 13.sp, color: Colors.blueAccent),
+        ),
+        SizedBox(height: 16.h),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                OutlinedButton.icon(
+                  icon: const Icon(Icons.copy_rounded, size: 18),
+                  label: const Text('Salin'),
+                  onPressed: widget.onCopy,
+                ),
+                SizedBox(width: 8.w),
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.open_in_new_rounded, size: 18),
+                  label: const Text('Buka Link'),
+                  onPressed: widget.onOpen,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primary,
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+            Icon(Icons.keyboard_arrow_up_rounded, color: Colors.grey),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildIcon() {
+    return Container(
+      padding: EdgeInsets.all(12.w),
+      decoration: BoxDecoration(
+        color: widget.tagColor.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(16.r),
+      ),
+      child: Icon(Icons.link_rounded, color: widget.tagColor),
+    );
+  }
+
+  Widget _buildTagBadge() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+      decoration: BoxDecoration(
+        color: widget.tagColor.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(10.r),
+        border: Border.all(color: widget.tagColor.withOpacity(0.3)),
+      ),
+      child: Text(
+        widget.res.tag,
+        style: TextStyle(
+          fontSize: 10.sp,
+          fontWeight: FontWeight.bold,
+          color: widget.tagColor,
+        ),
       ),
     );
   }
