@@ -19,6 +19,7 @@ void main() async {
   );
 
   await initializeDateFormatting('id_ID', null);
+  await AppData.instance.init();
 
   runApp(const KampusGoApp());
 }

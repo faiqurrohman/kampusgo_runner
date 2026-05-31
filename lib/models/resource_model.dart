@@ -12,4 +12,24 @@ class ResourceModel {
     required this.link,
     this.tag = 'Kuliah',
   });
+
+  factory ResourceModel.fromJson(Map<String, dynamic> json) {
+    return ResourceModel(
+      id: json['id'],
+      course: json['course'],
+      title: json['title'],
+      link: json['link'],
+      tag: json['tag'] ?? 'Kuliah',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'course': course,
+      'title': title,
+      'link': link,
+      'tag': tag,
+    };
+  }
 }

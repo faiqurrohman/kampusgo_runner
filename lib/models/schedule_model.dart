@@ -25,4 +25,26 @@ class ScheduleModel {
       done: done ?? this.done,
     );
   }
+
+  factory ScheduleModel.fromJson(Map<String, dynamic> json) {
+    return ScheduleModel(
+      id: json['id'],
+      title: json['title'],
+      course: json['course'],
+      deadline: DateTime.parse(json['deadline']),
+      priority: json['priority'],
+      done: json['done'] ?? false,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'course': course,
+      'deadline': deadline.toIso8601String(),
+      'priority': priority,
+      'done': done,
+    };
+  }
 }
