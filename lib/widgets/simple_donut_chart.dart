@@ -1,3 +1,4 @@
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import '../utils/app_theme.dart';
 
@@ -33,15 +34,15 @@ class SimpleDonutChart extends StatelessWidget {
     final total = data.values.fold<int>(0, (a, b) => a + b);
     return Card(
       elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28.r)),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(20.w),
         child: Row(
           children: [
             // Donut Chart visualization
             SizedBox(
-              width: 120,
-              height: 120,
+              width: 120.w,
+              height: 120.h,
               child: CustomPaint(
                 painter: _DonutPainter(
                   data: data,
@@ -49,7 +50,7 @@ class SimpleDonutChart extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 24),
+            SizedBox(width: 24.w),
             // Legend items (fully interactive/clickable)
             Expanded(
               child: Column(
@@ -61,16 +62,16 @@ class SimpleDonutChart extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4.h),
                   Text(
                     'Klik item untuk filter',
                     style: TextStyle(
-                      fontSize: 10,
+                      fontSize: 10.sp,
                       color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.6),
                       fontStyle: FontStyle.italic,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12.h),
                   if (total == 0)
                     Text(
                       'Belum ada pengeluaran',
@@ -85,10 +86,10 @@ class SimpleDonutChart extends StatelessWidget {
 
                       return AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
-                        margin: const EdgeInsets.only(bottom: 6),
+                        margin: EdgeInsets.only(bottom: 6.h),
                         decoration: BoxDecoration(
                           color: isSelected ? color.withOpacity(0.12) : Colors.transparent,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(12.r),
                           border: Border.all(
                             color: isSelected ? color.withOpacity(0.3) : Colors.transparent,
                           ),
@@ -99,25 +100,25 @@ class SimpleDonutChart extends StatelessWidget {
                               onCategorySelected!(isSelected ? null : e.key);
                             }
                           },
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(12.r),
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 6.h),
                             child: Row(
                               children: [
                                 Container(
-                                  width: 10,
-                                  height: 10,
+                                  width: 10.w,
+                                  height: 10.h,
                                   decoration: BoxDecoration(
                                     color: isDimmed ? color.withOpacity(0.3) : color,
                                     shape: BoxShape.circle,
                                   ),
                                 ),
-                                const SizedBox(width: 8),
+                                SizedBox(width: 8.w),
                                 Expanded(
                                   child: Text(
                                     e.key,
                                     style: TextStyle(
-                                      fontSize: 12,
+                                      fontSize: 12.sp,
                                       fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
                                       color: isDimmed
                                           ? Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.4)
@@ -129,7 +130,7 @@ class SimpleDonutChart extends StatelessWidget {
                                 Text(
                                   '$pct%',
                                   style: TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 12.sp,
                                     fontWeight: FontWeight.bold,
                                     color: isDimmed ? color.withOpacity(0.4) : color,
                                   ),

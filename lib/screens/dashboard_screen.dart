@@ -1,3 +1,4 @@
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'dart:io';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
@@ -48,30 +49,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
       ),
       builder: (ctx) => Padding(
-        padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+        padding: EdgeInsets.fromLTRB(24, 16, 24, 32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 40,
-              height: 4,
+              width: 40.w,
+              height: 4.h,
               decoration: BoxDecoration(
                 color: Theme.of(ctx).dividerColor.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: BorderRadius.circular(2.r),
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24.h),
             Text(
               'Aksi Cepat',
               style: Theme.of(ctx).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8.h),
             Text(
               'Pilih item baru yang ingin ditambahkan ke ruang kerjamu.',
               style: Theme.of(ctx).textTheme.bodySmall,
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24.h),
             _QuickActionTile(
               icon: Icons.alarm_add_rounded,
               color: Colors.redAccent,
@@ -82,7 +83,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 setState(() => index = 1);
               },
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12.h),
             _QuickActionTile(
               icon: Icons.receipt_long_rounded,
               color: Colors.green,
@@ -93,7 +94,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 setState(() => index = 2);
               },
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12.h),
             _QuickActionTile(
               icon: Icons.grade_rounded,
               color: Colors.orange,
@@ -104,7 +105,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 setState(() => index = 3);
               },
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12.h),
             _QuickActionTile(
               icon: Icons.link_rounded,
               color: AppTheme.primary,
@@ -136,7 +137,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           onPressed: () => _showQuickActionSheet(context),
           backgroundColor: AppTheme.primary,
           elevation: 4,
-          child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
+          child: Icon(Icons.add_rounded, color: Colors.white, size: 28),
         ) : null,
         bottomNavigationBar: _AnimatedMotionNavBar(
           selectedIndex: index,
@@ -168,36 +169,36 @@ class _QuickActionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(20.r),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(20.r),
           border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.08)),
           color: Theme.of(context).colorScheme.surface,
         ),
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: EdgeInsets.all(12.w),
               decoration: BoxDecoration(
                 color: color.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(16.r),
               ),
               child: Icon(icon, color: color, size: 24),
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: 16.w),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                  const SizedBox(height: 2),
-                  Text(subtitle, style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 11)),
+                  Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp)),
+                  SizedBox(height: 2.h),
+                  Text(subtitle, style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 11.sp)),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right_rounded, size: 20, color: Colors.grey),
+            Icon(Icons.chevron_right_rounded, size: 20, color: Colors.grey),
           ],
         ),
       ),
@@ -227,12 +228,12 @@ class _NotificationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: EdgeInsets.only(bottom: 12.h),
       decoration: BoxDecoration(
         color: isUnread 
             ? iconColor.withOpacity(0.08) 
             : Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(20.r),
         border: Border.all(
           color: isUnread 
               ? iconColor.withOpacity(0.2) 
@@ -241,21 +242,21 @@ class _NotificationCard extends StatelessWidget {
       ),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(20.r),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(16.w),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: EdgeInsets.all(10.w),
                 decoration: BoxDecoration(
                   color: iconColor.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(14.r),
                 ),
                 child: Icon(icon, color: iconColor, size: 22),
               ),
-              const SizedBox(width: 14),
+              SizedBox(width: 14.w),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -268,34 +269,34 @@ class _NotificationCard extends StatelessWidget {
                             title,
                             style: TextStyle(
                               fontWeight: isUnread ? FontWeight.bold : FontWeight.w600,
-                              fontSize: 13,
+                              fontSize: 13.sp,
                               color: isUnread ? iconColor : null,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        const SizedBox(width: 6),
+                        SizedBox(width: 6.w),
                         Text(
                           time,
-                          style: TextStyle(fontSize: 10, color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.6)),
+                          style: TextStyle(fontSize: 10.sp, color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.6)),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 6),
+                    SizedBox(height: 6.h),
                     Text(
                       message,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 11, height: 1.4),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 11.sp, height: 1.4.h),
                     ),
                   ],
                 ),
               ),
               if (isUnread) ...[
-                const SizedBox(width: 8),
+                SizedBox(width: 8.w),
                 Container(
-                  width: 8,
-                  height: 8,
-                  margin: const EdgeInsets.only(top: 6),
+                  width: 8.w,
+                  height: 8.h,
+                  margin: EdgeInsets.only(top: 6.h),
                   decoration: BoxDecoration(color: iconColor, shape: BoxShape.circle),
                 ),
               ],
@@ -423,11 +424,11 @@ void _showNotificationPanel(BuildContext context, void Function(int) onTabChange
             builder: (_, controller) => Container(
               decoration: BoxDecoration(
                 color: isDark ? const Color(0xFF1E1B2E) : Colors.white,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
                 boxShadow: [
                   BoxShadow(
                     color: AppTheme.primary.withOpacity(0.15),
-                    blurRadius: 30,
+                    blurRadius: 30.r,
                     offset: const Offset(0, -8),
                   ),
                 ],
@@ -436,53 +437,53 @@ void _showNotificationPanel(BuildContext context, void Function(int) onTabChange
                 children: [
                   // Handle bar
                   Padding(
-                    padding: const EdgeInsets.only(top: 14),
+                    padding: EdgeInsets.only(top: 14.h),
                     child: Container(
-                      width: 42,
-                      height: 4,
+                      width: 42.w,
+                      height: 4.h,
                       decoration: BoxDecoration(
                         color: isDark ? Colors.white24 : Colors.black12,
-                        borderRadius: BorderRadius.circular(2),
+                        borderRadius: BorderRadius.circular(2.r),
                       ),
                     ),
                   ),
                   // Header
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+                    padding: EdgeInsets.fromLTRB(24, 20, 24, 0),
                     child: Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(10),
+                          padding: EdgeInsets.all(10.w),
                           decoration: BoxDecoration(
                             color: Colors.amber.withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(14),
+                            borderRadius: BorderRadius.circular(14.r),
                           ),
-                          child: const Icon(Icons.notifications_rounded, color: Colors.amber, size: 22),
+                          child: Icon(Icons.notifications_rounded, color: Colors.amber, size: 22),
                         ),
-                        const SizedBox(width: 14),
+                        SizedBox(width: 14.w),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
+                              Text(
                                 'Notifikasi',
-                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
                               ),
                               Text(
                                 '$unreadCount belum dibaca',
-                                style: TextStyle(fontSize: 11, color: Colors.amber.shade700),
+                                style: TextStyle(fontSize: 11.sp, color: Colors.amber.shade700),
                               ),
                             ],
                           ),
                         ),
                         TextButton(
                           onPressed: () => Navigator.pop(ctx),
-                          child: const Text('Tutup', style: TextStyle(fontSize: 12)),
+                          child: Text('Tutup', style: TextStyle(fontSize: 12.sp)),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8.h),
                   Divider(indent: 24, endIndent: 24, color: isDark ? Colors.white12 : Colors.black12),
                   // Daftar Notifikasi
                   Expanded(
@@ -492,14 +493,14 @@ void _showNotificationPanel(BuildContext context, void Function(int) onTabChange
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(Icons.notifications_off_outlined, size: 56, color: Colors.grey.withOpacity(0.4)),
-                                const SizedBox(height: 12),
-                                const Text('Tidak ada notifikasi saat ini', style: TextStyle(color: Colors.grey)),
+                                SizedBox(height: 12.h),
+                                Text('Tidak ada notifikasi saat ini', style: TextStyle(color: Colors.grey)),
                               ],
                             ),
                           )
                         : ListView.builder(
                             controller: controller,
-                            padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+                            padding: EdgeInsets.fromLTRB(20, 8, 20, 32),
                             itemCount: notifications.length,
                             itemBuilder: (_, i) {
                               final n = notifications[i];
@@ -564,7 +565,7 @@ class _Home extends StatelessWidget {
       hasUnread = true;
     }
 
-    return SafeArea(child: ListView(padding: const EdgeInsets.only(left: 24, right: 24, top: 48, bottom: 20), children: [
+    return SafeArea(child: ListView(padding: EdgeInsets.only(left: 24.w, right: 24.w, top: 48.h, bottom: 20.h), children: [
       // Tata Letak Header Diperbarui (Foto Profil di atas, disusul Nama Mahasiswa/Sapaan ke bawah seperti Slide 2)
       Column(
         children: [
@@ -572,10 +573,10 @@ class _Home extends StatelessWidget {
           Align(
             alignment: Alignment.centerRight,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.surface,
-                borderRadius: BorderRadius.circular(24),
+                borderRadius: BorderRadius.circular(24.r),
                 border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.12)),
               ),
               child: Row(
@@ -590,16 +591,16 @@ class _Home extends StatelessWidget {
                     child: Stack(
                       clipBehavior: Clip.none,
                       children: [
-                        const Icon(Icons.notifications_none_rounded, color: Colors.amber, size: 20),
+                        Icon(Icons.notifications_none_rounded, color: Colors.amber, size: 20),
                         if (hasUnread)
                           Positioned(
                             top: -2, right: -2,
-                            child: Container(width: 6, height: 6, decoration: const BoxDecoration(color: AppTheme.accent, shape: BoxShape.circle)),
+                            child: Container(width: 6.w, height: 6.h, decoration: BoxDecoration(color: AppTheme.accent, shape: BoxShape.circle)),
                           )
                       ]
                     ),
                   ),
-                  const SizedBox(width: 14),
+                  SizedBox(width: 14.w),
                   GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTap: () {
@@ -618,7 +619,7 @@ class _Home extends StatelessWidget {
                       size: 20,
                     ),
                   ),
-                  const SizedBox(width: 14),
+                  SizedBox(width: 14.w),
                   GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTap: () {
@@ -627,77 +628,83 @@ class _Home extends StatelessWidget {
                         MaterialPageRoute(builder: (_) => SettingsScreen(onLogout: onLogout)),
                       );
                     },
-                    child: const Icon(Icons.settings_rounded, size: 20),
+                    child: Icon(Icons.settings_rounded, size: 20),
                   ),
                 ],
               ),
             ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12.h),
           // Foto profil mahasiswa melingkar berukuran besar di tengah (seperti Slide 2)
           Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: AppTheme.primary.withOpacity(0.5), width: 2),
+              border: Border.all(color: AppTheme.primary.withOpacity(0.5), width: 2.w),
               boxShadow: [
-                BoxShadow(color: AppTheme.primary.withOpacity(0.2), blurRadius: 12, spreadRadius: 2),
+                BoxShadow(color: AppTheme.primary.withOpacity(0.2), blurRadius: 12.r, spreadRadius: 2.r),
               ],
             ),
             child: CircleAvatar(
-              radius: 36,
+              radius: 36.r,
               backgroundColor: Colors.white.withOpacity(0.12),
               backgroundImage: data.userAvatarUrl.contains('/') || data.userAvatarUrl.contains('\\')
                   ? FileImage(File(data.userAvatarUrl))
                   : null,
               child: data.userAvatarUrl.contains('/') || data.userAvatarUrl.contains('\\')
                   ? null
-                  : Text(data.userAvatarUrl, style: const TextStyle(fontSize: 34)),
+                  : Text(data.userAvatarUrl, style: TextStyle(fontSize: 34.sp)),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
           // Nama mahasiswa/sapaan diletakkan ke bawah setelah foto profil tanpa mengubah variabel namanya
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 'Halo, ${data.userName}',
-                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(width: 6),
-              const Text('👋', style: TextStyle(fontSize: 22)),
+              SizedBox(width: 6.w),
+              Text('👋', style: TextStyle(fontSize: 22.sp)),
             ],
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: 4.h),
           Text(
             'Pantau hidup kampusmu hari ini.',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 12),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 12.sp),
           ),
         ],
       ),
-      const SizedBox(height: 32),
+      SizedBox(height: 32.h),
       Container(
-        padding: const EdgeInsets.fromLTRB(28, 28, 28, 36), 
+        padding: EdgeInsets.fromLTRB(28, 28, 28, 36), 
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
+          gradient: LinearGradient(
             colors: [AppTheme.primary, AppTheme.secondary],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ), 
-          borderRadius: BorderRadius.circular(32),
+          borderRadius: BorderRadius.circular(32.r),
           boxShadow: [
-            BoxShadow(color: AppTheme.primary.withOpacity(0.3), blurRadius: 24, offset: const Offset(0, 12)),
+            BoxShadow(color: AppTheme.primary.withOpacity(0.3), blurRadius: 24.r, offset: const Offset(0, 12)),
           ]
         ), 
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
             Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
-              child: const Icon(Icons.star_rounded, color: Colors.white, size: 20),
+              padding: EdgeInsets.all(8.w),
+              decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(12.r)),
+              child: Icon(Icons.star_rounded, color: Colors.white, size: 20),
             ),
-            const SizedBox(width: 12),
-            const Text('Prioritas Terdekat', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
-            const Spacer(),
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Text(
+                'Prioritas Terdekat', 
+                style: TextStyle(color: Colors.white, fontSize: 16.sp, fontWeight: FontWeight.w600),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            SizedBox(width: 8.w),
             if (next.isNotEmpty) ...[
               (() {
                 final diff = next.first.deadline.difference(DateTime.now());
@@ -714,66 +721,66 @@ class _Home extends StatelessWidget {
                   label = 'Sisa ${diff.inMinutes} menit';
                 }
                 return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
                   decoration: BoxDecoration(
                     color: isUrgent ? AppTheme.accent : Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(20.r),
                   ),
                   child: Text(
                     label,
-                    style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: Colors.white, fontSize: 12.sp, fontWeight: FontWeight.bold),
                   ),
                 );
               })(),
             ],
           ]),
-          const SizedBox(height: 16),
-          Text(next.isEmpty ? 'Semua tugas selesai. Mantap!' : next.first.title, style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold)),
+          SizedBox(height: 16.h),
+          Text(next.isEmpty ? 'Semua tugas selesai. Mantap!' : next.first.title, style: TextStyle(color: Colors.white, fontSize: 26.sp, fontWeight: FontWeight.bold)),
           if (next.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            Text('${next.first.course} • ${Formatters.date.format(next.first.deadline)}', style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 13)),
+            SizedBox(height: 8.h),
+            Text('${next.first.course} • ${Formatters.date.format(next.first.deadline)}', style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 13.sp)),
           ],
-          const SizedBox(height: 24),
+          SizedBox(height: 24.h),
           Row(children: [
-            Expanded(child: ElevatedButton(onPressed: () => onTabChange(1), style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: AppTheme.primary, padding: const EdgeInsets.symmetric(vertical: 12), elevation: 0), child: const Text('Lihat Semua Jadwal'))),
+            Expanded(child: ElevatedButton(onPressed: () => onTabChange(1), style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: AppTheme.primary, padding: EdgeInsets.symmetric(vertical: 12.h), elevation: 0), child: Text('Lihat Semua Jadwal'))),
           ]),
         ]),
       ),
-      const SizedBox(height: 24),
+      SizedBox(height: 24.h),
       // Komponen Produktivitas Ekstra: Kelas Selanjutnya
       Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(24.r),
           border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.08)),
         ),
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(10),
+              padding: EdgeInsets.all(10.w),
               decoration: BoxDecoration(
                 color: Colors.amber.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(14.r),
               ),
-              child: const Icon(Icons.event_seat_rounded, color: Colors.amber, size: 20),
+              child: Icon(Icons.event_seat_rounded, color: Colors.amber, size: 20),
             ),
-            const SizedBox(width: 14),
+            SizedBox(width: 14.w),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('Kelas Selanjutnya', style: Theme.of(context).textTheme.bodySmall),
-                  const SizedBox(height: 2),
-                  const Text('Struktur Data - Ruang B302', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                  SizedBox(height: 2.h),
+                  Text('Struktur Data - Ruang B302', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.sp)),
                 ],
               ),
             ),
-            const Text('13:00', style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primary)),
+            Text('13:00', style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primary)),
           ],
         ),
       ),
-      const SizedBox(height: 24),
+      SizedBox(height: 24.h),
       InfoCard(
         title: 'Deadline Aktif', 
         value: '${next.length} tugas', 
@@ -795,7 +802,7 @@ class _Home extends StatelessWidget {
         icon: Icons.workspace_premium_rounded, 
         color: Colors.purpleAccent, 
         trailingWidget: SizedBox(
-          width: 40, height: 40,
+          width: 40.w, height: 40.h,
           child: Stack(
             alignment: Alignment.center,
             children: [
@@ -805,7 +812,7 @@ class _Home extends StatelessWidget {
                 backgroundColor: Theme.of(context).dividerColor.withOpacity(0.08),
                 color: Colors.purpleAccent,
               ),
-              const Icon(Icons.star_rounded, size: 16, color: Colors.purpleAccent),
+              Icon(Icons.star_rounded, size: 16, color: Colors.purpleAccent),
             ],
           ),
         ),
@@ -863,7 +870,7 @@ class _SkeletonLoaderViewState extends State<_SkeletonLoaderView> with SingleTic
   Widget build(BuildContext context) {
     return SafeArea(
       child: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
+        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 48.h),
         physics: const NeverScrollableScrollPhysics(),
         children: [
           Row(
@@ -873,32 +880,32 @@ class _SkeletonLoaderViewState extends State<_SkeletonLoaderView> with SingleTic
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _box(140, 28),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8.h),
                   _box(180, 14),
                 ],
               ),
               _box(110, 44, borderRadius: 16),
             ],
           ),
-          const SizedBox(height: 32),
+          SizedBox(height: 32.h),
           // Main banner skeleton
           _box(double.infinity, 200, borderRadius: 32),
-          const SizedBox(height: 24),
+          SizedBox(height: 24.h),
           _box(double.infinity, 64, borderRadius: 24),
-          const SizedBox(height: 24),
+          SizedBox(height: 24.h),
           // Summaries row skeleton
           Row(
             children: [
               Expanded(child: _box(double.infinity, 110, borderRadius: 24)),
-              const SizedBox(width: 16),
+              SizedBox(width: 16.w),
               Expanded(child: _box(double.infinity, 110, borderRadius: 24)),
             ],
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
           Row(
             children: [
               Expanded(child: _box(double.infinity, 110, borderRadius: 24)),
-              const SizedBox(width: 16),
+              SizedBox(width: 16.w),
               Expanded(child: _box(double.infinity, 110, borderRadius: 24)),
             ],
           ),
@@ -915,22 +922,22 @@ class _SettingsSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final data = AppData.instance;
     return Container(
-      padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+      padding: EdgeInsets.fromLTRB(24, 16, 24, 32),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(width: 40, height: 4, decoration: BoxDecoration(color: Theme.of(context).dividerColor.withOpacity(0.2), borderRadius: BorderRadius.circular(2))),
-          const SizedBox(height: 24),
-          const Text('Pengaturan Dasbor', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 24),
+          Container(width: 40.w, height: 4.h, decoration: BoxDecoration(color: Theme.of(context).dividerColor.withOpacity(0.2), borderRadius: BorderRadius.circular(2.r))),
+          SizedBox(height: 24.h),
+          Text('Pengaturan Dasbor', style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold)),
+          SizedBox(height: 24.h),
           ListTile(
-            leading: const Icon(Icons.dark_mode_rounded, color: Colors.amber),
-            title: const Text('Tema Gelap / Terang'),
-            subtitle: const Text('Beralih mode warna UI'),
+            leading: Icon(Icons.dark_mode_rounded, color: Colors.amber),
+            title: Text('Tema Gelap / Terang'),
+            subtitle: Text('Beralih mode warna UI'),
             trailing: Switch(
               value: data.themeMode == ThemeMode.dark,
               onChanged: (_) => data.toggleTheme(),
@@ -939,24 +946,24 @@ class _SettingsSheet extends StatelessWidget {
           ),
           const Divider(),
           ListTile(
-            leading: const Icon(Icons.security_rounded, color: Colors.green),
-            title: const Text('Keamanan & Sandi'),
-            subtitle: const Text('Perbarui kredensial autentikasi'),
-            trailing: const Icon(Icons.chevron_right_rounded),
+            leading: Icon(Icons.security_rounded, color: Colors.green),
+            title: Text('Keamanan & Sandi'),
+            subtitle: Text('Perbarui kredensial autentikasi'),
+            trailing: Icon(Icons.chevron_right_rounded),
             onTap: () {},
           ),
           ListTile(
-            leading: const Icon(Icons.description_rounded, color: Colors.blue),
-            title: const Text('Ketentuan & Privasi'),
-            subtitle: const Text('Baca dokumen legal KAMPUSGO'),
-            trailing: const Icon(Icons.chevron_right_rounded),
+            leading: Icon(Icons.description_rounded, color: Colors.blue),
+            title: Text('Ketentuan & Privasi'),
+            subtitle: Text('Baca dokumen legal KAMPUSGO'),
+            trailing: Icon(Icons.chevron_right_rounded),
             onTap: () {},
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
           ElevatedButton.icon(
             onPressed: onLogout, 
-            icon: const Icon(Icons.logout_rounded), 
-            label: const Text('Keluar Akun'),
+            icon: Icon(Icons.logout_rounded), 
+            label: Text('Keluar Akun'),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.accent,
               foregroundColor: Colors.white,
@@ -1000,9 +1007,9 @@ class _AnimatedMotionNavBarState extends State<_AnimatedMotionNavBar> {
 
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+        padding: EdgeInsets.fromLTRB(20, 0, 20, 16),
         child: SizedBox(
-          height: 74,
+          height: 74.h,
           child: Stack(
             clipBehavior: Clip.none,
             children: [
@@ -1076,7 +1083,7 @@ class _AnimatedMotionNavBarState extends State<_AnimatedMotionNavBar> {
                               );
                             },
                           ),
-                          const SizedBox(height: 4),
+                          SizedBox(height: 4.h),
                           // Animasi Skala & Opasitas Label Teks
                           AnimatedOpacity(
                             duration: const Duration(milliseconds: 200),
@@ -1084,7 +1091,7 @@ class _AnimatedMotionNavBarState extends State<_AnimatedMotionNavBar> {
                             child: Text(
                               item.label,
                               style: TextStyle(
-                                fontSize: 10,
+                                fontSize: 10.sp,
                                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                                 color: isSelected ? liquidColor : Theme.of(context).textTheme.bodySmall?.color,
                               ),
@@ -1159,7 +1166,7 @@ class _LiquidFloatingDockPainter extends CustomPainter {
     Path liquidPath = Path();
     liquidPath.addRRect(
       RRect.fromRectAndRadius(
-        Rect.fromCenter(center: Offset(centerX, size.height - 8), width: 22, height: 5),
+        Rect.fromCenter(center: Offset(centerX, size.height - 8), width: 22.w, height: 5.h),
         const Radius.circular(4),
       ),
     );

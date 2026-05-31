@@ -1,3 +1,4 @@
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import '../services/app_data.dart';
 import '../utils/app_theme.dart';
@@ -23,60 +24,60 @@ class _PlannerScreenState extends State<PlannerScreen> {
           onPressed: () => _showAdd(context),
           backgroundColor: AppTheme.primary,
           elevation: 4,
-          child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
+          child: Icon(Icons.add_rounded, color: Colors.white, size: 28),
         ),
         body: SafeArea(
           child: ListView(
-            padding: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 80),
+            padding: EdgeInsets.only(left: 20.w, right: 20.w, top: 20.h, bottom: 80.h),
           children: [
             const SectionTitle(
               title: 'Smart Study Planner',
               subtitle: 'Kelola jadwal tugas dan ujian dengan panduan prioritas visual otomatis.',
             ),
             // Tombol Tambah dihapus, dipindah ke FAB
-            const SizedBox(height: 12),
+            SizedBox(height: 12.h),
             // Petunjuk Gestur Swipe
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
               decoration: BoxDecoration(
                 color: Theme.of(context).dividerColor.withOpacity(0.05),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(16.r),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.tips_and_updates_rounded, size: 16, color: Colors.amber),
-                  const SizedBox(width: 8),
+                  Icon(Icons.tips_and_updates_rounded, size: 16, color: Colors.amber),
+                  SizedBox(width: 8.w),
                   Expanded(
                     child: Text(
                       'Geser kanan ke kiri untuk Hapus • Kiri ke kanan untuk Selesai',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 11),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 11.sp),
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
             // Daftar Jadwal/Tugas dengan Premium Empty State
             if (data.schedules.isEmpty)
               Center(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 20),
+                  padding: EdgeInsets.symmetric(vertical: 48.h, horizontal: 20.w),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(24),
+                        padding: EdgeInsets.all(24.w),
                         decoration: BoxDecoration(
                           color: AppTheme.primary.withOpacity(0.12),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.nightlight_round_rounded,
                           size: 64,
                           color: AppTheme.primary,
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20.h),
                       Text(
                         'Santai dulu, belum ada tugas yang mendekat!',
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -84,7 +85,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
                             ),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 8),
+                      SizedBox(height: 8.h),
                       Text(
                         'Tekan tombol "Tambah Deadline Baru" di atas untuk mulai menyusun riwayat dan target studimu.',
                         style: Theme.of(context).textTheme.bodySmall,
@@ -130,35 +131,35 @@ class _PlannerScreenState extends State<PlannerScreen> {
                   key: ValueKey(item.id),
                   // Background saat di-swipe ke kanan (Selesai / Selesai Toggle)
                   background: Container(
-                    margin: const EdgeInsets.only(bottom: 12),
+                    margin: EdgeInsets.only(bottom: 12.h),
                     alignment: Alignment.centerLeft,
-                    padding: const EdgeInsets.only(left: 20),
+                    padding: EdgeInsets.only(left: 20.w),
                     decoration: BoxDecoration(
                       color: Colors.green,
-                      borderRadius: BorderRadius.circular(24),
+                      borderRadius: BorderRadius.circular(24.r),
                     ),
-                    child: const Row(
+                    child: Row(
                       children: [
                         Icon(Icons.check_circle_rounded, color: Colors.white),
-                        SizedBox(width: 8),
+                        SizedBox(width: 8.w),
                         Text('Status Selesai', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                       ],
                     ),
                   ),
                   // Background saat di-swipe ke kiri (Hapus)
                   secondaryBackground: Container(
-                    margin: const EdgeInsets.only(bottom: 12),
+                    margin: EdgeInsets.only(bottom: 12.h),
                     alignment: Alignment.centerRight,
-                    padding: const EdgeInsets.only(right: 20),
+                    padding: EdgeInsets.only(right: 20.w),
                     decoration: BoxDecoration(
                       color: Colors.redAccent,
-                      borderRadius: BorderRadius.circular(24),
+                      borderRadius: BorderRadius.circular(24.r),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text('Hapus', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                        SizedBox(width: 8),
+                        SizedBox(width: 8.w),
                         Icon(Icons.delete_rounded, color: Colors.white),
                       ],
                     ),
@@ -177,22 +178,22 @@ class _PlannerScreenState extends State<PlannerScreen> {
                     }
                   },
                   child: Card(
-                    margin: const EdgeInsets.only(bottom: 12),
+                    margin: EdgeInsets.only(bottom: 12.h),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(24),
+                      borderRadius: BorderRadius.circular(24.r),
                       side: BorderSide(
                         color: priorityColor.withOpacity(item.done ? 0.2 : 0.4),
-                        width: 1.5,
+                        width: 1.5.w,
                       ),
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      padding: EdgeInsets.symmetric(vertical: 4.h),
                       child: CheckboxListTile(
                         value: item.done,
                         onChanged: (_) => data.toggleSchedule(item.id),
                         activeColor: Colors.green,
-                        checkboxShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                        contentPadding: const EdgeInsets.only(left: 12, right: 16),
+                        checkboxShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6.r)),
+                        contentPadding: EdgeInsets.only(left: 12.w, right: 16.w),
                         title: Row(
                           children: [
                             Expanded(
@@ -205,18 +206,18 @@ class _PlannerScreenState extends State<PlannerScreen> {
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 8),
+                            SizedBox(width: 8.w),
                             // Lencana Kode Warna Visual Countdown Presisi
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                               decoration: BoxDecoration(
                                 color: priorityColor.withOpacity(0.12),
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(12.r),
                               ),
                               child: Text(
                                 timeLabel,
                                 style: TextStyle(
-                                  fontSize: 10,
+                                  fontSize: 10.sp,
                                   fontWeight: FontWeight.bold,
                                   color: priorityColor,
                                 ),
@@ -225,20 +226,20 @@ class _PlannerScreenState extends State<PlannerScreen> {
                           ],
                         ),
                         subtitle: Padding(
-                          padding: const EdgeInsets.only(top: 4),
+                          padding: EdgeInsets.only(top: 4.h),
                           child: Text(
                             '${item.course} • ${Formatters.date.format(item.deadline)}',
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: 12.sp,
                               color: item.done ? Colors.grey : null,
                             ),
                           ),
                         ),
                         secondary: Container(
-                          padding: const EdgeInsets.all(8),
+                          padding: EdgeInsets.all(8.w),
                           decoration: BoxDecoration(
                             color: priorityColor.withOpacity(0.12),
-                            borderRadius: BorderRadius.circular(14),
+                            borderRadius: BorderRadius.circular(14.r),
                           ),
                           child: Icon(
                             item.done ? Icons.task_alt_rounded : Icons.alarm_rounded,
@@ -252,50 +253,50 @@ class _PlannerScreenState extends State<PlannerScreen> {
                   ),
                 );
               }),
-            const SizedBox(height: 24),
+            SizedBox(height: 24.h),
             // Widget Layar Utama (Home Screen Widget Simulator)
             Card(
               elevation: 0,
               color: AppTheme.primary.withOpacity(0.06),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(28),
-                side: BorderSide(color: AppTheme.primary.withOpacity(0.2), width: 1.5),
+                borderRadius: BorderRadius.circular(28.r),
+                side: BorderSide(color: AppTheme.primary.withOpacity(0.2), width: 1.5.w),
               ),
               child: Padding(
-                padding: const EdgeInsets.all(20),
+                padding: EdgeInsets.all(20.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.widgets_rounded, color: AppTheme.primary, size: 20),
-                        const SizedBox(width: 8),
-                        const Text(
+                        Icon(Icons.widgets_rounded, color: AppTheme.primary, size: 20),
+                        SizedBox(width: 8.w),
+                        Text(
                           'Widget Layar Utama Tersedia',
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 14.sp,
                             fontWeight: FontWeight.bold,
                             color: AppTheme.primary,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8.h),
                     Text(
                       'Tambahkan widget KampusGo ke HP kamu untuk pantau tugas mendesak langsung dari Home Screen.',
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
-                    const SizedBox(height: 14),
+                    SizedBox(height: 14.h),
                     // Widget Preview / Mockup
                     Container(
-                      padding: const EdgeInsets.all(16),
+                      padding: EdgeInsets.all(16.w),
                       decoration: BoxDecoration(
                         color: Theme.of(context).cardColor,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(20.r),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.05),
-                            blurRadius: 10,
+                            blurRadius: 10.r,
                             offset: const Offset(0, 4),
                           ),
                         ],
@@ -303,28 +304,28 @@ class _PlannerScreenState extends State<PlannerScreen> {
                       child: Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.all(10),
+                            padding: EdgeInsets.all(10.w),
                             decoration: BoxDecoration(
                               color: Colors.redAccent.withOpacity(0.12),
-                              borderRadius: BorderRadius.circular(14),
+                              borderRadius: BorderRadius.circular(14.r),
                             ),
-                            child: const Icon(Icons.alarm_rounded, color: Colors.redAccent, size: 20),
+                            child: Icon(Icons.alarm_rounded, color: Colors.redAccent, size: 20),
                           ),
-                          const SizedBox(width: 12),
+                          SizedBox(width: 12.w),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
+                                Text(
                                   'Tugas Kritis Terdekat',
-                                  style: TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold),
+                                  style: TextStyle(fontSize: 10.sp, color: Colors.grey, fontWeight: FontWeight.bold),
                                 ),
-                                const SizedBox(height: 2),
+                                SizedBox(height: 2.h),
                                 Text(
                                   data.schedules.where((e) => !e.done).isEmpty
                                       ? 'Semua tugas tuntas! 🎉'
                                       : data.schedules.where((e) => !e.done).first.title,
-                                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                                  style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.bold),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -334,7 +335,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12.h),
                     Center(
                       child: TextButton.icon(
                         onPressed: () {
@@ -345,15 +346,15 @@ class _PlannerScreenState extends State<PlannerScreen> {
                             ),
                           );
                         },
-                        icon: const Icon(Icons.help_outline_rounded, size: 14),
-                        label: const Text('Cara Pasang Widget', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                        icon: Icon(Icons.help_outline_rounded, size: 14),
+                        label: Text('Cara Pasang Widget', style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.bold)),
                       ),
                     ),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 88), // Spasi bawah ekstra
+            SizedBox(height: 88.h), // Spasi bawah ekstra
           ],
         ),
       ),
@@ -373,29 +374,29 @@ class _PlannerScreenState extends State<PlannerScreen> {
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setModal) => Padding(
           padding: EdgeInsets.only(
-            left: 20,
-            right: 20,
-            top: 24,
+            left: 20.w,
+            right: 20.w,
+            top: 24.h,
             bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
+              Text(
                 'Tambah Deadline / Tugas',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16.h),
               TextField(
                 controller: title,
                 decoration: const InputDecoration(labelText: 'Judul tugas / ujian'),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12.h),
               TextField(
                 controller: course,
                 decoration: const InputDecoration(labelText: 'Mata kuliah'),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12.h),
               DropdownButtonFormField<String>(
                 value: priority,
                 decoration: const InputDecoration(labelText: 'Tingkat Prioritas'),
@@ -404,7 +405,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
                     .toList(),
                 onChanged: (v) => setModal(() => priority = v!),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16.h),
               OutlinedButton.icon(
                 onPressed: () async {
                   final picked = await showDatePicker(
@@ -434,14 +435,14 @@ class _PlannerScreenState extends State<PlannerScreen> {
                     });
                   }
                 },
-                icon: const Icon(Icons.calendar_month_rounded),
+                icon: Icon(Icons.calendar_month_rounded),
                 label: Text('Batas Waktu: ${Formatters.date.format(deadline)}'),
                 style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  padding: EdgeInsets.symmetric(vertical: 14.h),
                   alignment: Alignment.center,
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
               ElevatedButton(
                 onPressed: () {
                   if (title.text.isNotEmpty && course.text.isNotEmpty) {
@@ -456,7 +457,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
                     );
                   }
                 },
-                child: const Text('Simpan Jadwal'),
+                child: Text('Simpan Jadwal'),
               ),
             ],
           ),

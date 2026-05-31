@@ -1,3 +1,4 @@
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 
 class InfoCard extends StatelessWidget {
@@ -13,42 +14,42 @@ class InfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: EdgeInsets.only(bottom: 16.h),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(28.r),
         border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.08)),
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(28),
+          borderRadius: BorderRadius.circular(28.r),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 18.h),
             child: Row(children: [
               Container(
-                padding: const EdgeInsets.all(14),
+                padding: EdgeInsets.all(14.w),
                 decoration: BoxDecoration(
                   color: color.withOpacity(0.12), 
-                  borderRadius: BorderRadius.circular(18),
+                  borderRadius: BorderRadius.circular(18.r),
                 ),
                 child: Icon(icon, color: color, size: 24),
               ),
-              const SizedBox(width: 16),
+              SizedBox(width: 16.w),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start, 
                   children: [
                     Text(
                       title, 
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 12),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 12.sp),
                     ),
-                    const SizedBox(height: 6),
+                    SizedBox(height: 6.h),
                     Text(
                       value, 
                       style: TextStyle(
-                        fontSize: 20, 
+                        fontSize: 20.sp, 
                         fontWeight: FontWeight.bold, 
                         color: valueColor ?? Theme.of(context).textTheme.bodyLarge?.color,
                       ),
@@ -58,7 +59,7 @@ class InfoCard extends StatelessWidget {
               ),
               if (trailingWidget != null) ...[
                 trailingWidget!,
-                const SizedBox(width: 12),
+                SizedBox(width: 12.w),
               ],
               Icon(
                 Icons.chevron_right_rounded, 

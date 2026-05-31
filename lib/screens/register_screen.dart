@@ -1,3 +1,4 @@
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'dashboard_screen.dart';
 import 'privacy_screen.dart';
@@ -100,7 +101,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
         content: Text(msg),
         behavior: SnackBarBehavior.floating,
         backgroundColor: color,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
       ),
     );
   }
@@ -201,35 +202,35 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.r)),
         title: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: EdgeInsets.all(8.w),
               decoration: BoxDecoration(
                 color: Colors.teal.withOpacity(0.15),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.domain_verification_rounded, color: Colors.teal),
+              child: Icon(Icons.domain_verification_rounded, color: Colors.teal),
             ),
-            const SizedBox(width: 12),
-            const Text('Portal SSO Kampus', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            SizedBox(width: 12.w),
+            Text('Portal SSO Kampus', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
           ],
         ),
-        content: const Text(
+        content: Text(
           'Anda akan dialihkan ke halaman masuk identitas akademik terintegrasi. Sistem akan memverifikasi status kemahasiswaan Anda secara otomatis.',
-          style: TextStyle(fontSize: 13, height: 1.5),
+          style: TextStyle(fontSize: 13.sp, height: 1.5.h),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Batal', style: TextStyle(color: Colors.grey)),
+            child: Text('Batal', style: TextStyle(color: Colors.grey)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.teal,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
             ),
             onPressed: () async {
               Navigator.pop(ctx);
@@ -255,7 +256,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                 MaterialPageRoute(builder: (_) => const DashboardScreen()),
               );
             },
-            child: const Text('Lanjutkan Autentikasi', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: Text('Lanjutkan Autentikasi', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -277,26 +278,26 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
       filled: true,
       fillColor: Theme.of(context).inputDecorationTheme.fillColor,
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(20.r),
         borderSide: BorderSide.none,
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(20),
-        borderSide: BorderSide(color: borderColor, width: 1.5),
+        borderRadius: BorderRadius.circular(20.r),
+        borderSide: BorderSide(color: borderColor, width: 1.5.w),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(20),
-        borderSide: const BorderSide(color: AppTheme.primary, width: 2.0),
+        borderRadius: BorderRadius.circular(20.r),
+        borderSide: BorderSide(color: AppTheme.primary, width: 2.0.w),
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(20),
-        borderSide: const BorderSide(color: Colors.redAccent, width: 1.5),
+        borderRadius: BorderRadius.circular(20.r),
+        borderSide: BorderSide(color: Colors.redAccent, width: 1.5.w),
       ),
       focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(20),
-        borderSide: const BorderSide(color: Colors.redAccent, width: 2.0),
+        borderRadius: BorderRadius.circular(20.r),
+        borderSide: BorderSide(color: Colors.redAccent, width: 2.0.w),
       ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      contentPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 18.h),
     );
   }
 
@@ -307,14 +308,14 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
       children: [
         AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          margin: const EdgeInsets.only(right: 4),
-          padding: const EdgeInsets.all(2),
+          margin: EdgeInsets.only(right: 4.w),
+          padding: EdgeInsets.all(2.w),
           decoration: BoxDecoration(
             color: met ? Colors.teal.withOpacity(0.15) : Colors.transparent,
             shape: BoxShape.circle,
             border: Border.all(
               color: met ? Colors.teal : Theme.of(context).dividerColor.withOpacity(0.3),
-              width: 1,
+              width: 1.w,
             ),
           ),
           child: Icon(
@@ -328,7 +329,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
             label,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              fontSize: 10.5,
+              fontSize: 10.5.sp,
               fontWeight: met ? FontWeight.w600 : FontWeight.normal,
               color: met
                   ? Theme.of(context).textTheme.bodyLarge?.color
@@ -348,21 +349,21 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
           children: [
             // ─── Header Bersih & Modern ───
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+              padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
               child: Row(
                 children: [
                   IconButton(
                     style: IconButton.styleFrom(
                       backgroundColor: Theme.of(context).dividerColor.withOpacity(0.08),
-                      padding: const EdgeInsets.all(12),
+                      padding: EdgeInsets.all(12.w),
                     ),
-                    icon: const Icon(Icons.arrow_back_rounded, size: 20),
+                    icon: Icon(Icons.arrow_back_rounded, size: 20),
                     onPressed: () => Navigator.pop(context),
                   ),
-                  const SizedBox(width: 16),
-                  const Text(
+                  SizedBox(width: 16.w),
+                  Text(
                     'Daftar Akun',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -371,22 +372,22 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
             // ─── Area Formulir Utama ───
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 20),
+                padding: EdgeInsets.symmetric(horizontal: 28.w, vertical: 20.h),
                 children: [
-                  const Text(
+                  Text(
                     'Buat akun mahasiswa',
-                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, letterSpacing: -0.5),
+                    style: TextStyle(fontSize: 28.sp, fontWeight: FontWeight.w800, letterSpacing: -0.5),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8.h),
                   Text(
                     'Daftarkan identitas unik Anda untuk mengakses kapabilitas penuh platform kampus.',
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 13.sp,
                       color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.8),
-                      height: 1.4,
+                      height: 1.4.h,
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24.h),
 
                   // ─── Banner Error Dinamis (Animasi Shake) ───
                   if (errorMessage != null) ...[
@@ -397,31 +398,31 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                         child: child,
                       ),
                       child: Container(
-                        padding: const EdgeInsets.all(16),
+                        padding: EdgeInsets.all(16.w),
                         decoration: BoxDecoration(
                           color: Colors.redAccent.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(16.r),
                           border: Border.all(color: Colors.redAccent.withOpacity(0.3)),
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.error_outline_rounded, color: Colors.redAccent),
-                            const SizedBox(width: 12),
+                            Icon(Icons.error_outline_rounded, color: Colors.redAccent),
+                            SizedBox(width: 12.w),
                             Expanded(
                               child: Text(
                                 errorMessage!,
-                                style: const TextStyle(fontSize: 12, color: Colors.redAccent, fontWeight: FontWeight.w600),
+                                style: TextStyle(fontSize: 12.sp, color: Colors.redAccent, fontWeight: FontWeight.w600),
                               ),
                             ),
                             GestureDetector(
                               onTap: () => setState(() => errorMessage = null),
-                              child: const Icon(Icons.close_rounded, color: Colors.redAccent, size: 18),
+                              child: Icon(Icons.close_rounded, color: Colors.redAccent, size: 18),
                             ),
                           ],
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20.h),
                   ],
 
                   // ─── Formulir Data Mahasiswa Bersih (Tanpa Duplikasi) ───
@@ -437,13 +438,13 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                           textInputAction: TextInputAction.next,
                           decoration: _customInputDeco(
                             label: 'Nama Lengkap',
-                            prefixIcon: const Icon(Icons.person_outline_rounded),
+                            prefixIcon: Icon(Icons.person_outline_rounded),
                           ),
                           validator: (v) => v != null && v.trim().length > 2
                               ? null
                               : 'Nama wajib diisi dengan benar',
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: 16.h),
 
                         // 2. Nomor Induk Mahasiswa (NIM)
                         TextFormField(
@@ -453,7 +454,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                           textInputAction: TextInputAction.next,
                           decoration: _customInputDeco(
                             label: 'Nomor Induk Mahasiswa (NIM)',
-                            prefixIcon: const Icon(Icons.badge_outlined),
+                            prefixIcon: Icon(Icons.badge_outlined),
                           ),
                           validator: (v) {
                             if (v == null || v.trim().isEmpty) {
@@ -465,7 +466,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                             return null;
                           },
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: 16.h),
 
                         // 3. Alamat Email (Fleksibel: Mendukung Gmail, Yahoo, dll.)
                         TextFormField(
@@ -475,7 +476,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                           textInputAction: TextInputAction.next,
                           decoration: _customInputDeco(
                             label: 'Alamat Email',
-                            prefixIcon: const Icon(Icons.email_outlined),
+                            prefixIcon: Icon(Icons.email_outlined),
                           ),
                           validator: (v) {
                             if (v == null || v.trim().isEmpty) {
@@ -489,7 +490,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                             return null;
                           },
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: 16.h),
 
                         // 4. Kata Sandi
                         TextFormField(
@@ -500,7 +501,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                           onChanged: _onPasswordChanged,
                           decoration: _customInputDeco(
                             label: 'Password',
-                            prefixIcon: const Icon(Icons.lock_outline_rounded),
+                            prefixIcon: Icon(Icons.lock_outline_rounded),
                             suffixIcon: IconButton(
                               icon: Icon(hidePassword ? Icons.visibility : Icons.visibility_off),
                               onPressed: () => setState(() => hidePassword = !hidePassword),
@@ -520,11 +521,11 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                         // ─── Indikator Kekuatan Sandi Visual (Hanya 1 Kali) ───
                         AnimatedContainer(
                           duration: const Duration(milliseconds: 300),
-                          margin: const EdgeInsets.only(top: 8, bottom: 16),
-                          padding: const EdgeInsets.all(14),
+                          margin: EdgeInsets.only(top: 8.h, bottom: 16.h),
+                          padding: EdgeInsets.all(14.w),
                           decoration: BoxDecoration(
                             color: Theme.of(context).dividerColor.withOpacity(0.03),
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(16.r),
                             border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.08)),
                           ),
                           child: Column(
@@ -536,7 +537,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                                   Text(
                                     'Kekuatan Sandi:',
                                     style: TextStyle(
-                                      fontSize: 12,
+                                      fontSize: 12.sp,
                                       fontWeight: FontWeight.w600,
                                       color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.7),
                                     ),
@@ -547,7 +548,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                                       _strengthLabel,
                                       key: ValueKey(_strengthLabel),
                                       style: TextStyle(
-                                        fontSize: 12,
+                                        fontSize: 12.sp,
                                         fontWeight: FontWeight.bold,
                                         color: password.text.isEmpty
                                             ? Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.5)
@@ -557,7 +558,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 10),
+                              SizedBox(height: 10.h),
                               // Bar Warna Progresif
                               LayoutBuilder(
                                 builder: (context, constraints) {
@@ -566,23 +567,23 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                                   return Stack(
                                     children: [
                                       Container(
-                                        height: 6,
+                                        height: 6.h,
                                         width: width,
                                         decoration: BoxDecoration(
                                           color: Theme.of(context).dividerColor.withOpacity(0.1),
-                                          borderRadius: BorderRadius.circular(3),
+                                          borderRadius: BorderRadius.circular(3.r),
                                         ),
                                       ),
                                       AnimatedContainer(
                                         duration: const Duration(milliseconds: 300),
                                         curve: Curves.easeOut,
-                                        height: 6,
+                                        height: 6.h,
                                         width: width * factor,
                                         decoration: BoxDecoration(
                                           color: _strengthColor,
-                                          borderRadius: BorderRadius.circular(3),
+                                          borderRadius: BorderRadius.circular(3.r),
                                           boxShadow: password.text.isNotEmpty
-                                              ? [BoxShadow(color: _strengthColor.withOpacity(0.4), blurRadius: 6)]
+                                              ? [BoxShadow(color: _strengthColor.withOpacity(0.4), blurRadius: 6.r)]
                                               : null,
                                         ),
                                       ),
@@ -590,7 +591,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                                   );
                                 },
                               ),
-                              const SizedBox(height: 12),
+                              SizedBox(height: 12.h),
                               // Checklist Aturan Sandi
                               Row(
                                 children: [
@@ -612,7 +613,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                           onFieldSubmitted: (_) => _handleRegister(),
                           decoration: _customInputDeco(
                             label: 'Ulangi Password (Konfirmasi)',
-                            prefixIcon: const Icon(Icons.lock_reset_rounded),
+                            prefixIcon: Icon(Icons.lock_reset_rounded),
                             suffixIcon: IconButton(
                               icon: Icon(hideConfirmPassword ? Icons.visibility : Icons.visibility_off),
                               onPressed: () => setState(() => hideConfirmPassword = !hideConfirmPassword),
@@ -628,19 +629,19 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                             return null;
                           },
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: 16.h),
 
                         // ─── Syarat dan Ketentuan Checkbox ───
                         Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          padding: EdgeInsets.symmetric(vertical: 8.h),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Padding(
-                                padding: const EdgeInsets.only(top: 2),
+                                padding: EdgeInsets.only(top: 2.h),
                                 child: SizedBox(
-                                  height: 20,
-                                  width: 20,
+                                  height: 20.h,
+                                  width: 20.w,
                                   child: Checkbox(
                                     value: acceptedTerms,
                                     onChanged: isLoading
@@ -652,11 +653,11 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                                             }
                                           },
                                     activeColor: AppTheme.primary,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6.r)),
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 12),
+                              SizedBox(width: 12.w),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -666,22 +667,22 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                                       child: Text(
                                         'Saya menyetujui penyimpanan & pemrosesan data identitas mahasiswa.',
                                         style: TextStyle(
-                                          fontSize: 12,
+                                          fontSize: 12.sp,
                                           color: Theme.of(context).textTheme.bodyMedium?.color,
-                                          height: 1.3,
+                                          height: 1.3.h,
                                         ),
                                       ),
                                     ),
-                                    const SizedBox(height: 4),
+                                    SizedBox(height: 4.h),
                                     GestureDetector(
                                       onTap: () => Navigator.push(
                                         context,
                                         MaterialPageRoute(builder: (_) => const PrivacyScreen()),
                                       ),
-                                      child: const Text(
+                                      child: Text(
                                         'Baca Syarat & Ketentuan serta Kebijakan Privasi',
                                         style: TextStyle(
-                                          fontSize: 11.5,
+                                          fontSize: 11.5.sp,
                                           color: AppTheme.primary,
                                           fontWeight: FontWeight.bold,
                                           decoration: TextDecoration.underline,
@@ -694,42 +695,42 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                             ],
                           ),
                         ),
-                        const SizedBox(height: 24),
+                        SizedBox(height: 24.h),
 
                         // ─── Tombol Daftar Utama ───
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             minimumSize: const Size.fromHeight(54),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
                           ),
                           onPressed: (isLoading || isGoogleLoading) ? null : _handleRegister,
                           child: isLoading
-                              ? const SizedBox(
-                                  height: 22,
-                                  width: 22,
+                              ? SizedBox(
+                                  height: 22.h,
+                                  width: 22.w,
                                   child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
                                 )
-                              : const Text(
+                              : Text(
                                   'Daftar dan Masuk',
-                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
                                 ),
                         ),
                       ],
                     ),
                   ),
 
-                  const SizedBox(height: 32),
+                  SizedBox(height: 32.h),
 
                   // ─── Alternatif Pendaftaran (SSO/OAuth) ───
                   Row(
                     children: [
                       Expanded(child: Divider(color: Theme.of(context).dividerColor.withOpacity(0.15))),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        padding: EdgeInsets.symmetric(horizontal: 16.w),
                         child: Text(
                           'ATAU DAFTAR DENGAN',
                           style: TextStyle(
-                            fontSize: 11,
+                            fontSize: 11.sp,
                             fontWeight: FontWeight.bold,
                             color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.5),
                             letterSpacing: 1.0,
@@ -739,7 +740,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                       Expanded(child: Divider(color: Theme.of(context).dividerColor.withOpacity(0.15))),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20.h),
 
                   Row(
                     children: [
@@ -752,26 +753,26 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                           label: 'Google',
                         ),
                       ),
-                      const SizedBox(width: 16),
+                      SizedBox(width: 16.w),
                       // Tombol SSO Kampus
                       Expanded(
                         child: _SocialButton(
                           onTap: (isLoading || isGoogleLoading) ? null : _handleSsoSignUp,
                           isLoading: false,
-                          icon: const Icon(Icons.domain_verification_rounded, color: Colors.teal, size: 20),
+                          icon: Icon(Icons.domain_verification_rounded, color: Colors.teal, size: 20),
                           label: 'SSO Kampus',
                         ),
                       ),
                     ],
                   ),
 
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24.h),
 
                   // ─── Tautan Login ───
                   TextButton(
                     onPressed: (isLoading || isGoogleLoading) ? null : () => Navigator.pop(context),
                     style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      padding: EdgeInsets.symmetric(vertical: 12.h),
                       foregroundColor: Theme.of(context).textTheme.bodyMedium?.color,
                     ),
                     child: RichText(
@@ -821,15 +822,15 @@ class _SocialButton extends StatelessWidget {
 
     return OutlinedButton(
       style: OutlinedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 14),
+        padding: EdgeInsets.symmetric(vertical: 14.h),
         side: BorderSide(color: effectiveColor),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
       ),
       onPressed: onTap,
       child: isLoading
-          ? const SizedBox(
-              height: 20,
-              width: 20,
+          ? SizedBox(
+              height: 20.h,
+              width: 20.w,
               child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.primary),
             )
           : Row(
@@ -837,12 +838,12 @@ class _SocialButton extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 icon,
-                const SizedBox(width: 8),
+                SizedBox(width: 8.w),
                 Text(
                   label,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 14,
+                    fontSize: 14.sp,
                   ),
                 ),
               ],
@@ -857,8 +858,8 @@ class _GoogleIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 20,
-      height: 20,
+      width: 20.w,
+      height: 20.h,
       alignment: Alignment.center,
       child: CustomPaint(size: const Size(20, 20), painter: _GoogleGPainter()),
     );

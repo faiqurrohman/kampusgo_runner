@@ -1,3 +1,4 @@
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import '../services/app_data.dart';
 import '../utils/app_theme.dart';
@@ -28,11 +29,11 @@ class _GpaScreenState extends State<GpaScreen> {
             onPressed: () => _showAdd(context),
             backgroundColor: AppTheme.primary,
             elevation: 4,
-            child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
+            child: Icon(Icons.add_rounded, color: Colors.white, size: 28),
           ),
           body: SafeArea(
             child: ListView(
-              padding: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 80),
+              padding: EdgeInsets.only(left: 20.w, right: 20.w, top: 20.h, bottom: 80.h),
             children: [
               const SectionTitle(
                 title: 'GPA Predictor',
@@ -42,23 +43,23 @@ class _GpaScreenState extends State<GpaScreen> {
               Card(
                 elevation: 6,
                 shadowColor: Colors.black.withOpacity(0.2),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32.r)),
                 child: Padding(
-                  padding: const EdgeInsets.all(24),
+                  padding: EdgeInsets.all(24.w),
                   child: Column(
                     children: [
                       Row(
                         children: [
                           // Melingkar / Circular Progress Bar dengan Animasi Halus
                           SizedBox(
-                            width: 110,
-                            height: 110,
+                            width: 110.w,
+                            height: 110.h,
                             child: Stack(
                               alignment: Alignment.center,
                               children: [
                                 SizedBox(
-                                  width: 110,
-                                  height: 110,
+                                  width: 110.w,
+                                  height: 110.h,
                                   child: TweenAnimationBuilder<double>(
                                     tween: Tween<double>(begin: 0, end: progressToTarget),
                                     duration: const Duration(milliseconds: 1000),
@@ -81,17 +82,17 @@ class _GpaScreenState extends State<GpaScreen> {
                                   children: [
                                     Text(
                                       currentGpa.toStringAsFixed(2),
-                                      style: const TextStyle(
-                                        fontSize: 26,
+                                      style: TextStyle(
+                                        fontSize: 26.sp,
                                         fontWeight: FontWeight.bold,
-                                        height: 1.1,
+                                        height: 1.1.h,
                                       ),
                                     ),
-                                    const SizedBox(height: 2),
+                                    SizedBox(height: 2.h),
                                     Text(
                                       'Estimasi',
                                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                            fontSize: 11,
+                                            fontSize: 11.sp,
                                             fontWeight: FontWeight.w600,
                                           ),
                                     ),
@@ -100,7 +101,7 @@ class _GpaScreenState extends State<GpaScreen> {
                               ],
                             ),
                           ),
-                          const SizedBox(width: 24),
+                          SizedBox(width: 24.w),
                           // Konteks Perbandingan & Target
                           Expanded(
                             child: Column(
@@ -112,13 +113,13 @@ class _GpaScreenState extends State<GpaScreen> {
                                         fontWeight: FontWeight.bold,
                                       ),
                                 ),
-                                const SizedBox(height: 8),
+                                SizedBox(height: 8.h),
                                 // Label Konteks Naik / Turun
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
                                   decoration: BoxDecoration(
                                     color: (isUp ? Colors.green : AppTheme.accent).withOpacity(0.12),
-                                    borderRadius: BorderRadius.circular(16),
+                                    borderRadius: BorderRadius.circular(16.r),
                                     border: Border.all(
                                       color: (isUp ? Colors.green : AppTheme.accent).withOpacity(0.3),
                                     ),
@@ -131,27 +132,27 @@ class _GpaScreenState extends State<GpaScreen> {
                                         color: isUp ? Colors.green : AppTheme.accent,
                                         size: 14,
                                       ),
-                                      const SizedBox(width: 4),
+                                      SizedBox(width: 4.w),
                                       Flexible(
                                         child: Text(
                                           '${isUp ? "Naik" : "Turun"} ${diff.abs().toStringAsFixed(2)} dr sems lalu',
                                           style: TextStyle(
                                             color: isUp ? Colors.green : AppTheme.accent,
                                             fontWeight: FontWeight.bold,
-                                            fontSize: 11,
+                                            fontSize: 11.sp,
                                           ),
                                         ),
                                       ),
                                     ],
                                   ),
                                 ),
-                                const SizedBox(height: 12),
+                                SizedBox(height: 12.h),
                                 // Konteks Target
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
                                   decoration: BoxDecoration(
                                     color: Theme.of(context).dividerColor.withOpacity(0.05),
-                                    borderRadius: BorderRadius.circular(16),
+                                    borderRadius: BorderRadius.circular(16.r),
                                   ),
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -162,15 +163,15 @@ class _GpaScreenState extends State<GpaScreen> {
                                           Text(
                                             'Target IPK',
                                             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                                  fontSize: 10,
+                                                  fontSize: 10.sp,
                                                 ),
                                           ),
-                                          const SizedBox(height: 2),
+                                          SizedBox(height: 2.h),
                                           Text(
                                             data.targetGpa.toStringAsFixed(2),
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontWeight: FontWeight.bold,
-                                              fontSize: 14,
+                                              fontSize: 14.sp,
                                               color: AppTheme.secondary,
                                             ),
                                           ),
@@ -178,7 +179,7 @@ class _GpaScreenState extends State<GpaScreen> {
                                       ),
                                       IconButton(
                                         tooltip: 'Sesuaikan Target',
-                                        icon: const Icon(Icons.edit_rounded, size: 16),
+                                        icon: Icon(Icons.edit_rounded, size: 16),
                                         onPressed: () => _showEditTargetDialog(context),
                                         constraints: const BoxConstraints(),
                                         padding: EdgeInsets.zero,
@@ -191,7 +192,7 @@ class _GpaScreenState extends State<GpaScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
+                      SizedBox(height: 16.h),
                       // Progress Bar mendatar penunjuk sisa ke target jika belum tercapai
                       if (currentGpa < data.targetGpa) ...[
                         Row(
@@ -203,8 +204,8 @@ class _GpaScreenState extends State<GpaScreen> {
                             ),
                             Text(
                               '+${(data.targetGpa - currentGpa).toStringAsFixed(2)} Poin lagi',
-                              style: const TextStyle(
-                                fontSize: 12,
+                              style: TextStyle(
+                                fontSize: 12.sp,
                                 fontWeight: FontWeight.bold,
                                 color: AppTheme.secondary,
                               ),
@@ -214,13 +215,13 @@ class _GpaScreenState extends State<GpaScreen> {
                       ] else ...[
                         Row(
                           children: [
-                            const Icon(Icons.check_circle_rounded, color: Colors.green, size: 16),
-                            const SizedBox(width: 6),
-                            const Expanded(
+                            Icon(Icons.check_circle_rounded, color: Colors.green, size: 16),
+                            SizedBox(width: 6.w),
+                            Expanded(
                               child: Text(
                                 'Luar biasa! Target IPK semester ini terlampaui 🎉',
                                 style: TextStyle(
-                                  fontSize: 12,
+                                  fontSize: 12.sp,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.green,
                                 ),
@@ -233,9 +234,9 @@ class _GpaScreenState extends State<GpaScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16.h),
               // Tombol Tambah dihapus, dipindah ke FAB
-              const SizedBox(height: 16),
+              SizedBox(height: 16.h),
               // Daftar Matkul Simulasi
               ...data.gpaItems.map((e) {
                 return Dismissible(
@@ -243,45 +244,45 @@ class _GpaScreenState extends State<GpaScreen> {
                   direction: DismissDirection.endToStart,
                   onDismissed: (_) => data.deleteGpa(e.id),
                   background: Container(
-                    margin: const EdgeInsets.only(bottom: 12),
+                    margin: EdgeInsets.only(bottom: 12.h),
                     alignment: Alignment.centerRight,
-                    padding: const EdgeInsets.only(right: 20),
+                    padding: EdgeInsets.only(right: 20.w),
                     decoration: BoxDecoration(
                       color: Colors.redAccent,
-                      borderRadius: BorderRadius.circular(32),
+                      borderRadius: BorderRadius.circular(32.r),
                     ),
-                    child: const Icon(Icons.delete_rounded, color: Colors.white),
+                    child: Icon(Icons.delete_rounded, color: Colors.white),
                   ),
                   child: Card(
-                    margin: const EdgeInsets.only(bottom: 12),
+                    margin: EdgeInsets.only(bottom: 12.h),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      padding: EdgeInsets.symmetric(vertical: 4.h),
                       child: ListTile(
                         leading: Container(
-                          padding: const EdgeInsets.all(10),
+                          padding: EdgeInsets.all(10.w),
                           decoration: BoxDecoration(
                             color: AppTheme.secondary.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(16.r),
                           ),
-                          child: const Icon(Icons.school_rounded, color: AppTheme.secondary),
+                          child: Icon(Icons.school_rounded, color: AppTheme.secondary),
                         ),
                         title: Text(
                           e.course,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         subtitle: Text('${e.sks} SKS'),
                         trailing: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
                           decoration: BoxDecoration(
                             color: AppTheme.secondary.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(16.r),
                             border: Border.all(color: AppTheme.secondary.withOpacity(0.3)),
                           ),
                           child: Text(
                             e.gradePoint.toStringAsFixed(1),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: 14,
+                              fontSize: 14.sp,
                               color: AppTheme.secondary,
                             ),
                           ),
@@ -306,7 +307,7 @@ class _GpaScreenState extends State<GpaScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Sesuaikan Konteks IPK'),
+        title: Text('Sesuaikan Konteks IPK'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -315,7 +316,7 @@ class _GpaScreenState extends State<GpaScreen> {
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
               decoration: const InputDecoration(labelText: 'Target IPK Semester Ini'),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12.h),
             TextField(
               controller: prevController,
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -326,7 +327,7 @@ class _GpaScreenState extends State<GpaScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Batal'),
+            child: Text('Batal'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -344,7 +345,7 @@ class _GpaScreenState extends State<GpaScreen> {
             style: ElevatedButton.styleFrom(
               minimumSize: const Size(100, 48),
             ),
-            child: const Text('Simpan'),
+            child: Text('Simpan'),
           ),
         ],
       ),
@@ -361,34 +362,34 @@ class _GpaScreenState extends State<GpaScreen> {
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setModal) => Padding(
           padding: EdgeInsets.only(
-            left: 20,
-            right: 20,
-            top: 24,
+            left: 20.w,
+            right: 20.w,
+            top: 24.h,
             bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
+              Text(
                 'Tambah Simulasi Nilai',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16.h),
               TextField(
                 controller: course,
                 decoration: const InputDecoration(labelText: 'Mata Kuliah'),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12.h),
               TextField(
                 controller: sks,
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(labelText: 'Bobot SKS'),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12.h),
               DropdownButtonFormField<double>(
                 value: grade,
                 decoration: const InputDecoration(labelText: 'Target Nilai / Huruf'),
-                items: const [
+                items: [
                   DropdownMenuItem(value: 4.0, child: Text('A / 4.0')),
                   DropdownMenuItem(value: 3.7, child: Text('A- / 3.7')),
                   DropdownMenuItem(value: 3.3, child: Text('B+ / 3.3')),
@@ -401,7 +402,7 @@ class _GpaScreenState extends State<GpaScreen> {
                 ],
                 onChanged: (v) => setModal(() => grade = v!),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
               ElevatedButton(
                 onPressed: () {
                   final s = int.tryParse(sks.text) ?? 0;
@@ -417,7 +418,7 @@ class _GpaScreenState extends State<GpaScreen> {
                     );
                   }
                 },
-                child: const Text('Hitung Simulasi'),
+                child: Text('Hitung Simulasi'),
               ),
             ],
           ),

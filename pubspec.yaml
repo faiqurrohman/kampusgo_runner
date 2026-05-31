@@ -18,6 +18,7 @@ dependencies:
   google_sign_in: ^6.2.1
   local_auth: ^2.3.0
   flutter_secure_storage: ^9.2.2
+  flutter_screenutil: ^5.9.3
 
 # Untuk versi produksi selanjutnya bisa ditambahkan Firebase:
 # firebase_core: ^3.6.0

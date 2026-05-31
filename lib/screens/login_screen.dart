@@ -1,3 +1,4 @@
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'dashboard_screen.dart';
 import 'register_screen.dart';
@@ -105,7 +106,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
         content: Text(msg),
         behavior: SnackBarBehavior.floating,
         backgroundColor: color,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
       ),
     );
   }
@@ -224,14 +225,14 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
       labelText: label,
       prefixIcon: prefixIcon,
       suffixIcon: suffixIcon,
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(16.r)),
       errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: Colors.redAccent, width: 1.5),
+        borderRadius: BorderRadius.circular(16.r),
+        borderSide: BorderSide(color: Colors.redAccent, width: 1.5.w),
       ),
       focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: Colors.redAccent, width: 2.0),
+        borderRadius: BorderRadius.circular(16.r),
+        borderSide: BorderSide(color: Colors.redAccent, width: 2.0.w),
       ),
     );
   }
@@ -241,9 +242,9 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   Widget build(BuildContext context) => Scaffold(
     body: SafeArea(
       child: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
+        padding: EdgeInsets.symmetric(horizontal: 28.w, vertical: 24.h),
         children: [
-          const SizedBox(height: 40),
+          SizedBox(height: 40.h),
 
           // ── Logo ──
           Align(
@@ -252,14 +253,14 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  width: 54,
-                  height: 54,
+                  width: 54.w,
+                  height: 54.h,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.purpleAccent.withOpacity(0.5), width: 1.5),
+                    border: Border.all(color: Colors.purpleAccent.withOpacity(0.5), width: 1.5.w),
                     boxShadow: [
-                      BoxShadow(color: Colors.purpleAccent.withOpacity(0.4), blurRadius: 20, spreadRadius: 2),
-                      BoxShadow(color: Colors.deepPurple.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 4)),
+                      BoxShadow(color: Colors.purpleAccent.withOpacity(0.4), blurRadius: 20.r, spreadRadius: 2.r),
+                      BoxShadow(color: Colors.deepPurple.withOpacity(0.3), blurRadius: 10.r, offset: const Offset(0, 4)),
                     ],
                   ),
                   child: ClipOval(
@@ -269,23 +270,23 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
+                SizedBox(width: 16.w),
                 ShaderMask(
-                  shaderCallback: (bounds) => const LinearGradient(
+                  shaderCallback: (bounds) => LinearGradient(
                     colors: [Colors.white, Colors.purpleAccent],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ).createShader(bounds),
                   child: RichText(
-                    text: const TextSpan(
+                    text: TextSpan(
                       children: [
                         TextSpan(
                           text: 'KAMPUS',
-                          style: TextStyle(fontSize: 26, fontWeight: FontWeight.w900, letterSpacing: 2.0, color: Colors.white),
+                          style: TextStyle(fontSize: 26.sp, fontWeight: FontWeight.w900, letterSpacing: 2.0, color: Colors.white),
                         ),
                         TextSpan(
                           text: 'GO',
-                          style: TextStyle(fontSize: 26, fontWeight: FontWeight.w200, letterSpacing: 1.0, color: Colors.white),
+                          style: TextStyle(fontSize: 26.sp, fontWeight: FontWeight.w200, letterSpacing: 1.0, color: Colors.white),
                         ),
                       ],
                     ),
@@ -295,14 +296,14 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
             ),
           ),
 
-          const SizedBox(height: 32),
-          Text('Masuk ke KAMPUSGO', style: Theme.of(context).textTheme.displayMedium?.copyWith(fontSize: 32)),
-          const SizedBox(height: 12),
+          SizedBox(height: 32.h),
+          Text('Masuk ke KAMPUSGO', style: Theme.of(context).textTheme.displayMedium?.copyWith(fontSize: 32.sp)),
+          SizedBox(height: 12.h),
           Text(
             'Kelola jadwal, uang saku, IPK, dan link kuliahmu dengan lebih cerdas.',
             style: Theme.of(context).textTheme.bodyMedium,
           ),
-          const SizedBox(height: 36),
+          SizedBox(height: 36.h),
 
           // ── Error Banner dengan animasi shake ──
           if (errorMessage != null) ...[
@@ -313,31 +314,31 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                 child: child,
               ),
               child: Container(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.all(16.w),
                 decoration: BoxDecoration(
                   color: Colors.redAccent.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(16.r),
                   border: Border.all(color: Colors.redAccent.withOpacity(0.3)),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.error_outline_rounded, color: Colors.redAccent),
-                    const SizedBox(width: 12),
+                    Icon(Icons.error_outline_rounded, color: Colors.redAccent),
+                    SizedBox(width: 12.w),
                     Expanded(
                       child: Text(
                         errorMessage!,
-                        style: const TextStyle(fontSize: 12, color: Colors.redAccent, fontWeight: FontWeight.w600),
+                        style: TextStyle(fontSize: 12.sp, color: Colors.redAccent, fontWeight: FontWeight.w600),
                       ),
                     ),
                     GestureDetector(
                       onTap: () => setState(() => errorMessage = null),
-                      child: const Icon(Icons.close_rounded, color: Colors.redAccent, size: 18),
+                      child: Icon(Icons.close_rounded, color: Colors.redAccent, size: 18),
                     ),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20.h),
           ],
 
           // ── Form ──
@@ -352,11 +353,11 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                   textInputAction: TextInputAction.next,
                   decoration: _customInputDeco(
                     label: 'Email',
-                    prefixIcon: const Icon(Icons.email_outlined),
+                    prefixIcon: Icon(Icons.email_outlined),
                   ),
                   validator: (v) => v != null && v.contains('@') ? null : 'Alamat email tidak valid',
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20.h),
                 TextFormField(
                   controller: password,
                   obscureText: hide,
@@ -365,7 +366,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                   onFieldSubmitted: (_) => _handleLogin(),
                   decoration: _customInputDeco(
                     label: 'Password',
-                    prefixIcon: const Icon(Icons.lock_outline),
+                    prefixIcon: Icon(Icons.lock_outline),
                     suffixIcon: IconButton(
                       icon: Icon(hide ? Icons.visibility : Icons.visibility_off),
                       onPressed: () => setState(() => hide = !hide),
@@ -373,21 +374,21 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                   ),
                   validator: (v) => v != null && v.length >= 6 ? null : 'Password minimal 6 karakter',
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
 
                 // ── Ingat Saya & Lupa Kata Sandi ──
                 Row(
                   children: [
                     SizedBox(
-                      height: 24, width: 24,
+                      height: 24.h, width: 24.w,
                       child: Checkbox(
                         value: rememberMe,
                         onChanged: isLoading ? null : (v) => setState(() => rememberMe = v ?? false),
                         activeColor: AppTheme.primary,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6.r)),
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8.w),
                     GestureDetector(
                       onTap: isLoading ? null : () => setState(() => rememberMe = !rememberMe),
                       child: Text(
@@ -404,42 +405,42 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                         foregroundColor: AppTheme.primary,
                       ),
                       onPressed: isLoading ? null : _showForgotPasswordDialog,
-                      child: const Text('Lupa Kata Sandi?', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                      child: Text('Lupa Kata Sandi?', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.sp)),
                     ),
                   ],
                 ),
-                const SizedBox(height: 32),
+                SizedBox(height: 32.h),
 
                 // ── Tombol Masuk Sekarang ──
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size.fromHeight(52),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
                   ),
                   onPressed: (isLoading || isGoogleLoading || isBiometricLoading) ? null : _handleLogin,
                   child: isLoading
-                      ? const SizedBox(
-                          height: 22, width: 22,
+                      ? SizedBox(
+                          height: 22.h, width: 22.w,
                           child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
                         )
-                      : const Text('Masuk Sekarang', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      : Text('Masuk Sekarang', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp)),
                 ),
               ],
             ),
           ),
 
-          const SizedBox(height: 32),
+          SizedBox(height: 32.h),
 
           // ── Divider ATAU MASUK DENGAN ──
           Row(
             children: [
               Expanded(child: Divider(color: Theme.of(context).dividerColor.withOpacity(0.15))),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
                 child: Text(
                   'ATAU MASUK DENGAN',
                   style: TextStyle(
-                    fontSize: 11,
+                    fontSize: 11.sp,
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.5),
                     letterSpacing: 1.0,
@@ -449,7 +450,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
               Expanded(child: Divider(color: Theme.of(context).dividerColor.withOpacity(0.15))),
             ],
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: 24.h),
 
           // ── Tombol Google & Biometrik ──
           Row(
@@ -464,7 +465,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                   tooltip: 'Masuk dengan Akun Google',
                 ),
               ),
-              const SizedBox(width: 16),
+              SizedBox(width: 16.w),
               // ── Tombol Biometrik ──
               Expanded(
                 child: Tooltip(
@@ -488,21 +489,21 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
           // ── Keterangan biometrik belum aktif ──
           if (!_hasPreviousSession && _biometricStatus == BiometricStatus.available) ...[
-            const SizedBox(height: 10),
+            SizedBox(height: 10.h),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(Icons.info_outline_rounded, size: 13, color: Colors.grey.withOpacity(0.7)),
-                const SizedBox(width: 6),
+                SizedBox(width: 6.w),
                 Text(
                   'Login pertama diperlukan untuk mengaktifkan Biometrik',
-                  style: TextStyle(fontSize: 11, color: Colors.grey.withOpacity(0.7)),
+                  style: TextStyle(fontSize: 11.sp, color: Colors.grey.withOpacity(0.7)),
                 ),
               ],
             ),
           ],
 
-          const SizedBox(height: 24),
+          SizedBox(height: 24.h),
 
           // ── Daftar ──
           TextButton(
@@ -523,40 +524,40 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
 
           // ── Info Demo ──
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
             decoration: BoxDecoration(
               color: Theme.of(context).dividerColor.withOpacity(0.04),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(12.r),
               border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.08)),
             ),
             child: Row(
               children: [
-                const Icon(Icons.info_outline_rounded, size: 16, color: Colors.grey),
-                const SizedBox(width: 8),
+                Icon(Icons.info_outline_rounded, size: 16, color: Colors.grey),
+                SizedBox(width: 8.w),
                 Expanded(
                   child: Text(
                     'Demo akun: nama@gmail.com / 123456',
-                    style: TextStyle(fontSize: 11, color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.8)),
+                    style: TextStyle(fontSize: 11.sp, color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.8)),
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 32),
+          SizedBox(height: 32.h),
           Text(
             'Dengan masuk, Anda menyetujui Syarat & Ketentuan serta Kebijakan Privasi kami.',
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 11,
+              fontSize: 11.sp,
               color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.6),
-              height: 1.4,
+              height: 1.4.h,
             ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12.h),
         ],
       ),
     ),
@@ -590,16 +591,16 @@ class _SocialButton extends StatelessWidget {
 
     return OutlinedButton(
       style: OutlinedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 14),
+        padding: EdgeInsets.symmetric(vertical: 14.h),
         side: BorderSide(color: effectiveColor),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
         backgroundColor: isDisabled ? Theme.of(context).dividerColor.withOpacity(0.03) : null,
         foregroundColor: isDisabled ? Colors.grey : null,
       ),
       onPressed: onTap,
       child: isLoading
-          ? const SizedBox(
-              height: 20, width: 20,
+          ? SizedBox(
+              height: 20.h, width: 20.w,
               child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white70),
             )
           : Row(
@@ -607,12 +608,12 @@ class _SocialButton extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 icon,
-                const SizedBox(width: 8),
+                SizedBox(width: 8.w),
                 Text(
                   label,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 14,
+                    fontSize: 14.sp,
                     color: isDisabled ? Colors.grey : null,
                   ),
                 ),
@@ -628,8 +629,8 @@ class _GoogleIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 20,
-      height: 20,
+      width: 20.w,
+      height: 20.h,
       alignment: Alignment.center,
       child: Stack(
         alignment: Alignment.center,
@@ -810,9 +811,9 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog>
       opacity: _fadeAnim,
       child: Dialog(
         backgroundColor: Colors.transparent,
-        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+        insetPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 40.h),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(28),
+          borderRadius: BorderRadius.circular(28.r),
           child: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -823,21 +824,21 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog>
                   const Color(0xFF252540).withOpacity(0.96),
                 ],
               ),
-              borderRadius: BorderRadius.circular(28),
+              borderRadius: BorderRadius.circular(28.r),
               border: Border.all(
                 color: Colors.purpleAccent.withOpacity(0.25),
-                width: 1.2,
+                width: 1.2.w,
               ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.purpleAccent.withOpacity(0.15),
-                  blurRadius: 40,
-                  spreadRadius: 4,
+                  blurRadius: 40.r,
+                  spreadRadius: 4.r,
                 ),
               ],
             ),
             child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+              padding: EdgeInsets.fromLTRB(24, 28, 24, 24),
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 400),
                 switchInCurve: Curves.easeOut,
@@ -861,54 +862,54 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog>
         children: [
           // Icon sukses
           Container(
-            width: 72,
-            height: 72,
+            width: 72.w,
+            height: 72.h,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: Colors.teal.withOpacity(0.15),
-              border: Border.all(color: Colors.teal.withOpacity(0.4), width: 1.5),
+              border: Border.all(color: Colors.teal.withOpacity(0.4), width: 1.5.w),
             ),
-            child: const Icon(Icons.mark_email_read_rounded, color: Colors.tealAccent, size: 36),
+            child: Icon(Icons.mark_email_read_rounded, color: Colors.tealAccent, size: 36),
           ),
-          const SizedBox(height: 20),
-          const Text(
+          SizedBox(height: 20.h),
+          Text(
             'Email Terkirim! 🎉',
             style: TextStyle(
-              fontSize: 22,
+              fontSize: 22.sp,
               fontWeight: FontWeight.w800,
               color: Colors.white,
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12.h),
           Text(
             'Tautan pemulihan telah dikirim ke:\n${_emailCtrl.text.trim()}\n\nSilakan cek kotak masuk atau folder spam Anda.',
             style: TextStyle(
-              fontSize: 13,
+              fontSize: 13.sp,
               color: Colors.white.withOpacity(0.75),
-              height: 1.6,
+              height: 1.6.h,
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: 24.h),
 
           // Cooldown / Resend button
           _isCoolingDown
               ? Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.05),
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(14.r),
                     border: Border.all(color: Colors.white.withOpacity(0.1)),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.timer_outlined, size: 16, color: Colors.grey),
-                      const SizedBox(width: 8),
+                      Icon(Icons.timer_outlined, size: 16, color: Colors.grey),
+                      SizedBox(width: 8.w),
                       Text(
                         'Kirim ulang dalam $_cooldownSeconds detik',
-                        style: const TextStyle(fontSize: 13, color: Colors.grey),
+                        style: TextStyle(fontSize: 13.sp, color: Colors.grey),
                       ),
                     ],
                   ),
@@ -919,16 +920,16 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog>
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.purpleAccent,
                       side: BorderSide(color: Colors.purpleAccent.withOpacity(0.4)),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                      padding: const EdgeInsets.symmetric(vertical: 13),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
+                      padding: EdgeInsets.symmetric(vertical: 13.h),
                     ),
                     onPressed: _handleResend,
-                    icon: const Icon(Icons.refresh_rounded, size: 18),
-                    label: const Text('Kirim Ulang', style: TextStyle(fontWeight: FontWeight.bold)),
+                    icon: Icon(Icons.refresh_rounded, size: 18),
+                    label: Text('Kirim Ulang', style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
                 ),
 
-          const SizedBox(height: 12),
+          SizedBox(height: 12.h),
 
           // Tutup
           SizedBox(
@@ -937,16 +938,16 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog>
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF7C5CFC),
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                padding: const EdgeInsets.symmetric(vertical: 13),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
+                padding: EdgeInsets.symmetric(vertical: 13.h),
                 elevation: 0,
               ),
               onPressed: () => Navigator.pop(context),
-              child: const Text('Tutup', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+              child: Text('Tutup', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.sp)),
             ),
           ),
 
-          const SizedBox(height: 20),
+          SizedBox(height: 20.h),
 
           // Bantuan alternatif
           _buildContactAdminLink(),
@@ -966,36 +967,36 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog>
         Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(10),
+              padding: EdgeInsets.all(10.w),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.purpleAccent.withOpacity(0.15),
                 border: Border.all(color: Colors.purpleAccent.withOpacity(0.3)),
               ),
-              child: const Icon(Icons.lock_reset_rounded, color: Colors.purpleAccent, size: 20),
+              child: Icon(Icons.lock_reset_rounded, color: Colors.purpleAccent, size: 20),
             ),
-            const SizedBox(width: 14),
-            const Text(
+            SizedBox(width: 14.w),
+            Text(
               'Lupa Kata Sandi',
               style: TextStyle(
-                fontSize: 20,
+                fontSize: 20.sp,
                 fontWeight: FontWeight.w800,
                 color: Colors.white,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 14),
+        SizedBox(height: 14.h),
 
         Text(
           'Masukkan alamat email terdaftar untuk menerima instruksi tautan pemulihan kata sandi.',
-          style: TextStyle(fontSize: 13, color: Colors.white.withOpacity(0.65), height: 1.5),
+          style: TextStyle(fontSize: 13.sp, color: Colors.white.withOpacity(0.65), height: 1.5.h),
         ),
-        const SizedBox(height: 22),
+        SizedBox(height: 22.h),
 
         // ── Email field ──
         _buildLabel('Alamat Email'),
-        const SizedBox(height: 8),
+        SizedBox(height: 8.h),
         _GlassTextField(
           controller: _emailCtrl,
           hintText: 'contoh@kampusgo.id',
@@ -1012,14 +1013,14 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog>
         // Error email
         if (_emailError != null) _buildErrorText(_emailError!),
 
-        const SizedBox(height: 20),
+        SizedBox(height: 20.h),
 
         // ── CAPTCHA ──
         Container(
-          padding: const EdgeInsets.all(14),
+          padding: EdgeInsets.all(14.w),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.04),
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(16.r),
             border: Border.all(color: Colors.purpleAccent.withOpacity(0.15)),
           ),
           child: Column(
@@ -1027,12 +1028,12 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog>
             children: [
               Row(
                 children: [
-                  const Icon(Icons.security_rounded, size: 14, color: Colors.purpleAccent),
-                  const SizedBox(width: 6),
+                  Icon(Icons.security_rounded, size: 14, color: Colors.purpleAccent),
+                  SizedBox(width: 6.w),
                   Text(
                     'Verifikasi Keamanan',
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 12.sp,
                       color: Colors.white.withOpacity(0.55),
                       fontWeight: FontWeight.w600,
                       letterSpacing: 0.5,
@@ -1040,22 +1041,22 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog>
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12.h),
               Row(
                 children: [
                   // Soal
                   Expanded(
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
                       decoration: BoxDecoration(
                         color: Colors.purpleAccent.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(12.r),
                         border: Border.all(color: Colors.purpleAccent.withOpacity(0.25)),
                       ),
                       child: Text(
                         '$_captchaA + $_captchaB = ?',
-                        style: const TextStyle(
-                          fontSize: 18,
+                        style: TextStyle(
+                          fontSize: 18.sp,
                           fontWeight: FontWeight.w700,
                           color: Colors.purpleAccent,
                           letterSpacing: 1,
@@ -1063,7 +1064,7 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog>
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12.w),
                   // Jawaban
                   Expanded(
                     child: _GlassTextField(
@@ -1083,7 +1084,7 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog>
           ),
         ),
 
-        const SizedBox(height: 24),
+        SizedBox(height: 24.h),
 
         // ── Action buttons ──
         Row(
@@ -1093,17 +1094,17 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog>
               child: TextButton(
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.white.withOpacity(0.55),
-                  padding: const EdgeInsets.symmetric(vertical: 13),
+                  padding: EdgeInsets.symmetric(vertical: 13.h),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(14.r),
                     side: BorderSide(color: Colors.white.withOpacity(0.1)),
                   ),
                 ),
                 onPressed: _isSending ? null : () => Navigator.pop(context),
-                child: const Text('Batal', style: TextStyle(fontWeight: FontWeight.bold)),
+                child: Text('Batal', style: TextStyle(fontWeight: FontWeight.bold)),
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 12.w),
             // Kirim Tautan
             Expanded(
               flex: 2,
@@ -1117,7 +1118,7 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog>
           ],
         ),
 
-        const SizedBox(height: 20),
+        SizedBox(height: 20.h),
 
         // ── Bantuan alternatif ──
         _buildContactAdminLink(),
@@ -1128,7 +1129,7 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog>
   Widget _buildLabel(String text) => Text(
         text,
         style: TextStyle(
-          fontSize: 12,
+          fontSize: 12.sp,
           fontWeight: FontWeight.w600,
           color: Colors.white.withOpacity(0.6),
           letterSpacing: 0.5,
@@ -1136,12 +1137,12 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog>
       );
 
   Widget _buildErrorText(String text) => Padding(
-        padding: const EdgeInsets.only(top: 6, left: 4),
+        padding: EdgeInsets.only(top: 6.h, left: 4.w),
         child: Row(
           children: [
-            const Icon(Icons.error_outline_rounded, size: 13, color: Colors.redAccent),
-            const SizedBox(width: 5),
-            Text(text, style: const TextStyle(fontSize: 12, color: Colors.redAccent)),
+            Icon(Icons.error_outline_rounded, size: 13, color: Colors.redAccent),
+            SizedBox(width: 5.w),
+            Text(text, style: TextStyle(fontSize: 12.sp, color: Colors.redAccent)),
           ],
         ),
       );
@@ -1158,10 +1159,10 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog>
             Navigator.pop(context);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: const Text('Hubungi Admin Kampus: admin@kampusgo.id'),
+                content: Text('Hubungi Admin Kampus: admin@kampusgo.id'),
                 behavior: SnackBarBehavior.floating,
                 backgroundColor: Colors.blueGrey.shade700,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
                 action: SnackBarAction(
                   label: 'Salin',
                   textColor: Colors.white,
@@ -1170,10 +1171,10 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog>
               ),
             );
           },
-          icon: const Icon(Icons.help_outline_rounded, size: 14),
-          label: const Text(
+          icon: Icon(Icons.help_outline_rounded, size: 14),
+          label: Text(
             'Tidak punya akses ke email ini? Hubungi Admin Kampus',
-            style: TextStyle(fontSize: 12, decoration: TextDecoration.underline),
+            style: TextStyle(fontSize: 12.sp, decoration: TextDecoration.underline),
           ),
         ),
       );
@@ -1205,31 +1206,31 @@ class _GlassTextField extends StatelessWidget {
       controller: controller,
       keyboardType: keyboardType,
       onChanged: onChanged,
-      style: const TextStyle(color: Colors.white, fontSize: 14),
+      style: TextStyle(color: Colors.white, fontSize: 14.sp),
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 13),
+        hintStyle: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 13.sp),
         prefixIcon: prefixIcon != null
             ? Icon(prefixIcon, color: Colors.purpleAccent.withOpacity(0.7), size: 20)
             : null,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 13.h),
         filled: true,
         fillColor: Colors.white.withOpacity(0.06),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(14.r),
           borderSide: BorderSide(color: Colors.white.withOpacity(0.12)),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(14.r),
           borderSide: BorderSide(
             color: hasError ? Colors.redAccent.withOpacity(0.6) : Colors.white.withOpacity(0.12),
           ),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(14.r),
           borderSide: BorderSide(
             color: hasError ? Colors.redAccent : Colors.purpleAccent,
-            width: 1.5,
+            width: 1.5.w,
           ),
         ),
       ),
@@ -1257,9 +1258,9 @@ class _AnimatedSendButton extends StatelessWidget {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(14.r),
         gradient: onPressed != null
-            ? const LinearGradient(
+            ? LinearGradient(
                 colors: [Color(0xFF7C5CFC), Color(0xFF5B8DEF)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -1270,7 +1271,7 @@ class _AnimatedSendButton extends StatelessWidget {
             ? [
                 BoxShadow(
                   color: const Color(0xFF7C5CFC).withOpacity(0.4),
-                  blurRadius: 16,
+                  blurRadius: 16.r,
                   offset: const Offset(0, 6),
                 )
               ]
@@ -1280,14 +1281,14 @@ class _AnimatedSendButton extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onPressed,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(14.r),
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 13),
+            padding: EdgeInsets.symmetric(vertical: 13.h),
             child: Center(
               child: isLoading
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
+                  ? SizedBox(
+                      height: 20.h,
+                      width: 20.w,
                       child: CircularProgressIndicator(
                         strokeWidth: 2.2,
                         valueColor: AlwaysStoppedAnimation(Colors.white),
@@ -1297,13 +1298,13 @@ class _AnimatedSendButton extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.send_rounded, size: 16, color: Colors.white),
-                        const SizedBox(width: 8),
+                        Icon(Icons.send_rounded, size: 16, color: Colors.white),
+                        SizedBox(width: 8.w),
                         Text(
                           isCoolingDown ? 'Tunggu ${cooldownSeconds}d' : 'Kirim Tautan',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 14,
+                            fontSize: 14.sp,
                             color: Colors.white,
                           ),
                         ),

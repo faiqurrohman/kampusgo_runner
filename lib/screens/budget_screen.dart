@@ -1,3 +1,4 @@
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import '../services/app_data.dart';
 import '../utils/app_theme.dart';
@@ -45,11 +46,11 @@ class _BudgetScreenState extends State<BudgetScreen> {
             onPressed: () => _showAdd(context),
             backgroundColor: AppTheme.primary,
             elevation: 4,
-            child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
+            child: Icon(Icons.add_rounded, color: Colors.white, size: 28),
           ),
           body: SafeArea(
             child: ListView(
-              padding: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 80),
+              padding: EdgeInsets.only(left: 20.w, right: 20.w, top: 20.h, bottom: 80.h),
             children: [
               const SectionTitle(
                 title: 'Budget Buddy',
@@ -59,11 +60,11 @@ class _BudgetScreenState extends State<BudgetScreen> {
               Card(
                 elevation: 6,
                 shadowColor: Colors.black.withOpacity(0.2),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32.r)),
                 child: Container(
-                  padding: const EdgeInsets.all(24),
+                  padding: EdgeInsets.all(24.w),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(32),
+                    borderRadius: BorderRadius.circular(32.r),
                     gradient: LinearGradient(
                       colors: [
                         Theme.of(context).colorScheme.surface,
@@ -79,22 +80,25 @@ class _BudgetScreenState extends State<BudgetScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            'Sisa Uang Saku / Anggaran',
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                          Expanded(
+                            child: Text(
+                              'Sisa Uang Saku / Anggaran',
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
                           ),
+                          SizedBox(width: 8.w),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
                             decoration: BoxDecoration(
                               color: statusColor.withOpacity(0.12),
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(12.r),
                             ),
                             child: Text(
                               isOver ? 'Melebihi Saldo!' : '${((1.0 - usageRatio) * 100).toInt()}% Tersisa',
                               style: TextStyle(
-                                fontSize: 11,
+                                fontSize: 11.sp,
                                 fontWeight: FontWeight.bold,
                                 color: statusColor,
                               ),
@@ -102,19 +106,19 @@ class _BudgetScreenState extends State<BudgetScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12),
+                      SizedBox(height: 12.h),
                       Text(
                         Formatters.currency.format(sisa),
                         style: TextStyle(
-                          fontSize: 32,
+                          fontSize: 32.sp,
                           fontWeight: FontWeight.bold,
                           color: isOver ? AppTheme.accent : Theme.of(context).textTheme.headlineMedium?.color,
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      SizedBox(height: 16.h),
                       // Progress Bar Pemakaian Anggaran
                       ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(8.r),
                         child: LinearProgressIndicator(
                           value: usageRatio,
                           minHeight: 10,
@@ -122,7 +126,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
                           valueColor: AlwaysStoppedAnimation<Color>(statusColor),
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      SizedBox(height: 16.h),
                       // Keterangan Total Pengeluaran & Pengaturan Uang Saku
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -134,7 +138,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
                                 'Terpakai: ${Formatters.currency.format(totalExp)}',
                                 style: Theme.of(context).textTheme.bodySmall,
                               ),
-                              const SizedBox(height: 2),
+                              SizedBox(height: 2.h),
                               Text(
                                 'Uang Saku: ${Formatters.currency.format(data.budgetLimit)}',
                                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -145,10 +149,10 @@ class _BudgetScreenState extends State<BudgetScreen> {
                           ),
                           TextButton.icon(
                             onPressed: () => _showEditLimitDialog(context),
-                            icon: const Icon(Icons.edit_rounded, size: 16),
-                            label: const Text('Input Saldo', style: TextStyle(fontSize: 12)),
+                            icon: Icon(Icons.edit_rounded, size: 16),
+                            label: Text('Input Saldo', style: TextStyle(fontSize: 12.sp)),
                             style: TextButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
                               minimumSize: Size.zero,
                               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                             ),
@@ -159,7 +163,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16.h),
               // Grafik Donat Interaktif (Klik Kategori untuk Filter)
               SimpleDonutChart(
                 data: data.expenseByCategory(),
@@ -168,9 +172,9 @@ class _BudgetScreenState extends State<BudgetScreen> {
                   setState(() => _selectedCategoryFilter = category);
                 },
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16.h),
               // Tombol Tambah dihapus, dipindah ke FAB
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
               // Header Riwayat Pengeluaran beserta tombol ekspor ke orang tua & indikator filter
               Row(
                 children: [
@@ -181,36 +185,36 @@ class _BudgetScreenState extends State<BudgetScreen> {
                   const Spacer(),
                   if (_selectedCategoryFilter != null) ...[
                     ActionChip(
-                      avatar: const Icon(Icons.clear_rounded, size: 12),
+                      avatar: Icon(Icons.clear_rounded, size: 12),
                       label: Text(
                         _selectedCategoryFilter!,
-                        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 10.sp, fontWeight: FontWeight.bold),
                       ),
                       backgroundColor: AppTheme.primary.withOpacity(0.12),
                       side: BorderSide.none,
                       onPressed: () => setState(() => _selectedCategoryFilter = null),
                     ),
-                    const SizedBox(width: 6),
+                    SizedBox(width: 6.w),
                   ],
                   // Tombol Ekspor CSV/Laporan
                   IconButton(
                     onPressed: () => _showExportDialog(context),
-                    icon: const Icon(Icons.ios_share_rounded, size: 18),
+                    icon: Icon(Icons.ios_share_rounded, size: 18),
                     tooltip: 'Ekspor Laporan (CSV/PDF)',
                     style: IconButton.styleFrom(
                       backgroundColor: AppTheme.primary.withOpacity(0.08),
                       foregroundColor: AppTheme.primary,
-                      padding: const EdgeInsets.all(8),
+                      padding: EdgeInsets.all(8.w),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12.h),
               // Daftar Pengeluaran terfilter dengan Empty State yang relevan
               if (filteredExpenses.isEmpty)
                 Center(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 24),
+                    padding: EdgeInsets.symmetric(vertical: 24.h),
                     child: Text(
                       _selectedCategoryFilter == null
                           ? 'Belum ada catatan pengeluaran minggu ini.'
@@ -228,49 +232,52 @@ class _BudgetScreenState extends State<BudgetScreen> {
                     direction: DismissDirection.endToStart,
                     onDismissed: (_) => data.deleteExpense(e.id),
                     background: Container(
-                      margin: const EdgeInsets.only(bottom: 12),
+                      margin: EdgeInsets.only(bottom: 12.h),
                       alignment: Alignment.centerRight,
-                      padding: const EdgeInsets.only(right: 20),
+                      padding: EdgeInsets.only(right: 20.w),
                       decoration: BoxDecoration(
                         color: Colors.redAccent,
-                        borderRadius: BorderRadius.circular(32),
+                        borderRadius: BorderRadius.circular(32.r),
                       ),
-                      child: const Icon(Icons.delete_rounded, color: Colors.white),
+                      child: Icon(Icons.delete_rounded, color: Colors.white),
                     ),
                     child: Card(
-                      margin: const EdgeInsets.only(bottom: 12),
+                      margin: EdgeInsets.only(bottom: 12.h),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        padding: EdgeInsets.symmetric(vertical: 4.h),
                         child: ListTile(
                           leading: Container(
-                            padding: const EdgeInsets.all(10),
+                            padding: EdgeInsets.all(10.w),
                             decoration: BoxDecoration(
                               color: catColor.withOpacity(0.12),
-                              borderRadius: BorderRadius.circular(16),
+                              borderRadius: BorderRadius.circular(16.r),
                             ),
                             child: Icon(Icons.receipt_long_rounded, color: catColor),
                           ),
                           title: Text(
                             e.title,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
+                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           subtitle: Row(
                             children: [
                               Container(
-                                width: 8,
-                                height: 8,
+                                width: 8.w,
+                                height: 8.h,
                                 decoration: BoxDecoration(color: catColor, shape: BoxShape.circle),
                               ),
-                              const SizedBox(width: 6),
-                              Text(
-                                '${e.category} • ${Formatters.date.format(e.date)}',
-                                style: const TextStyle(fontSize: 12),
+                              SizedBox(width: 6.w),
+                              Expanded(
+                                child: Text(
+                                  '${e.category} • ${Formatters.date.format(e.date)}',
+                                  style: TextStyle(fontSize: 12.sp),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
                             ],
                           ),
                           trailing: Text(
                             Formatters.currency.format(e.amount),
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp),
                           ),
                         ),
                       ),
@@ -312,35 +319,35 @@ class _BudgetScreenState extends State<BudgetScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Row(
+        title: Row(
           children: [
             Icon(Icons.insert_drive_file_rounded, color: AppTheme.primary),
-            SizedBox(width: 8),
-            Text('Ekspor Laporan (CSV)', style: TextStyle(fontSize: 18)),
+            SizedBox(width: 8.w),
+            Text('Ekspor Laporan (CSV)', style: TextStyle(fontSize: 18.sp)),
           ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Format CSV/Teks siap dikirimkan ke orang tua atau diolah di Excel:',
-              style: TextStyle(fontSize: 12),
+              style: TextStyle(fontSize: 12.sp),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12.h),
             Container(
               constraints: const BoxConstraints(maxHeight: 180),
               width: double.infinity,
-              padding: const EdgeInsets.all(12),
+              padding: EdgeInsets.all(12.w),
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.surface,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(16.r),
                 border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)),
               ),
               child: SingleChildScrollView(
                 child: SelectableText(
                   buffer.toString(),
-                  style: const TextStyle(fontFamily: 'monospace', fontSize: 10),
+                  style: TextStyle(fontFamily: 'monospace', fontSize: 10.sp),
                 ),
               ),
             ),
@@ -349,7 +356,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Tutup'),
+            child: Text('Tutup'),
           ),
           ElevatedButton.icon(
             onPressed: () {
@@ -361,8 +368,8 @@ class _BudgetScreenState extends State<BudgetScreen> {
                 ),
               );
             },
-            icon: const Icon(Icons.copy_rounded, size: 16),
-            label: const Text('Salin Data'),
+            icon: Icon(Icons.copy_rounded, size: 16),
+            label: Text('Salin Data'),
             style: ElevatedButton.styleFrom(minimumSize: const Size(120, 40)),
           ),
         ],
@@ -376,7 +383,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Input Uang Saku / Anggaran'),
+        title: Text('Input Uang Saku / Anggaran'),
         content: TextField(
           controller: limitController,
           keyboardType: TextInputType.number,
@@ -388,7 +395,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Batal'),
+            child: Text('Batal'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -399,7 +406,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
               }
             },
             style: ElevatedButton.styleFrom(minimumSize: const Size(100, 48)),
-            child: const Text('Simpan'),
+            child: Text('Simpan'),
           ),
         ],
       ),
@@ -417,30 +424,30 @@ class _BudgetScreenState extends State<BudgetScreen> {
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setModal) => Padding(
           padding: EdgeInsets.only(
-            left: 20,
-            right: 20,
-            top: 24,
+            left: 20.w,
+            right: 20.w,
+            top: 24.h,
             bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
+              Text(
                 'Catat Pengeluaran',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16.h),
               TextField(
                 controller: title,
                 decoration: const InputDecoration(labelText: 'Nama pengeluaran / barang'),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12.h),
               TextField(
                 controller: amount,
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(labelText: 'Nominal (Rp)'),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12.h),
               DropdownButtonFormField<String>(
                 value: category,
                 decoration: const InputDecoration(labelText: 'Kategori'),
@@ -449,7 +456,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
                     .toList(),
                 onChanged: (v) => setModal(() => category = v!),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
               ElevatedButton(
                 onPressed: () {
                   final nominal = int.tryParse(amount.text) ?? 0;
@@ -465,7 +472,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
                     );
                   }
                 },
-                child: const Text('Simpan Pengeluaran'),
+                child: Text('Simpan Pengeluaran'),
               ),
             ],
           ),

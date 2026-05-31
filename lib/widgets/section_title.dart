@@ -1,3 +1,4 @@
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 
 class SectionTitle extends StatelessWidget {
@@ -8,10 +9,10 @@ class SectionTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(title, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-      const SizedBox(height: 6),
+      Text(title, style: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold)),
+      SizedBox(height: 6.h),
       Text(subtitle, style: Theme.of(context).textTheme.bodyMedium),
-      const SizedBox(height: 18),
+      SizedBox(height: 18.h),
     ]);
   }
 }

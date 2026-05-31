@@ -1,3 +1,4 @@
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import '../utils/app_theme.dart';
 
@@ -6,26 +7,26 @@ class PrivacyScreen extends StatelessWidget {
 
   Widget _buildSection(BuildContext context, String title, String content) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 24),
+      padding: EdgeInsets.only(bottom: 24.h),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             title,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 16.sp,
               fontWeight: FontWeight.bold,
               color: AppTheme.primary.withOpacity(0.95),
               letterSpacing: 0.5,
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8.h),
           Text(
             content,
             style: TextStyle(
-              fontSize: 13,
+              fontSize: 13.sp,
               color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.85),
-              height: 1.6,
+              height: 1.6.h,
             ),
           ),
         ],
@@ -41,22 +42,22 @@ class PrivacyScreen extends StatelessWidget {
           children: [
             // Header custom
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+              padding: EdgeInsets.fromLTRB(20, 20, 20, 12),
               child: Row(
                 children: [
                   IconButton(
                     style: IconButton.styleFrom(
                       backgroundColor: Theme.of(context).dividerColor.withOpacity(0.08),
-                      padding: const EdgeInsets.all(12),
+                      padding: EdgeInsets.all(12.w),
                     ),
-                    icon: const Icon(Icons.arrow_back_rounded, size: 20),
+                    icon: Icon(Icons.arrow_back_rounded, size: 20),
                     onPressed: () => Navigator.pop(context),
                   ),
-                  const SizedBox(width: 16),
-                  const Expanded(
+                  SizedBox(width: 16.w),
+                  Expanded(
                     child: Text(
                       'Syarat & Ketentuan',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],
@@ -66,45 +67,45 @@ class PrivacyScreen extends StatelessWidget {
             // Konten utama
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.all(24),
+                padding: EdgeInsets.all(24.w),
                 children: [
                   // Icon/Ilustrasi Header
                   Center(
                     child: Container(
-                      padding: const EdgeInsets.all(20),
+                      padding: EdgeInsets.all(20.w),
                       decoration: BoxDecoration(
                         color: AppTheme.primary.withOpacity(0.1),
                         shape: BoxShape.circle,
-                        border: Border.all(color: AppTheme.primary.withOpacity(0.3), width: 1.5),
+                        border: Border.all(color: AppTheme.primary.withOpacity(0.3), width: 1.5.w),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.verified_user_rounded,
                         size: 48,
                         color: AppTheme.primary,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24.h),
 
-                  const Text(
+                  Text(
                     'Persetujuan Layanan & Kebijakan Privasi Akun Mahasiswa',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 18.sp,
                       fontWeight: FontWeight.w800,
-                      height: 1.4,
+                      height: 1.4.h,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8.h),
                   Text(
                     'Terakhir diperbarui: Mei 2026',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 12.sp,
                       color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.6),
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  SizedBox(height: 32.h),
 
                   _buildSection(
                     context,
@@ -130,46 +131,46 @@ class PrivacyScreen extends StatelessWidget {
                     'Opsi pendaftaran melalui Google atau SSO Kampus tunduk pada pertukaran token otorisasi standar. Kami hanya mengambil informasi profil dasar (Nama dan Email) yang diizinkan oleh penyedia identitas terkait.',
                   ),
 
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16.h),
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.all(16.w),
                     decoration: BoxDecoration(
                       color: Theme.of(context).dividerColor.withOpacity(0.05),
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(16.r),
                       border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.info_outline_rounded, size: 20, color: Colors.blueAccent),
-                        const SizedBox(width: 12),
+                        Icon(Icons.info_outline_rounded, size: 20, color: Colors.blueAccent),
+                        SizedBox(width: 12.w),
                         Expanded(
                           child: Text(
                             'Dengan mendaftar, Anda otomatis terikat pada peraturan sistem informasi akademik kampus.',
                             style: TextStyle(
-                              fontSize: 11.5,
+                              fontSize: 11.5.sp,
                               color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.8),
-                              height: 1.4,
+                              height: 1.4.h,
                             ),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  SizedBox(height: 32.h),
 
                   // Tombol Setuju / Kembali
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.primary,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      padding: EdgeInsets.symmetric(vertical: 16.h),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
                       elevation: 0,
                     ),
                     onPressed: () => Navigator.pop(context),
-                    child: const Text('Saya Mengerti & Setuju', style: TextStyle(fontWeight: FontWeight.bold)),
+                    child: Text('Saya Mengerti & Setuju', style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16.h),
                 ],
               ),
             ),

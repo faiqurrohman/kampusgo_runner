@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'login_screen.dart';
 import '../utils/app_theme.dart';
 
@@ -31,18 +32,18 @@ class _SplashScreenState extends State<SplashScreen> {
       ),
       child: Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         ClipRRect(
-          borderRadius: BorderRadius.circular(36),
+          borderRadius: BorderRadius.circular(36.r),
           child: Image.asset(
             'assets/images/logo_mewah.png',
-            width: 150,
-            height: 150,
+            width: 150.w,
+            height: 150.w, // maintain aspect ratio
             fit: BoxFit.cover,
           ),
         ),
-        const SizedBox(height: 32),
-        Text('KAMPUSGO', style: Theme.of(context).textTheme.displayMedium?.copyWith(letterSpacing: 2)),
-        const SizedBox(height: 12),
-        Text('Smart Assistant untuk Hidup Kampus', style: Theme.of(context).textTheme.bodyMedium),
+        SizedBox(height: 32.h),
+        Text('KAMPUSGO', style: Theme.of(context).textTheme.displayMedium?.copyWith(letterSpacing: 2.w, fontSize: 45.sp)),
+        SizedBox(height: 12.h),
+        Text('Smart Assistant untuk Hidup Kampus', style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 14.sp)),
       ])),
     ),
   );

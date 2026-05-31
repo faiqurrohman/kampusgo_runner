@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'screens/splash_screen.dart';
 import 'services/app_data.dart';
@@ -27,16 +28,23 @@ class KampusGoApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: AppData.instance,
-      builder: (context, _) {
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'KAMPUSGO',
-          theme: AppTheme.lightTheme,
-          darkTheme: AppTheme.darkTheme,
-          themeMode: AppData.instance.themeMode,
-          home: const SplashScreen(),
+    return ScreenUtilInit(
+      designSize: const Size(390, 844), // Standard iPhone 12/13/14 size
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (context, child) {
+        return AnimatedBuilder(
+          animation: AppData.instance,
+          builder: (context, _) {
+            return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              title: 'KAMPUSGO',
+              theme: AppTheme.lightTheme,
+              darkTheme: AppTheme.darkTheme,
+              themeMode: AppData.instance.themeMode,
+              home: const SplashScreen(),
+            );
+          },
         );
       },
     );
