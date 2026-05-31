@@ -22,14 +22,8 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
   // State loading terpisah per tombol agar UX lebih tepat
   bool isLoading = false;
-  bool isGoogleLoading = false;
-  bool isBiometricLoading = false;
 
   String? errorMessage;
-
-  // Status biometrik — diperiksa saat init
-  BiometricStatus _biometricStatus = BiometricStatus.deviceNotSupported;
-  bool _hasPreviousSession = false;
 
   // Animasi shake untuk error
   late final AnimationController _shakeCtrl;
@@ -42,7 +36,6 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     _shakeAnim = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(parent: _shakeCtrl, curve: Curves.elasticIn),
     );
-    _checkBiometricAvailability();
   }
 
   @override
@@ -51,36 +44,6 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     password.dispose();
     _shakeCtrl.dispose();
     super.dispose();
-  }
-
-  /// Memeriksa dukungan biometrik dan sesi sebelumnya saat screen dibuka.
-  Future<void> _checkBiometricAvailability() async {
-    final status = await AuthService.instance.checkBiometricStatus();
-    final hasSession = await AuthService.instance.hasPreviousSession();
-    if (mounted) {
-      setState(() {
-        _biometricStatus = status;
-        _hasPreviousSession = hasSession;
-      });
-    }
-  }
-
-  /// Apakah tombol biometrik aktif: hanya jika perangkat mendukung DAN sudah pernah login.
-  bool get _isBiometricEnabled =>
-      _biometricStatus == BiometricStatus.available && _hasPreviousSession;
-
-  /// Teks tooltip tombol biometrik sesuai kondisi.
-  String get _biometricTooltip {
-    if (_biometricStatus == BiometricStatus.deviceNotSupported) {
-      return 'Perangkat tidak mendukung biometrik';
-    }
-    if (_biometricStatus == BiometricStatus.notEnrolled) {
-      return 'Sidik jari/wajah belum terdaftar di perangkat';
-    }
-    if (!_hasPreviousSession) {
-      return 'Login manual dulu untuk mengaktifkan biometrik';
-    }
-    return 'Masuk dengan sidik jari atau wajah';
   }
 
   void _showForgotPasswordDialog() {
@@ -122,8 +85,6 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   void _setError(String? msg) {
     setState(() {
       isLoading = false;
-      isGoogleLoading = false;
-      isBiometricLoading = false;
       errorMessage = msg;
     });
     if (msg != null) _shakeCtrl.forward(from: 0);
@@ -145,11 +106,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
       final savedName = await AuthService.instance.getSavedName();
       
       // Sinkronisasi memori global
-      AppData.instance.updateProfile(name: savedName ?? 'Mahasiswa', email: inputEmail);
-      
-      // Refresh status biometrik
-      await _checkBiometricAvailability();
-      
+      AppData.instance.updateProfile(name: savedName ?? 'Mahasiswa', email: inputEmail);      
       _showSnackBar('✅ Login berhasil! Selamat datang kembali.', Colors.teal);
       await Future.delayed(const Duration(milliseconds: 300));
       if (!mounted) return;
@@ -161,66 +118,6 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
       _setError('Terjadi kesalahan. Silakan coba lagi.');
     }
   }
-
-  // ─── Google Sign-In ───────────────────────────────────────────────────────
-  Future<void> _handleGoogleSignIn() async {
-    setState(() { isGoogleLoading = true; errorMessage = null; });
-
-    try {
-      final account = await AuthService.instance.signInWithGoogle();
-      if (!mounted) return;
-      if (account != null) {
-        AppData.instance.updateProfile(
-          name: account.displayName ?? account.email.split('@').first,
-          email: account.email,
-        );
-        _showSnackBar('🔑 Berhasil masuk dengan akun Google: ${account.email}', Colors.teal);
-        await Future.delayed(const Duration(milliseconds: 400));
-        _navigateToDashboard();
-      } else {
-        // User membatalkan dialog Google
-        setState(() => isGoogleLoading = false);
-      }
-    } on AuthException catch (e) {
-      _setError(e.message);
-    } catch (_) {
-      _setError('Gagal terhubung ke layanan Google. Coba lagi.');
-    }
-  }
-
-  // ─── Biometric Auth ───────────────────────────────────────────────────────
-  Future<void> _handleBiometricAuth() async {
-    if (!_isBiometricEnabled) {
-      // Tampilkan pesan tooltip sebagai SnackBar agar jelas
-      _showSnackBar('ℹ️ $_biometricTooltip', Colors.blueGrey.shade700);
-      return;
-    }
-
-    setState(() { isBiometricLoading = true; errorMessage = null; });
-
-    try {
-      final ok = await AuthService.instance.authenticateWithBiometric();
-      if (!mounted) return;
-      if (ok) {
-        // Muat nama tersimpan ke memori aktif
-        final savedName = await AuthService.instance.getSavedName();
-        final savedEmail = await AuthService.instance.getSavedEmail();
-        if (savedName != null) AppData.instance.updateProfile(name: savedName, email: savedEmail);
-
-        _showSnackBar('✅ Sidik jari/wajah terverifikasi — Selamat datang kembali!', Colors.teal);
-        await Future.delayed(const Duration(milliseconds: 400));
-        _navigateToDashboard();
-      } else {
-        // Dibatalkan oleh user (dialog ditutup)
-        setState(() => isBiometricLoading = false);
-      }
-    } on AuthException catch (e) {
-      _setError(e.message);
-    } catch (_) {
-      _setError('Autentikasi biometrik gagal. Coba lagi.');
-    }
-  }
-
   // ─── Input Decoration ─────────────────────────────────────────────────────
   InputDecoration _customInputDeco({
     required String label,
@@ -423,7 +320,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                     minimumSize: const Size.fromHeight(52),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
                   ),
-                  onPressed: (isLoading || isGoogleLoading || isBiometricLoading) ? null : _handleLogin,
+                  onPressed: isLoading ? null : _handleLogin,
                   child: isLoading
                       ? SizedBox(
                           height: 22.h, width: 22.w,
@@ -436,84 +333,9 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
           ),
 
           SizedBox(height: 32.h),
-
-          // ── Divider ATAU MASUK DENGAN ──
-          Row(
-            children: [
-              Expanded(child: Divider(color: Theme.of(context).dividerColor.withOpacity(0.15))),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: Text(
-                  'ATAU MASUK DENGAN',
-                  style: TextStyle(
-                    fontSize: 11.sp,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.5),
-                    letterSpacing: 1.0,
-                  ),
-                ),
-              ),
-              Expanded(child: Divider(color: Theme.of(context).dividerColor.withOpacity(0.15))),
-            ],
-          ),
-          SizedBox(height: 24.h),
-
-          // ── Tombol Google & Biometrik ──
-          Row(
-            children: [
-              // ── Tombol Google ──
-              Expanded(
-                child: _SocialButton(
-                  onTap: (isLoading || isGoogleLoading || isBiometricLoading) ? null : _handleGoogleSignIn,
-                  isLoading: isGoogleLoading,
-                  icon: _GoogleIcon(),
-                  label: 'Google',
-                  tooltip: 'Masuk dengan Akun Google',
-                ),
-              ),
-              SizedBox(width: 16.w),
-              // ── Tombol Biometrik ──
-              Expanded(
-                child: Tooltip(
-                  message: _biometricTooltip,
-                  child: _SocialButton(
-                    onTap: (isLoading || isGoogleLoading || isBiometricLoading) ? null : _handleBiometricAuth,
-                    isLoading: isBiometricLoading,
-                    icon: Icon(
-                      Icons.fingerprint_rounded,
-                      color: _isBiometricEnabled ? Colors.blueAccent : Colors.grey,
-                      size: 22,
-                    ),
-                    label: 'Biometrik',
-                    tooltip: _biometricTooltip,
-                    isDisabled: !_isBiometricEnabled,
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          // ── Keterangan biometrik belum aktif ──
-          if (!_hasPreviousSession && _biometricStatus == BiometricStatus.available) ...[
-            SizedBox(height: 10.h),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.info_outline_rounded, size: 13, color: Colors.grey.withOpacity(0.7)),
-                SizedBox(width: 6.w),
-                Text(
-                  'Login pertama diperlukan untuk mengaktifkan Biometrik',
-                  style: TextStyle(fontSize: 11.sp, color: Colors.grey.withOpacity(0.7)),
-                ),
-              ],
-            ),
-          ],
-
-          SizedBox(height: 24.h),
-
           // ── Daftar ──
           TextButton(
-            onPressed: (isLoading || isGoogleLoading || isBiometricLoading)
+            onPressed: isLoading
                 ? null
                 : () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RegisterScreen())),
             style: TextButton.styleFrom(foregroundColor: Theme.of(context).textTheme.bodyMedium?.color),
@@ -547,115 +369,6 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
       ),
     ),
   );
-}
-
-// ─── Widget Helper: Tombol Sosial ─────────────────────────────────────────────
-
-class _SocialButton extends StatelessWidget {
-  final VoidCallback? onTap;
-  final bool isLoading;
-  final Widget icon;
-  final String label;
-  final String tooltip;
-  final bool isDisabled;
-
-  const _SocialButton({
-    required this.onTap,
-    required this.isLoading,
-    required this.icon,
-    required this.label,
-    required this.tooltip,
-    this.isDisabled = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final effectiveColor = isDisabled
-        ? Theme.of(context).dividerColor.withOpacity(0.08)
-        : Theme.of(context).dividerColor.withOpacity(0.15);
-
-    return OutlinedButton(
-      style: OutlinedButton.styleFrom(
-        padding: EdgeInsets.symmetric(vertical: 14.h),
-        side: BorderSide(color: effectiveColor),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
-        backgroundColor: isDisabled ? Theme.of(context).dividerColor.withOpacity(0.03) : null,
-        foregroundColor: isDisabled ? Colors.grey : null,
-      ),
-      onPressed: onTap,
-      child: isLoading
-          ? SizedBox(
-              height: 20.h, width: 20.w,
-              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white70),
-            )
-          : Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                icon,
-                SizedBox(width: 8.w),
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14.sp,
-                    color: isDisabled ? Colors.grey : null,
-                  ),
-                ),
-              ],
-            ),
-    );
-  }
-}
-
-// ─── Widget: Google "G" Icon ──────────────────────────────────────────────────
-
-class _GoogleIcon extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 20.w,
-      height: 20.h,
-      alignment: Alignment.center,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // Lingkaran merah (representasi G)
-          CustomPaint(size: const Size(20, 20), painter: _GoogleGPainter()),
-        ],
-      ),
-    );
-  }
-}
-
-class _GoogleGPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.width / 2;
-
-    // Segmen warna Google
-    final colors = [
-      const Color(0xFF4285F4), // Biru
-      const Color(0xFF34A853), // Hijau
-      const Color(0xFFFBBC05), // Kuning
-      const Color(0xFFEA4335), // Merah
-    ];
-
-    for (int i = 0; i < 4; i++) {
-      final paint = Paint()..color = colors[i]..style = PaintingStyle.stroke..strokeWidth = 3;
-      canvas.drawArc(
-        Rect.fromCircle(center: center, radius: radius - 1.5),
-        (i * 90 - 45) * 3.14159 / 180,
-        90 * 3.14159 / 180,
-        false,
-        paint,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 // ─── Widget: Forgot Password Dialog (Premium) ─────────────────────────────────

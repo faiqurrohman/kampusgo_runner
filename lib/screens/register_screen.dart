@@ -26,7 +26,6 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
   bool acceptedTerms = false;
 
   bool isLoading = false;
-  bool isGoogleLoading = false;
   String? errorMessage;
 
   // Indikator Kekuatan Sandi secara Real-time
@@ -109,7 +108,6 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
   void _setError(String? msg) {
     setState(() {
       isLoading = false;
-      isGoogleLoading = false;
       errorMessage = msg;
     });
     if (msg != null) _shakeCtrl.forward(from: 0);
@@ -171,102 +169,6 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
     } catch (_) {
       _setError('Pendaftaran gagal. Silakan coba lagi.');
     }
-  }
-
-  // ─── Pendaftaran OAuth Google ─────────────────────────────────────────────
-  Future<void> _handleGoogleSignUp() async {
-    setState(() {
-      isGoogleLoading = true;
-      errorMessage = null;
-    });
-
-    try {
-      final account = await AuthService.instance.signInWithGoogle();
-      if (!mounted) return;
-      if (account != null) {
-        AppData.instance.updateProfile(
-          name: account.displayName ?? account.email.split('@').first,
-          email: account.email,
-        );
-        _showSnackBar('🔑 Akun Google berhasil terhubung: ${account.email}', Colors.teal);
-        await Future.delayed(const Duration(milliseconds: 400));
-        if (!mounted) return;
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const DashboardScreen()),
-        );
-      } else {
-        setState(() => isGoogleLoading = false);
-      }
-    } catch (e) {
-      _setError('Pendaftaran via Google gagal. Silakan coba metode manual.');
-    }
-  }
-
-  // ─── Pendaftaran SSO Kampus ───────────────────────────────────────────────
-  void _handleSsoSignUp() {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.r)),
-        title: Row(
-          children: [
-            Container(
-              padding: EdgeInsets.all(8.w),
-              decoration: BoxDecoration(
-                color: Colors.teal.withOpacity(0.15),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(Icons.domain_verification_rounded, color: Colors.teal),
-            ),
-            SizedBox(width: 12.w),
-            Text('Portal SSO Kampus', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
-          ],
-        ),
-        content: Text(
-          'Anda akan dialihkan ke halaman masuk identitas akademik terintegrasi. Sistem akan memverifikasi status kemahasiswaan Anda secara otomatis.',
-          style: TextStyle(fontSize: 13.sp, height: 1.5.h),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text('Batal', style: TextStyle(color: Colors.grey)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.teal,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-            ),
-            onPressed: () async {
-              Navigator.pop(ctx);
-              setState(() => isLoading = true);
-              await Future.delayed(const Duration(milliseconds: 1500));
-              if (!mounted) return;
-
-              // Simpan sesi SSO
-              await AuthService.instance.saveManualSession(
-                email: 'sso.student@kampusgo.id',
-                name: 'Mahasiswa Terverifikasi SSO',
-              );
-              AppData.instance.updateProfile(
-                name: 'Mahasiswa Terverifikasi SSO',
-                email: 'sso.student@kampusgo.id',
-              );
-              _showSnackBar('✅ Verifikasi Single Sign-On sukses.', Colors.teal);
-              await Future.delayed(const Duration(milliseconds: 400));
-              if (!mounted) return;
-
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => const DashboardScreen()),
-              );
-            },
-            child: Text('Lanjutkan Autentikasi', style: TextStyle(fontWeight: FontWeight.bold)),
-          ),
-        ],
-      ),
-    );
   }
 
   // ─── Dekorasi Kolom Input Custom ──────────────────────────────────────────
@@ -709,7 +611,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                             minimumSize: const Size.fromHeight(54),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
                           ),
-                          onPressed: (isLoading || isGoogleLoading) ? null : _handleRegister,
+                          onPressed: isLoading ? null : _handleRegister,
                           child: isLoading
                               ? SizedBox(
                                   height: 22.h,
@@ -727,56 +629,9 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
 
                   SizedBox(height: 32.h),
 
-                  // ─── Alternatif Pendaftaran (SSO/OAuth) ───
-                  Row(
-                    children: [
-                      Expanded(child: Divider(color: Theme.of(context).dividerColor.withOpacity(0.15))),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.w),
-                        child: Text(
-                          'ATAU DAFTAR DENGAN',
-                          style: TextStyle(
-                            fontSize: 11.sp,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.5),
-                            letterSpacing: 1.0,
-                          ),
-                        ),
-                      ),
-                      Expanded(child: Divider(color: Theme.of(context).dividerColor.withOpacity(0.15))),
-                    ],
-                  ),
-                  SizedBox(height: 20.h),
-
-                  Row(
-                    children: [
-                      // Tombol Google
-                      Expanded(
-                        child: _SocialButton(
-                          onTap: (isLoading || isGoogleLoading) ? null : _handleGoogleSignUp,
-                          isLoading: isGoogleLoading,
-                          icon: _GoogleIcon(),
-                          label: 'Google',
-                        ),
-                      ),
-                      SizedBox(width: 16.w),
-                      // Tombol SSO Kampus
-                      Expanded(
-                        child: _SocialButton(
-                          onTap: (isLoading || isGoogleLoading) ? null : _handleSsoSignUp,
-                          isLoading: false,
-                          icon: Icon(Icons.domain_verification_rounded, color: Colors.teal, size: 20),
-                          label: 'SSO Kampus',
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  SizedBox(height: 24.h),
-
                   // ─── Tautan Login ───
                   TextButton(
-                    onPressed: (isLoading || isGoogleLoading) ? null : () => Navigator.pop(context),
+                    onPressed: isLoading ? null : () => Navigator.pop(context),
                     style: TextButton.styleFrom(
                       padding: EdgeInsets.symmetric(vertical: 12.h),
                       foregroundColor: Theme.of(context).textTheme.bodyMedium?.color,
