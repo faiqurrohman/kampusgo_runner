@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 import 'screens/splash_screen.dart';
 import 'services/app_data.dart';
@@ -20,6 +22,14 @@ void main() async {
 
   await initializeDateFormatting('id_ID', null);
   await AppData.instance.init();
+  
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e) {
+    debugPrint("Firebase initialization failed (Have you run flutterfire configure?): $e");
+  }
 
   runApp(const KampusGoApp());
 }
