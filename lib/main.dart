@@ -7,6 +7,7 @@ import 'firebase_options.dart';
 
 import 'screens/splash_screen.dart';
 import 'services/app_data.dart';
+import 'services/notification_service.dart';
 import 'utils/app_theme.dart';
 
 void main() async {
@@ -22,6 +23,7 @@ void main() async {
 
   await initializeDateFormatting('id_ID', null);
   await AppData.instance.init();
+  await NotificationService().init();
   
   try {
     await Firebase.initializeApp(

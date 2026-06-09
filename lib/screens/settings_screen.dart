@@ -1008,6 +1008,40 @@ class _AccountSecurityScreen extends StatefulWidget {
 class _AccountSecurityScreenState extends State<_AccountSecurityScreen> {
   final oldPass = TextEditingController();
   final newPass = TextEditingController();
+  final confirmPass = TextEditingController();
+
+  bool _obscureOld = true;
+  bool _obscureNew = true;
+  bool _obscureConfirm = true;
+  bool _signOutAll = false;
+
+  String _passwordStrength = '';
+  Color _strengthColor = Colors.transparent;
+
+  void _checkPasswordStrength(String value) {
+    if (value.isEmpty) {
+      setState(() {
+        _passwordStrength = '';
+        _strengthColor = Colors.transparent;
+      });
+    } else if (value.length < 6) {
+      setState(() {
+        _passwordStrength = 'Lemah';
+        _strengthColor = Colors.redAccent;
+      });
+    } else if (value.length < 10 || !value.contains(RegExp(r'[0-9]')) || !value.contains(RegExp(r'[A-Z]'))) {
+      setState(() {
+        _passwordStrength = 'Sedang';
+        _strengthColor = Colors.orange;
+      });
+    } else {
+      setState(() {
+        _passwordStrength = 'Kuat';
+        _strengthColor = Colors.green;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -1019,16 +1053,74 @@ class _AccountSecurityScreenState extends State<_AccountSecurityScreen> {
           children: [
             Text('Ganti Kata Sandi', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp)),
             SizedBox(height: 12.h),
-            TextField(controller: oldPass, obscureText: true, decoration: InputDecoration(labelText: 'Kata Sandi Lama', border: OutlineInputBorder(borderRadius: BorderRadius.circular(16.r)))),
+            TextField(
+              controller: oldPass, 
+              obscureText: _obscureOld, 
+              decoration: InputDecoration(
+                labelText: 'Kata Sandi Lama', 
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16.r)),
+                suffixIcon: IconButton(
+                  icon: Icon(_obscureOld ? Icons.visibility_off_outlined : Icons.visibility_outlined),
+                  onPressed: () => setState(() => _obscureOld = !_obscureOld),
+                ),
+              ),
+            ),
             SizedBox(height: 16.h),
-            TextField(controller: newPass, obscureText: true, decoration: InputDecoration(labelText: 'Kata Sandi Baru', border: OutlineInputBorder(borderRadius: BorderRadius.circular(16.r)))),
+            TextField(
+              controller: newPass, 
+              obscureText: _obscureNew, 
+              onChanged: _checkPasswordStrength,
+              decoration: InputDecoration(
+                labelText: 'Kata Sandi Baru', 
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16.r)),
+                suffixIcon: IconButton(
+                  icon: Icon(_obscureNew ? Icons.visibility_off_outlined : Icons.visibility_outlined),
+                  onPressed: () => setState(() => _obscureNew = !_obscureNew),
+                ),
+              ),
+            ),
+            if (_passwordStrength.isNotEmpty)
+              Padding(
+                padding: EdgeInsets.only(top: 8.h, left: 12.w),
+                child: Text('Kekuatan sandi: $_passwordStrength', style: TextStyle(color: _strengthColor, fontSize: 12.sp, fontWeight: FontWeight.bold)),
+              ),
+            SizedBox(height: 16.h),
+            TextField(
+              controller: confirmPass, 
+              obscureText: _obscureConfirm, 
+              decoration: InputDecoration(
+                labelText: 'Konfirmasi Kata Sandi Baru', 
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16.r)),
+                suffixIcon: IconButton(
+                  icon: Icon(_obscureConfirm ? Icons.visibility_off_outlined : Icons.visibility_outlined),
+                  onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
+                ),
+              ),
+            ),
+            SizedBox(height: 12.h),
+            CheckboxListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text('Keluarkan akun saya dari perangkat lain', style: TextStyle(fontSize: 14.sp)),
+              value: _signOutAll,
+              activeColor: AppTheme.primary,
+              controlAffinity: ListTileControlAffinity.leading,
+              onChanged: (val) => setState(() => _signOutAll = val ?? false),
+            ),
             SizedBox(height: 20.h),
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primary, foregroundColor: Colors.white, padding: EdgeInsets.symmetric(vertical: 16.h), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r))),
               onPressed: () {
                 if (newPass.text.isNotEmpty) {
-                  oldPass.clear(); newPass.clear();
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Kata sandi berhasil diubah'), behavior: SnackBarBehavior.floating));
+                  if (newPass.text != confirmPass.text) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Kata sandi baru dan konfirmasi tidak cocok!'), backgroundColor: Colors.redAccent, behavior: SnackBarBehavior.floating));
+                    return;
+                  }
+                  oldPass.clear(); newPass.clear(); confirmPass.clear();
+                  setState(() {
+                    _passwordStrength = '';
+                    _signOutAll = false;
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Kata sandi berhasil diubah'), backgroundColor: Colors.teal, behavior: SnackBarBehavior.floating));
                 }
               },
               child: Text('Perbarui Kata Sandi', style: TextStyle(fontWeight: FontWeight.bold)),

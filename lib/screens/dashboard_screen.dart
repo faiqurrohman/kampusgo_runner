@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import '../services/app_data.dart';
 import '../services/auth_service.dart';
+import '../services/notification_service.dart';
 import '../utils/app_theme.dart';
 import '../utils/formatters.dart';
 import '../widgets/info_card.dart';
@@ -32,6 +33,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   void initState() {
     super.initState();
+    // Meminta izin notifikasi sistem secara otomatis saat dashboard pertama kali dimuat
+    NotificationService().requestPermission();
+    
     // Muat profil tersimpan dari sesi lokal ke dalam memori reaktif global AppData
     AuthService.instance.getSavedName().then((name) {
       if (name != null && name.isNotEmpty) AppData.instance.updateProfile(name: name);
